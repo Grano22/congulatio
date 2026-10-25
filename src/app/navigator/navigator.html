@@ -1,0 +1,103 @@
+<div class="nav" [style.width.px]="width()">
+  <!-- carved rail -->
+  <nav class="nav__rail" aria-label="Navigators">
+    @for (def of navigators; track def.id) {
+      <button
+        type="button"
+        class="nav__rail-btn"
+        [class.nav__rail-btn--open]="isOpen(def.id)"
+        [attr.aria-pressed]="isOpen(def.id)"
+        [attr.title]="def.label"
+        (click)="toggle(def.id)"
+      >
+        <app-lucide-icon [icon]="def.icon" iconClass="ic-20" [strokeWidth]="1.8" />
+      </button>
+    }
+    <span class="nav__rail-ornament" aria-hidden="true"></span>
+    <span class="gem nav__rail-gem" aria-hidden="true"></span>
+  </nav>
+
+  <!-- split view of the open panes, always in canonical order -->
+  <div class="nav__split" #split [class.nav__split--dragging]="dragging() !== -1">
+    @for (def of openDefs(); track def.id; let idx = $index) {
+      <div class="nav__pane" [style]="paneStyle(def)" animate.enter="nav-enter" animate.leave="nav-leave">
+        @switch (def.id) {
+          @case ('codex') {
+            <app-characters-galery closable (close)="closeNavigator('codex')" (focusCharacter)="focusCharacter.emit()" />
+          }
+          @case ('routines') {
+            <app-routines-almanac closable (close)="closeNavigator('routines')" />
+          }
+          @case ('attributes') {
+            <app-attribute-ledger closable (close)="closeNavigator('attributes')" />
+          }
+          @case ('dialogues') {
+            <app-navigator-page
+              title="Dialogue Threads"
+              subtitle="Trees of every tongue"
+              empty-text="No threads are spun yet. Choose a character and begin the loom."
+              closable
+              (close)="closeNavigator('dialogues')"
+            />
+          }
+          @case ('quests') {
+            <app-navigator-page
+              title="Quest Board"
+              subtitle="Tasks of the realm"
+              empty-text="The board hangs empty. No deeds are posted yet."
+              closable
+              (close)="closeNavigator('quests')"
+            />
+          }
+          @case ('world') {
+            <app-navigator-page
+              title="World Atlas"
+              subtitle="Lands &amp; realms"
+              empty-text="The map is yet uncharted. No lands have been inscribed."
+              closable
+              (close)="closeNavigator('world')"
+            />
+          }
+        }
+      </div>
+
+      @if (idx < openDefs().length - 1) {
+        <div
+          class="nav__divider"
+          role="separator"
+          aria-orientation="horizontal"
+          title="Drag to resize · double-click to fill the remaining space equally"
+          [class.nav__divider--dragging]="dragging() === idx"
+          animate.enter="nav-fade"
+          animate.leave="nav-leave"
+          (pointerdown)="beginPaneDrag(idx, $event)"
+          (pointermove)="onPaneDragMove($event)"
+          (pointerup)="endPaneDrag()"
+          (pointercancel)="endPaneDrag()"
+          (dblclick)="equalizePair(idx, split)"
+        >
+          <span class="nav__divider-grip" aria-hidden="true"></span>
+        </div>
+      }
+    }
+
+    @if (isEmpty()) {
+      <div class="nav__empty" animate.enter="nav-fade">
+        <app-lucide-icon [icon]="compassIcon" iconClass="ic-32" [strokeWidth]="1.6" />
+        <p class="nav__empty-text">Choose a rune from the rail to open its navigator…</p>
+      </div>
+    }
+  </div>
+
+  <!-- right-edge width handle -->
+  <div
+    class="nav__resizer"
+    role="separator"
+    aria-orientation="vertical"
+    title="Resize the sidebar"
+    (pointerdown)="beginWidthDrag($event)"
+    (pointermove)="onWidthDragMove($event)"
+    (pointerup)="endWidthDrag()"
+    (pointercancel)="endWidthDrag()"
+  ></div>
+</div>

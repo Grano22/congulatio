@@ -1,0 +1,55 @@
+{
+  "name": "congulatio",
+  "version": "0.0.1",
+  "description": "Aplikacja do tworzenia postaci np: NPC oraz drzewek dialogowych i interakcji do gry komputerowej typu RPG.",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:ci": "ng test --watch=false",
+    "build:pages": "ng build --base-href /congulatio/"
+  },
+  "private": true,
+  "packageManager": "npm@12.2.0",
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@fontsource/alegreya": "^5.3.0",
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/uncial-antiqua": "^5.3.0",
+    "@ngrx/signals": "^22.0.1",
+    "@primeuix/themes": "^3.0.1",
+    "lucide": "^1.59.0",
+    "primeng": "^22.1.2",
+    "rxjs": "~7.8.0",
+    "three": "^0.180.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.3",
+    "@angular/cli": "^22.2.3",
+    "@angular/compiler-cli": "^22.2.0",
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/three": "^0.180.0",
+    "jsdom": "^30.0.0",
+    "postcss": "^8.5.3",
+    "prettier": "^3.8.1",
+    "puppeteer-core": "^25.14.0",
+    "tailwindcss": "^4.1.12",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true,
+    "lmdb@3.5.6": true,
+    "msgpackr-extract@3.0.4": true
+  }
+}

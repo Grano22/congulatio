@@ -1,0 +1,197 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.forge {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1rem 1.2rem 1.4rem;
+  align-items: flex-start;
+}
+
+/* ---- portrait preview ---- */
+.forge__portrait {
+  width: 220px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.forge__frame {
+  position: relative;
+  height: 262px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 244, 214, 0.07), transparent 60%),
+    linear-gradient(180deg, var(--color-stone-700), var(--color-stone-900));
+  border: 5px solid var(--color-wood-700);
+  box-shadow:
+    inset 0 0 0 2px var(--color-gold-600),
+    inset 0 0 26px rgba(0, 0, 0, 0.65),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.forge__silhouette {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  width: 150px;
+  color: #7a6234;
+  opacity: 0.85;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+/* 8-bit portrait, summoned by the dice */
+.forge__avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  width: 132px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+.forge__frame-rune {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  font-family: var(--font-rune);
+  font-size: 1.1rem;
+  color: var(--color-gold-500);
+  opacity: 0.55;
+}
+
+/* nameplate under the frame */
+.forge__plate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.14) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.02) 5px 6px,
+      transparent 6px 13px
+    ),
+    linear-gradient(180deg, var(--color-wood-700), var(--color-wood-900));
+  border: 1px solid var(--color-wood-950);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.2),
+    0 2px 5px rgba(0, 0, 0, 0.4);
+}
+.forge__plate-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  color: var(--color-gold-200);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+.forge__plate-sub {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--color-parchment-300);
+}
+
+.forge__traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.forge__trait {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--color-ink-700);
+  background: linear-gradient(180deg, rgba(255, 250, 232, 0.85), rgba(222, 198, 146, 0.7));
+  border: 1px solid var(--color-wood-700);
+  border-radius: 999px;
+  padding: 0.18rem 0.6rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ---- form ---- */
+.forge__form {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.forge__section {
+  min-width: 0;
+}
+.forge__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-700);
+}
+.forge__section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-parchment-400), transparent);
+}
+.forge__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem 1.1rem;
+}
+.forge__grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1280px) {
+  .forge {
+    flex-direction: column;
+  }
+  .forge__portrait {
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .forge__frame {
+    height: 170px;
+    flex: 1;
+  }
+}
+
+.forge__notice {
+  margin: 0 auto 0 0;
+  min-width: 0;
+}
+.forge__notice-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-parchment-50);
+  border: 1px solid var(--color-wood-950);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  animation: forge-notice-in 180ms ease-out;
+}
+.forge__notice-text--success {
+  background: linear-gradient(180deg, var(--color-moss-500), var(--color-moss-600));
+}
+.forge__notice-text--error {
+  background: linear-gradient(180deg, var(--color-blood-500), var(--color-blood-600));
+}
+@keyframes forge-notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}

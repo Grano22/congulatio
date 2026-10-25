@@ -1,0 +1,180 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- subtab shelf (constrains the flexing RpgTabs host) ---- */
+.wb__tabs {
+  flex: none;
+  display: flex;
+  min-height: 0;
+}
+
+/* ---- content area (position anchor for the stage fade) ---- */
+.wb__content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.wb__pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================================
+   Story composer — the old SMS-RPG prompt: write, and the branch grows
+   ===================================================================== */
+.comp {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem 1.2rem;
+}
+
+/* where the writing cursor sits */
+.comp__context {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 7px;
+  background: linear-gradient(180deg, var(--color-stone-800), var(--color-stone-900));
+  border: 1px solid var(--color-stone-950);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 214, 0.05);
+}
+.comp__context-label {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+}
+.comp__context-node {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.comp__context-speaker {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-parchment-100);
+}
+.comp__context-text {
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--color-parchment-300);
+}
+.comp__context-node--muted {
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--color-parchment-400);
+}
+
+/* the terminal: candle-lit stone, sunken */
+.comp__screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  border: 1px solid var(--color-stone-950);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.4),
+    inset 0 0 46px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.comp__log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* newest entry rests just above the prompt */
+  gap: 0.35rem;
+  padding: 0.8rem 1rem;
+  overflow-y: auto;
+}
+.comp__log-line {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--color-parchment-200);
+}
+.comp__log-line--dim {
+  font-style: italic;
+  color: var(--color-parchment-400);
+}
+.comp__log-glyph {
+  margin-right: 0.45rem;
+  font-weight: 700;
+  color: var(--color-gold-400);
+}
+.comp__log-note {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-parchment-400);
+}
+
+.comp__promptline {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--color-stone-600);
+  background: rgba(0, 0, 0, 0.28);
+}
+.comp__prompt {
+  flex: none;
+  font-weight: 700;
+  color: var(--color-gold-400);
+}
+.comp__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-gold-200);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  caret-color: var(--color-gold-300);
+}
+.comp__input::placeholder {
+  font-style: italic;
+  color: var(--color-parchment-400);
+  opacity: 0.75;
+}
+
+.comp__hint {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-parchment-400);
+}
+

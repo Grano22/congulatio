@@ -1,0 +1,136 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.imp {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1rem 1.2rem 1.5rem;
+  color: var(--color-parchment-200);
+}
+
+.imp__head {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-wood-800);
+  background: linear-gradient(168deg, #f4e8c8, #dcc48f);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+.imp__speaker {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-500);
+}
+.imp__text {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--color-ink-900);
+}
+
+.imp__section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+.imp__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+}
+.imp__hint,
+.imp__empty {
+  margin: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-parchment-400);
+}
+.imp__empty {
+  padding: 1.4rem;
+}
+
+.imp__variants {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.imp__variant {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) 2rem;
+  gap: 0.45rem;
+  align-items: center;
+}
+.imp__tone--warm {
+  border-color: var(--color-moss-500);
+}
+.imp__tone--hostile {
+  border-color: var(--color-blood-500);
+}
+.imp__remove {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--color-blood-600);
+  background: rgba(110, 36, 24, 0.35);
+  color: var(--color-parchment-200);
+  cursor: pointer;
+}
+
+.imp__axes {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.imp__axis {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) 2.2rem;
+  gap: 0.6rem;
+  align-items: center;
+}
+.imp__interaction {
+  max-width: 18rem;
+}
+.imp__interaction .rpg-label,
+.imp__axis .rpg-label,
+.imp__interests .rpg-label {
+  color: var(--color-parchment-300);
+}
+.imp__range {
+  accent-color: var(--color-gold-500);
+}
+.imp__value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: right;
+}
+.imp__value--up {
+  color: var(--color-moss-400);
+}
+.imp__value--down {
+  color: var(--color-blood-400);
+}
+
+.imp__interests {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}

@@ -1,0 +1,174 @@
+<app-rpg-panel title="Interactions" subtitle="Bonds between souls, set in motion" [footer]="true">
+  <div class="acts">
+    <div class="acts__toolbar">
+      <div class="acts__kinds" role="group" aria-label="Filter by kind">
+        <button type="button" class="acts__filter" [class.acts__filter--on]="kindFilter() === 'all'" [attr.aria-pressed]="kindFilter() === 'all'" (click)="kindFilter.set('all')">All</button>
+        @for (kind of kinds; track kind) {
+          @if (kindCounts().get(kind); as count) {
+            <button
+              type="button"
+              class="acts__filter"
+              [class.acts__filter--on]="kindFilter() === kind"
+              [attr.aria-pressed]="kindFilter() === kind"
+              (click)="kindFilter.set(kindFilter() === kind ? 'all' : kind)"
+            >{{ kindInfo[kind].label }} <span class="acts__count">{{ count }}</span></button>
+          }
+        }
+      </div>
+      <input class="rpg-input acts__search" type="search" placeholder="Filter by soul, trigger or note…" aria-label="Filter interactions" [value]="query()" (input)="query.set($any($event.target).value)" />
+      <label class="acts__sort">
+        <span class="rpg-label">Sort</span>
+        <select class="rpg-select" [value]="sortBy()" (change)="sortBy.set($any($event.target).value)">
+          @for (s of sortOptions; track s.key) {
+            <option [value]="s.key">{{ s.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (draft(); as d) {
+      <form class="acts__editor" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New interaction' : 'Edit interaction'">
+        <h4 class="acts__editor-title">{{ editingId() === 'new' ? 'Inscribe a new interaction' : 'Edit interaction' }}</h4>
+        <div class="acts__grid">
+          <label class="field">
+            <span class="rpg-label">Kind</span>
+            <select class="rpg-select" [value]="d.kind" (change)="patch('kind', $any($event.target).value)">
+              @for (kind of kinds; track kind) {
+                <option [value]="kind">{{ kindInfo[kind].label }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            <span class="rpg-label">Source</span>
+            <select class="rpg-select" [value]="d.sourceId" (change)="patch('sourceId', $any($event.target).value)">
+              @for (p of parties(); track p.id) {
+                <option [value]="p.id">{{ p.label }}</option>
+              }
+            </select>
+          </label>
+          <button type="button" class="acts__swap" aria-label="Swap source and target" title="Swap source and target" (click)="swapParties()">⇄</button>
+          <label class="field">
+            <span class="rpg-label">Target</span>
+            <select class="rpg-select" [value]="d.targetId" (change)="patch('targetId', $any($event.target).value)">
+              @for (p of parties(); track p.id) {
+                <option [value]="p.id">{{ p.label }}</option>
+              }
+            </select>
+          </label>
+          <div class="field">
+            <span class="rpg-label">Trigger</span>
+            <app-suggest-input
+              [suggestions]="triggerSuggestions()"
+              [value]="d.trigger"
+              (valueChange)="patch('trigger', $event)"
+              placeholder="When does it happen?"
+              label="Trigger"
+            />
+          </div>
+          <label class="field acts__wide">
+            <span class="rpg-label">Opens dialogue</span>
+            <select class="rpg-select" [value]="d.dialogueId ?? ''" (change)="patch('dialogueId', $any($event.target).value || null)">
+              <option value="">No dialogue</option>
+              @for (g of dialogueGroups(); track g.title) {
+                <optgroup [label]="g.title">
+                  @for (o of g.options; track o.id) {
+                    <option [value]="o.id">{{ o.label }}</option>
+                  }
+                </optgroup>
+              }
+            </select>
+          </label>
+          <label class="field acts__wide">
+            <span class="rpg-label">Note</span>
+            <input class="rpg-input" [value]="d.note" placeholder="What the designer should remember…" (input)="patch('note', $any($event.target).value)" />
+          </label>
+        </div>
+        @if (error()) {
+          <p class="acts__error" role="alert">{{ error() }}</p>
+        }
+        <div class="acts__editor-actions">
+          <app-rpg-button variant="wood" size="sm" (click)="cancel()">Cancel</app-rpg-button>
+          <app-rpg-button variant="gold" size="sm" (click)="save()">{{ editingId() === 'new' ? 'Inscribe' : 'Save changes' }}</app-rpg-button>
+        </div>
+      </form>
+    }
+
+    <div class="acts__head" aria-hidden="true">
+      <span>Kind</span>
+      <span></span>
+      <span>Source → Target</span>
+      <span class="acts__col--trigger">Trigger</span>
+      <span></span>
+    </div>
+
+    <ul class="acts__list" aria-label="Interactions">
+      @for (row of rows(); track row.act.id) {
+        <li
+          class="acts__row"
+          [class.acts__row--focused]="focusedId() === row.act.id"
+          [class.acts__row--broken]="row.broken"
+          tabindex="0"
+          (click)="select(row.act)"
+          (keydown.enter)="select(row.act)"
+        >
+          <span class="acts__chip" [class]="'acts__chip acts__chip--' + kindInfo[row.act.kind].tone">
+            <app-lucide-icon [icon]="kindIcon[row.act.kind]" iconClass="ic-18" [strokeWidth]="1.8" />
+          </span>
+          <span class="acts__kind">{{ kindInfo[row.act.kind].label }}</span>
+          <span class="acts__main">
+            <span class="acts__names">
+              <b class="acts__party">{{ row.source }}</b>
+              <app-lucide-icon [icon]="arrowRightIcon" iconClass="acts__arrow" [strokeWidth]="2.2" />
+              <b class="acts__party">{{ row.target }}</b>
+            </span>
+            @if (row.dialogue || row.act.note) {
+              <span class="acts__sub">{{ row.dialogue ? '“' + clip(row.dialogue.text, 44) + '”' : row.act.note }}</span>
+            }
+          </span>
+          <span class="acts__trigger" [title]="row.act.trigger">{{ row.act.trigger }}</span>
+          <span class="acts__actions">
+            @if (row.dialogue) {
+              <button type="button" class="acts__mini" aria-label="Open linked dialogue" title="Open linked dialogue" (click)="$event.stopPropagation(); openDialogue(row.act)">
+                <app-lucide-icon [icon]="dialogueIcon" iconClass="ic-13" [strokeWidth]="2" />
+              </button>
+            }
+            <button type="button" class="acts__mini" aria-label="Edit interaction" (click)="$event.stopPropagation(); edit(row.act)">
+              <app-lucide-icon [icon]="pencilIcon" iconClass="ic-13" [strokeWidth]="2" />
+            </button>
+            <button
+              type="button"
+              class="acts__mini acts__mini--danger"
+              [class.acts__mini--confirm]="confirmRemoveId() === row.act.id"
+              [attr.aria-label]="confirmRemoveId() === row.act.id ? 'Click again to remove' : 'Remove interaction'"
+              [title]="confirmRemoveId() === row.act.id ? 'Click again to remove' : 'Remove interaction'"
+              (click)="$event.stopPropagation(); remove(row.act)"
+            >
+              @if (confirmRemoveId() === row.act.id) {
+                ?
+              } @else {
+                <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+              }
+            </button>
+          </span>
+        </li>
+      } @empty {
+        <li class="acts__empty">
+          {{ query() || kindFilter() !== 'all' ? 'No interaction matches this filter.' : 'No bonds are inscribed yet. Inscribe the first one below.' }}
+        </li>
+      }
+    </ul>
+  </div>
+
+  <p footer class="acts__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="acts__notice-text" [class]="'acts__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    }
+  </p>
+  <app-rpg-button footer variant="gold" size="sm" [disabled]="editingId() !== null" (click)="openNew()">
+    <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+    Inscribe New Interaction
+  </app-rpg-button>
+</app-rpg-panel>

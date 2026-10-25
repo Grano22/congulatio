@@ -1,0 +1,98 @@
+<section class="sai" aria-label="Story AI">
+  <header class="sai__head">
+    <app-lucide-icon [icon]="sparkIcon" iconClass="ic-14 sai__spark" [strokeWidth]="2" />
+    <span class="sai__title">Story AI</span>
+    <span class="sai__by">Chrome built-in, on this device</span>
+    @switch (ai.availability()) {
+      @case ('available') {
+        <span class="sai__status sai__status--ok">Ready</span>
+      }
+      @case ('downloadable') {
+        <app-rpg-button variant="wood" size="sm" [disabled]="ai.busy()" (click)="download()">Download model</app-rpg-button>
+      }
+      @case ('downloading') {
+        <span class="sai__status sai__status--wait">Downloading{{ ai.downloadProgress() !== null ? ' ' + ai.downloadProgress() + '%' : '…' }}</span>
+      }
+      @case ('unavailable') {
+        <span class="sai__status sai__status--off">Not available on this device</span>
+      }
+      @default {
+        <span class="sai__status sai__status--off">Not supported in this browser</span>
+      }
+    }
+  </header>
+
+  @if (!usable()) {
+    <p class="sai__note">
+      Story AI uses Chrome’s on-device Prompt API (desktop Chrome with about 22 GB free and a capable GPU or 16 GB RAM).
+      You can still write every line by hand below.
+    </p>
+  } @else {
+    <div class="sai__modes" role="tablist" aria-label="Story AI mode">
+      <button type="button" role="tab" class="sai__mode" [class.sai__mode--on]="mode() === 'next'" [attr.aria-selected]="mode() === 'next'" (click)="mode.set('next')">Next steps</button>
+      <button type="button" role="tab" class="sai__mode" [class.sai__mode--on]="mode() === 'scene'" [attr.aria-selected]="mode() === 'scene'" (click)="mode.set('scene')">New scene</button>
+    </div>
+
+    <div class="sai__row">
+      @if (mode() === 'next') {
+        <input class="rpg-input sai__grow" placeholder="Direction (optional): make it tense, hint at the crypt…" aria-label="Direction for the next steps" [value]="hint()" (input)="hint.set($any($event.target).value)" />
+      } @else {
+        <select class="rpg-select sai__soul" aria-label="Soul the player meets" [value]="sceneSoulId()" (change)="sceneSoulId.set($any($event.target).value)">
+          <option value="">Choose a soul…</option>
+          @for (c of souls(); track c.id) {
+            <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+          }
+        </select>
+        <input class="rpg-input sai__grow" placeholder="Topic: a lost ring, a debt to settle…" aria-label="Scene topic" [value]="topic()" (input)="topic.set($any($event.target).value)" />
+      }
+      <select class="rpg-select sai__count" aria-label="Number of options" [value]="count()" (change)="count.set(+$any($event.target).value)">
+        @for (n of counts; track n) {
+          <option [value]="n">{{ n }} options</option>
+        }
+      </select>
+      @if (ai.busy()) {
+        <app-rpg-button variant="danger" size="sm" (click)="ai.cancel()">
+          <app-lucide-icon [icon]="stopIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+          Stop
+        </app-rpg-button>
+      } @else {
+        <app-rpg-button variant="gold" size="sm" (click)="mode() === 'next' ? suggest() : writeScene()">
+          <app-lucide-icon [icon]="sparkIcon" iconClass="ic-14" [strokeWidth]="2" />
+          {{ mode() === 'next' ? 'Suggest from cursor' : 'Write scene' }}
+        </app-rpg-button>
+      }
+      <app-rpg-button variant="wood" size="sm" [disabled]="ai.busy() || !draftText().trim()" (click)="polish()" title="Rewrite the line in the composer in the speaker's voice">
+        <app-lucide-icon [icon]="wandIcon" iconClass="ic-14" [strokeWidth]="2" />
+        Polish my line
+      </app-rpg-button>
+    </div>
+
+    @if (ai.busy()) {
+      <p class="sai__busy" role="status">The model is writing…</p>
+    }
+  }
+
+  @if (error()) {
+    <p class="sai__error" role="alert">{{ error() }}</p>
+  }
+
+  @if (drafts().length) {
+    <div class="sai__preview">
+      <p class="sai__preview-head">Drafts — edit, uncheck what you do not want, then add them to the tome.</p>
+      <ul class="sai__drafts">
+        @for (row of draftRows(); track row.draft.key) {
+          <li class="sai__draft" [style.--level]="row.level" [class.sai__draft--off]="!row.draft.include">
+            <input type="checkbox" [checked]="row.draft.include" [attr.aria-label]="'Keep: ' + row.draft.text" (change)="toggle(row.draft.key)" />
+            <span class="sai__kind" [class.sai__kind--choice]="row.draft.kind === 'choice'">{{ row.draft.kind === 'choice' ? 'Option' : row.draft.speaker }}</span>
+            <input class="rpg-input sai__text" [value]="row.draft.text" [attr.aria-label]="'Draft text by ' + row.draft.speaker" (input)="edit(row.draft.key, $any($event.target).value)" />
+          </li>
+        }
+      </ul>
+      <div class="sai__preview-actions">
+        <app-rpg-button variant="wood" size="sm" (click)="discard()">Discard</app-rpg-button>
+        <app-rpg-button variant="wood" size="sm" [disabled]="ai.busy()" (click)="regenerate()">Try again</app-rpg-button>
+        <app-rpg-button variant="gold" size="sm" [disabled]="!keptCount()" (click)="addToTome()">Add {{ keptCount() }} to tome</app-rpg-button>
+      </div>
+    </div>
+  }
+</section>

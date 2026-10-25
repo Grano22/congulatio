@@ -1,0 +1,87 @@
+<app-rpg-modal title="Remove dialogue step" width="38rem" [open]="shell.dialog() === 'remove-dialogue'" (closed)="close()">
+  @if (target(); as t) {
+    <div class="rd__target">
+      <span class="rd__speaker">{{ t.speaker }} · {{ t.kind === 'choice' ? 'Option' : 'Line' }}</span>
+      <p class="rd__text">{{ t.text }}</p>
+    </div>
+
+    @if (branches().length) {
+      <p class="rd__lead">
+        This step leads on to more dialogue. Checked steps are removed with it; unchecked steps are kept, and any kept step
+        whose parent is removed becomes a standalone scene.
+      </p>
+      <div class="rd__quick">
+        <button type="button" class="rd__quick-btn" (click)="selectAll(true)">Remove the whole branch</button>
+        <button type="button" class="rd__quick-btn" (click)="selectAll(false)">Remove only this step</button>
+      </div>
+
+      <ul class="rd__branches">
+        @for (b of branches(); track b.head.node.id) {
+          @let state = branchState(b);
+          <li class="rd__branch" [class.rd__branch--kept]="state === 'none'">
+            <div class="rd__branch-head">
+              <input
+                type="checkbox"
+                [checked]="state === 'all'"
+                [indeterminate]="state === 'some'"
+                [attr.aria-label]="'Remove branch: ' + b.head.node.text"
+                (change)="toggleBranch(b)"
+              />
+              <button
+                type="button"
+                class="rd__expand"
+                [attr.aria-expanded]="expanded().has(b.head.node.id)"
+                [disabled]="!b.rows.length"
+                (click)="toggleExpanded(b)"
+              >
+                <span class="rd__chevron" aria-hidden="true">{{ b.rows.length ? (expanded().has(b.head.node.id) ? '▾' : '▸') : '·' }}</span>
+                <span class="rd__who">{{ b.head.node.kind === 'choice' ? 'Option' : b.head.node.speaker }}</span>
+                <span class="rd__line">{{ b.head.node.text }}</span>
+                <span class="rd__count">{{ b.ids.length }} step{{ b.ids.length === 1 ? '' : 's' }}</span>
+              </button>
+            </div>
+            @if (expanded().has(b.head.node.id) && b.rows.length) {
+              <ul class="rd__rows">
+                @for (r of b.rows; track r.node.id) {
+                  <li class="rd__row" [style.--depth]="r.depth - 1">
+                    <label>
+                      <input type="checkbox" [checked]="isChecked(r.node.id)" (change)="toggle(r.node.id)" />
+                      <span class="rd__who">{{ r.node.kind === 'choice' ? 'Option' : r.node.speaker }}</span>
+                      <span class="rd__line">{{ r.node.text }}</span>
+                    </label>
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    }
+
+    @if (plan(); as p) {
+      <ul class="rd__summary" aria-live="polite">
+        <li><b>{{ p.removed.size }}</b> step{{ p.removed.size === 1 ? '' : 's' }} removed</li>
+        @if (p.detached.length) {
+          <li><b>{{ p.detached.length }}</b> kept step{{ p.detached.length === 1 ? '' : 's' }} become standalone scenes</li>
+        }
+        @for (f of p.forksCut; track f.forkId) {
+          <li class="rd__warn">Routine fork cut: {{ f.label }}</li>
+        }
+        @if (p.interactionsUnlinked.length) {
+          <li class="rd__warn">{{ p.interactionsUnlinked.length }} interaction{{ p.interactionsUnlinked.length === 1 ? '' : 's' }} will no longer open dialogue</li>
+        }
+      </ul>
+    }
+  } @else {
+    <p>This step no longer exists.</p>
+  }
+
+  <ng-container modalFooter>
+    <app-rpg-button variant="wood" size="sm" (click)="close()">Keep it</app-rpg-button>
+    @if (target()) {
+      <app-rpg-button variant="danger" size="sm" (click)="confirm()">
+        Remove {{ plan()?.removed?.size ?? 1 }} step{{ (plan()?.removed?.size ?? 1) === 1 ? '' : 's' }}
+      </app-rpg-button>
+    }
+  </ng-container>
+</app-rpg-modal>

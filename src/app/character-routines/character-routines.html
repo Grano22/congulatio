@@ -1,0 +1,181 @@
+<app-rpg-panel title="Routines" [subtitle]="soul() ? soul()!.firstName + '’s day' : 'A soul’s day'" [footer]="true">
+  <div class="cr">
+    <div class="cr__top">
+      <label class="cr__soul">
+        <span class="rpg-label">Soul</span>
+        <select class="rpg-select" [value]="soulId()" (change)="pickSoul($any($event.target).value)">
+          @for (c of souls(); track c.id) {
+            <option [value]="c.id">{{ c.firstName }} {{ c.lastName }} · {{ c.race }}</option>
+          }
+        </select>
+      </label>
+      @if (soul(); as s) {
+        <p class="cr__summary">{{ s.temperament }} {{ s.race.toLowerCase() }} of {{ s.origin }}</p>
+      }
+    </div>
+
+    @if (!soul()) {
+      <p class="cr__empty">The codex is empty. Forge a soul first.</p>
+    } @else {
+      <div class="cr__body">
+        <div class="cr__day">
+          @if (draft(); as d) {
+            <form class="cr__form" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New personal routine' : 'Edit routine'">
+              <h4 class="cr__form-title">{{ editingId() === 'new' ? 'New personal routine' : 'Edit ' + (d.scope === 'personal' ? 'personal' : 'global') + ' routine' }}</h4>
+              @if (d.scope !== 'personal') {
+                <p class="cr__shared">This routine is shared. Changes apply to every soul that keeps it.</p>
+              }
+              <div class="cr__grid">
+                <label class="field cr__wide">
+                  <span class="rpg-label">Name</span>
+                  <input class="rpg-input" [value]="d.name" placeholder="Morning prayer, sword drills…" (input)="patch('name', $any($event.target).value)" />
+                </label>
+                <label class="field">
+                  <span class="rpg-label">Time of day</span>
+                  <select class="rpg-select" [value]="d.slot" (change)="patch('slot', $any($event.target).value)">
+                    @for (s of slots; track s.key) {
+                      <option [value]="s.key">{{ s.label }} ({{ s.hours }})</option>
+                    }
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="rpg-label">When</span>
+                  <input class="rpg-input" [value]="d.schedule" placeholder="Every day, on rest days…" (input)="patch('schedule', $any($event.target).value)" />
+                </label>
+                <label class="field">
+                  <span class="rpg-label">Where</span>
+                  <input class="rpg-input" [value]="d.location ?? ''" placeholder="The chapel…" (input)="patch('location', $any($event.target).value)" />
+                </label>
+                <label class="field">
+                  <span class="rpg-label">Note</span>
+                  <input class="rpg-input" [value]="d.note ?? ''" placeholder="Why they do it…" (input)="patch('note', $any($event.target).value)" />
+                </label>
+              </div>
+
+              <div class="cr__forks">
+                <span class="rpg-label">Forks into dialogue</span>
+                @for (f of d.forks; track f.id) {
+                  <div class="cr__fork">
+                    <input class="rpg-input" [value]="f.label" placeholder="What happens" aria-label="Fork label" (input)="patchFork(f.id, { label: $any($event.target).value })" />
+                    <select class="rpg-select" [value]="f.dialogueId" aria-label="Dialogue step" (change)="patchFork(f.id, { dialogueId: $any($event.target).value })">
+                      <option value="">Choose a step…</option>
+                      @for (g of dialogueGroups(); track g.title) {
+                        <optgroup [label]="g.title">
+                          @for (o of g.options; track o.id) {
+                            <option [value]="o.id">{{ o.label }}</option>
+                          }
+                        </optgroup>
+                      }
+                    </select>
+                    <button type="button" class="cr__mini cr__mini--danger" aria-label="Remove fork" (click)="removeFork(f.id)">×</button>
+                  </div>
+                } @empty {
+                  <p class="cr__hint">No forks yet. A fork is a moment in the routine that opens a dialogue.</p>
+                }
+                <app-rpg-button variant="wood" size="sm" (click)="addFork()">
+                  <app-lucide-icon [icon]="plusIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+                  Add fork
+                </app-rpg-button>
+              </div>
+
+              @if (error()) {
+                <p class="cr__error" role="alert">{{ error() }}</p>
+              }
+              <div class="cr__form-actions">
+                <app-rpg-button variant="wood" size="sm" (click)="cancel()">Cancel</app-rpg-button>
+                <app-rpg-button variant="gold" size="sm" (click)="save()">{{ editingId() === 'new' ? 'Add to the day' : 'Save' }}</app-rpg-button>
+              </div>
+            </form>
+          }
+
+          <ol class="cr__slots" aria-label="Day planner">
+            @for (row of day(); track row.slot.key) {
+              <li class="cr__slot" [class.cr__slot--clash]="row.clash">
+                <div class="cr__slot-head">
+                  <span class="cr__slot-name">{{ row.slot.label }}</span>
+                  <span class="cr__slot-hours">{{ row.slot.hours }}</span>
+                  @if (row.clash) {
+                    <span class="cr__clash" title="Two routines at the same time">Clash</span>
+                  }
+                </div>
+                <div class="cr__cards">
+                  @for (r of row.routines; track r.id) {
+                    <article
+                      class="cr__card"
+                      [class.cr__card--personal]="scopeOf(r) === 'personal'"
+                      [class.cr__card--focused]="focusedRoutineId() === r.id"
+                      tabindex="0"
+                      (click)="select(r)"
+                      (keydown.enter)="select(r)"
+                    >
+                      <div class="cr__card-head">
+                        <span class="cr__scope">{{ scopeOf(r) === 'personal' ? 'Personal' : 'Global' }}</span>
+                        <span class="cr__card-name">{{ r.name }}</span>
+                      </div>
+                      <p class="cr__card-meta">{{ r.schedule }}{{ r.location ? ' · ' + r.location : '' }}</p>
+                      @for (f of r.forks; track f.id) {
+                        <p class="cr__card-fork">↳ {{ f.label }}: “{{ forkTarget(f) }}”</p>
+                      }
+                      <div class="cr__card-tools">
+                        <button type="button" class="cr__mini" aria-label="Edit routine" (click)="$event.stopPropagation(); edit(r)">
+                          <app-lucide-icon [icon]="pencilIcon" iconClass="ic-13" [strokeWidth]="2" />
+                        </button>
+                        @if (scopeOf(r) === 'personal') {
+                          <button
+                            type="button"
+                            class="cr__mini cr__mini--danger"
+                            [attr.aria-label]="confirmId() === r.id ? 'Click again to delete' : 'Delete routine'"
+                            [title]="confirmId() === r.id ? 'Click again to delete' : 'Delete routine'"
+                            (click)="$event.stopPropagation(); remove(r)"
+                          >{{ confirmId() === r.id ? '?' : '×' }}</button>
+                        } @else {
+                          <button type="button" class="cr__mini" aria-label="Leave this routine" title="Leave this routine" (click)="$event.stopPropagation(); leave(r)">
+                            <app-lucide-icon [icon]="leaveIcon" iconClass="ic-13" [strokeWidth]="2" />
+                          </button>
+                        }
+                      </div>
+                    </article>
+                  }
+                  <button type="button" class="cr__add" [disabled]="editingId() !== null" [attr.aria-label]="'Add a personal routine at ' + row.slot.label" (click)="openNew(row.slot.key)">+</button>
+                </div>
+              </li>
+            }
+          </ol>
+        </div>
+
+        <aside class="cr__join" aria-label="Join a global routine">
+          <h4 class="cr__join-title">Join a global routine</h4>
+          <ul class="cr__join-list">
+            @for (j of joinable(); track j.routine.id) {
+              <li class="cr__join-item">
+                <span class="cr__join-info">
+                  <span class="cr__join-name">{{ j.routine.name }}</span>
+                  <span class="cr__join-meta">{{ j.slot.label }} · {{ j.routine.schedule }}</span>
+                  @if (j.busy) {
+                    <span class="cr__join-warn">Already busy at {{ j.slot.label.toLowerCase() }}</span>
+                  }
+                </span>
+                <app-rpg-button variant="wood" size="sm" (click)="join(j.routine)">Join</app-rpg-button>
+              </li>
+            } @empty {
+              <li class="cr__hint">Keeps every global routine, or none exist. Add some in the Routine Almanac.</li>
+            }
+          </ul>
+        </aside>
+      </div>
+    }
+  </div>
+
+  <p footer class="cr__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="cr__notice-text" [class]="'cr__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    }
+  </p>
+  <app-rpg-button footer variant="gold" size="sm" [disabled]="!soul() || editingId() !== null" (click)="openNew()">
+    <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+    New Personal Routine
+  </app-rpg-button>
+</app-rpg-panel>

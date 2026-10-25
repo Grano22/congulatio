@@ -1,0 +1,365 @@
+<app-rpg-panel title="Inspector" [subtitle]="subtitle()" [footer]="true">
+  <button
+    headerActions
+    type="button"
+    class="insp__lock"
+    [class.insp__lock--on]="readonly()"
+    [attr.aria-pressed]="readonly()"
+    [attr.aria-label]="readonly() ? 'Read-only on. Click to allow editing' : 'Switch to read-only'"
+    [title]="readonly() ? 'Read-only: click to allow editing' : 'Switch to read-only'"
+    (click)="toggleReadonly()"
+  >
+    <app-lucide-icon [icon]="readonly() ? lockIcon : unlockIcon" iconClass="ic-14" [strokeWidth]="2" />
+  </button>
+  <div class="insp" [class.insp--readonly]="readonly()">
+    @if (soul(); as c) {
+      <div class="insp__subject">
+        <span class="insp__portrait">
+          <app-pixel-avatar [face]="c.face" [image]="c.portrait" [label]="c.firstName + ' portrait'" />
+        </span>
+        <div class="insp__subject-text">
+          <span class="insp__name">{{ c.firstName }} {{ c.lastName }} {{ c.nickname }}</span>
+          <span class="insp__sub">{{ c.race }} · {{ c.origin }}</span>
+        </div>
+      </div>
+
+      <div class="ornament" aria-hidden="true"></div>
+
+      <section class="insp__section">
+        <h4 class="insp__section-title">Properties</h4>
+        <div class="insp__fields">
+          <label class="insp__field">
+            <span class="insp__key">Level</span>
+            <input
+              [disabled]="readonly()" class="rpg-input insp__num"
+              type="number"
+              [min]="levelMin"
+              [max]="levelMax"
+              [value]="c.level"
+              (change)="setLevel($any($event.target).value)"
+            />
+          </label>
+          <label class="insp__field">
+            <span class="insp__key">Status</span>
+            <select [disabled]="readonly()" class="rpg-select" [value]="c.status" (change)="setSoulField('status', $any($event.target).value)">
+              @for (s of statuses; track s.key) {
+                <option [value]="s.key">{{ s.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="insp__field">
+            <span class="insp__key">Temperament</span>
+            <select [disabled]="readonly()" class="rpg-select" [value]="c.temperament" (change)="setSoulField('temperament', $any($event.target).value)">
+              @for (t of temperaments; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </label>
+          <label class="insp__field">
+            <span class="insp__key">Origin</span>
+            <input [disabled]="readonly()" class="rpg-input" [value]="c.origin" (change)="setSoulField('origin', $any($event.target).value)" />
+          </label>
+        </div>
+      </section>
+
+      @if (attributeRows().length) {
+        <section class="insp__section">
+          <h4 class="insp__section-title">Attributes</h4>
+          <p class="insp__tip">Click a number to copy it, double-click to type a value.</p>
+          <ul class="insp__stats">
+            @for (row of attributeRows(); track row.id) {
+              <li class="insp__stat" [class.insp__stat--custom]="row.custom">
+                <span class="insp__stat-name" [title]="row.name + ' (' + row.min + ' to ' + row.max + ')'">{{ row.key }}</span>
+                <span class="insp__stat-bar" aria-hidden="true"><span [style.width.%]="((row.value - row.min) / (row.max - row.min)) * 100"></span></span>
+                <input
+                  class="insp__stat-range"
+                  type="range"
+                  [min]="row.min"
+                  [max]="row.max"
+                  [value]="row.value"
+                  [attr.aria-label]="row.name"
+                  (change)="setAttributeValue(row, +$any($event.target).value)"
+                />
+                @if (editingAttrId() === row.id) {
+                  <input
+                    [disabled]="readonly()" class="rpg-input insp__stat-edit"
+                    data-attr-edit
+                    inputmode="numeric"
+                    [attr.aria-label]="'Exact value for ' + row.name"
+                    [value]="row.value"
+                    (keydown.enter)="commitAttributeEdit(row, $any($event.target).value)"
+                    (keydown.escape)="editingAttrId.set(null)"
+                    (blur)="commitAttributeEdit(row, $any($event.target).value)"
+                  />
+                } @else {
+                  <button
+                    type="button"
+                    class="insp__stat-value"
+                    [class.insp__stat-value--copied]="copiedAttrId() === row.id"
+                    [attr.aria-label]="row.name + ' ' + row.value + '. Click to copy, double-click to edit.'"
+                    (click)="onValueClick(row)"
+                    (dblclick)="onValueDblClick(row)"
+                  >{{ copiedAttrId() === row.id ? 'Copied' : row.value }}</button>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (soulLinks(); as links) {
+        <section class="insp__section">
+          <h4 class="insp__section-title">Relations</h4>
+          <ul class="insp__links">
+            @for (link of links.relations; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)">
+                  <span class="insp__tag" [class]="'insp__tag insp__tag--' + link.tone">{{ link.tag }}</span>
+                  {{ link.label }}
+                </button>
+              </li>
+            } @empty {
+              <li class="insp__none">No bonds yet. Bind one on the Relations map.</li>
+            }
+          </ul>
+        </section>
+        <section class="insp__section">
+          <h4 class="insp__section-title">Routines</h4>
+          <ul class="insp__links">
+            @for (link of links.routines; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)">
+                  {{ link.label }}<span class="insp__muted">{{ link.tag }}</span>
+                </button>
+              </li>
+            } @empty {
+              <li class="insp__none">Keeps no routine.</li>
+            }
+          </ul>
+        </section>
+        <section class="insp__section">
+          <h4 class="insp__section-title">Interactions</h4>
+          <ul class="insp__links">
+            @for (link of links.acts; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button>
+              </li>
+            } @empty {
+              <li class="insp__none">Takes part in no interaction.</li>
+            }
+          </ul>
+        </section>
+        <section class="insp__section">
+          <h4 class="insp__section-title">Scenes</h4>
+          <ul class="insp__links">
+            @for (link of links.scenes; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)">
+                  <span class="insp__tag">{{ link.tag }}</span>{{ link.label }}
+                </button>
+              </li>
+            } @empty {
+              <li class="insp__none">Takes part in no dialogue yet.</li>
+            }
+          </ul>
+        </section>
+      }
+    } @else if (routine(); as r) {
+      <section class="insp__section insp__section--top">
+        <h4 class="insp__section-title">Routine</h4>
+        <div class="insp__fields">
+          <label class="insp__field insp__field--wide">
+            <span class="insp__key">Name</span>
+            <input [disabled]="readonly()" class="rpg-input" [value]="r.name" (change)="setRoutineField('name', $any($event.target).value)" />
+          </label>
+          <label class="insp__field insp__field--wide">
+            <span class="insp__key">Schedule</span>
+            <input [disabled]="readonly()" class="rpg-input" [value]="r.schedule" (change)="setRoutineField('schedule', $any($event.target).value)" />
+          </label>
+          <label class="insp__field">
+            <span class="insp__key">Time of day</span>
+            <select [disabled]="readonly()" class="rpg-select" [value]="slotOf(r)" (change)="setRoutineField('slot', $any($event.target).value)">
+              @for (t of timeSlots; track t.key) {
+                <option [value]="t.key">{{ t.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="insp__field">
+            <span class="insp__key">Scope</span>
+            <input [disabled]="readonly()" class="rpg-input" [value]="scopeOf(r) === 'personal' ? 'Personal' : 'Global'" readonly />
+          </label>
+          <label class="insp__field insp__field--wide">
+            <span class="insp__key">Where</span>
+            <input [disabled]="readonly()" class="rpg-input" [value]="r.location ?? ''" (change)="setRoutineField('location', $any($event.target).value)" />
+          </label>
+          <label class="insp__field insp__field--wide">
+            <span class="insp__key">Note</span>
+            <textarea [disabled]="readonly()" class="rpg-textarea" rows="2" [value]="r.note ?? ''" (change)="setRoutineField('note', $any($event.target).value)"></textarea>
+          </label>
+        </div>
+      </section>
+      @if (routineLinks(); as links) {
+        <section class="insp__section">
+          <h4 class="insp__section-title">Kept by</h4>
+          <ul class="insp__links">
+            @for (link of links.participants; track link.focus.id) {
+              <li><button type="button" class="insp__link" (click)="follow(link)">{{ link.label }}</button></li>
+            } @empty {
+              <li class="insp__none">No soul keeps it.</li>
+            }
+          </ul>
+        </section>
+        <section class="insp__section">
+          <h4 class="insp__section-title">Forks</h4>
+          <ul class="insp__links">
+            @for (link of links.forks; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)">
+                  <span class="insp__tag">{{ link.tag }}</span>{{ link.label }}
+                </button>
+              </li>
+            } @empty {
+              <li class="insp__none">It forks into no dialogue.</li>
+            }
+          </ul>
+        </section>
+      }
+    } @else if (interactionDetail(); as d) {
+      <section class="insp__section insp__section--top">
+        <h4 class="insp__section-title">{{ d.kind }}</h4>
+        <p class="insp__summary">{{ d.sourceName }} → {{ d.targetName }}</p>
+        <p class="insp__summary insp__summary--muted">{{ interaction()?.trigger }}</p>
+        @if (interaction()?.note) {
+          <p class="insp__summary">{{ interaction()?.note }}</p>
+        }
+      </section>
+      <section class="insp__section">
+        <h4 class="insp__section-title">Souls</h4>
+        <ul class="insp__links">
+          @for (link of d.souls; track link.focus.id) {
+            <li><button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button></li>
+          } @empty {
+            <li class="insp__none">Only the player takes part.</li>
+          }
+        </ul>
+      </section>
+      <section class="insp__section">
+        <h4 class="insp__section-title">Opens dialogue</h4>
+        @if (d.dialogue; as link) {
+          <button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button>
+        } @else {
+          <p class="insp__none">No dialogue is linked.</p>
+        }
+      </section>
+    } @else if (step(); as n) {
+      @if (stepDetail(); as d) {
+        <section class="insp__section insp__section--top">
+          <h4 class="insp__section-title">{{ n.speaker }} · {{ n.kind === 'choice' ? 'Option' : 'Line' }}</h4>
+          <div class="insp__fields">
+            <label class="insp__field insp__field--wide">
+              <span class="insp__key">Interaction</span>
+              <select [disabled]="readonly()" class="rpg-select" [value]="d.interaction" (change)="setStepInteraction($any($event.target).value)">
+                @for (k of interactionKinds; track k.key) {
+                  <option [value]="k.key">{{ k.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="insp__field insp__field--wide">
+              <span class="insp__key">Text</span>
+              <textarea [disabled]="readonly()" class="rpg-textarea" rows="3" [value]="n.text" (change)="setStepText($any($event.target).value)"></textarea>
+            </label>
+          </div>
+        </section>
+        @if (d.follows; as f) {
+          <section class="insp__section">
+            <h4 class="insp__section-title">Follows</h4>
+            <button type="button" class="insp__link" (click)="follow(f)"><span class="insp__tag">{{ f.tag }}</span>{{ f.label }}</button>
+          </section>
+        }
+        <section class="insp__section">
+          <h4 class="insp__section-title">Next steps</h4>
+          <ol class="insp__links">
+            @for (link of d.next; track link.focus.id) {
+              <li>
+                <button type="button" class="insp__link" (click)="follow(link)">
+                  <span class="insp__tag">{{ link.tag }}</span>{{ link.label }}
+                </button>
+              </li>
+            } @empty {
+              <li class="insp__none">End of this branch.</li>
+            }
+          </ol>
+        </section>
+        <section class="insp__section">
+          <h4 class="insp__section-title">Souls in the scene</h4>
+          <ul class="insp__links">
+            @for (link of d.souls; track link.focus.id) {
+              <li><button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button></li>
+            } @empty {
+              <li class="insp__none">No codex soul takes part.</li>
+            }
+          </ul>
+        </section>
+      }
+    } @else {
+      <p class="insp__empty">
+        Pick a soul in the codex, a node on the Relations map or a step in the Dialogue list to examine and edit it here.
+      </p>
+    }
+  </div>
+
+  <p footer class="insp__notice" role="status" aria-live="polite">
+    @if (notice(); as m) {
+      <span class="insp__notice-text" [class]="'insp__notice-text--' + m.kind">
+        <app-lucide-icon [icon]="m.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ m.text }}
+      </span>
+    }
+  </p>
+  @if (focus()) {
+    <app-rpg-button footer variant="wood" size="sm" (click)="open('relations')" title="Show on the Relations map">
+      <app-lucide-icon [icon]="mapIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Map
+    </app-rpg-button>
+  }
+  @if (soul()) {
+    <ng-container footer>
+      <app-rpg-button footer variant="wood" size="sm" (click)="open('character')" title="Open in the Forge">
+        <app-lucide-icon [icon]="forgeIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Forge
+      </app-rpg-button>
+      <app-rpg-button footer variant="wood" size="sm" (click)="open('sculptor')" title="Open in the Sculptor">
+        <app-lucide-icon [icon]="sculptIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Sculpt
+      </app-rpg-button>
+      <app-rpg-button footer variant="danger" size="sm" [class.insp__hidden]="readonly()" (click)="removeSoul()">
+        <app-lucide-icon [icon]="trashIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Remove…
+      </app-rpg-button>
+    </ng-container>
+  }
+  @if (routine() || soul()) {
+    <app-rpg-button footer variant="wood" size="sm" (click)="open('routines')" title="Plan the day in the Routines tab">
+      <app-lucide-icon [icon]="routinesIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Day
+    </app-rpg-button>
+  }
+  @if (interaction()) {
+    <app-rpg-button footer variant="wood" size="sm" (click)="open('interactions')">
+      <app-lucide-icon [icon]="actsIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Interactions
+    </app-rpg-button>
+  }
+  @if (step(); as n) {
+    <ng-container footer>
+      <app-rpg-button variant="wood" size="sm" (click)="open('dialogue')">
+        <app-lucide-icon [icon]="dialogueIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Dialogue
+      </app-rpg-button>
+      <app-rpg-button variant="danger" size="sm" [class.insp__hidden]="readonly()" (click)="removeStep(n.id)">
+        <app-lucide-icon [icon]="trashIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Remove
+      </app-rpg-button>
+    </ng-container>
+  }
+</app-rpg-panel>

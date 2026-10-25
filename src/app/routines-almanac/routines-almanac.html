@@ -1,0 +1,86 @@
+<app-rpg-panel title="Routine Almanac" [subtitle]="subtitle()" [footer]="true">
+  @if (closable()) {
+    <app-rpg-button headerActions variant="ghost" size="sm" class="ra__close" aria-label="Close routine almanac" (click)="close.emit()">
+      <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    </app-rpg-button>
+  }
+
+  <div class="ra__filter">
+    <input class="rpg-input" type="search" placeholder="Filter the routines…" aria-label="Filter global routines" [value]="filter()" (input)="filter.set($any($event.target).value)" />
+  </div>
+
+  @if (draft(); as d) {
+    <form class="ra__form" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New global routine' : 'Edit global routine'">
+      <label class="field">
+        <span class="rpg-label">Name</span>
+        <input class="rpg-input" [value]="d.name" placeholder="Market day, Night watch…" (input)="patch('name', $any($event.target).value)" />
+      </label>
+      <div class="ra__pair">
+        <label class="field">
+          <span class="rpg-label">Time of day</span>
+          <select class="rpg-select" [value]="d.slot" (change)="patch('slot', $any($event.target).value)">
+            @for (s of slots; track s.key) {
+              <option [value]="s.key">{{ s.label }} ({{ s.hours }})</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span class="rpg-label">When</span>
+          <input class="rpg-input" [value]="d.schedule" placeholder="Every day, market days…" (input)="patch('schedule', $any($event.target).value)" />
+        </label>
+      </div>
+      <label class="field">
+        <span class="rpg-label">Where</span>
+        <input class="rpg-input" [value]="d.location ?? ''" placeholder="Valemark square…" (input)="patch('location', $any($event.target).value)" />
+      </label>
+      <label class="field">
+        <span class="rpg-label">Note</span>
+        <input class="rpg-input" [value]="d.note ?? ''" placeholder="Who joins and why…" (input)="patch('note', $any($event.target).value)" />
+      </label>
+      @if (error()) {
+        <p class="ra__error" role="alert">{{ error() }}</p>
+      }
+      <div class="ra__actions">
+        <app-rpg-button variant="wood" size="sm" (click)="cancel()">Cancel</app-rpg-button>
+        <app-rpg-button variant="gold" size="sm" (click)="save()">{{ editingId() === 'new' ? 'Add routine' : 'Save' }}</app-rpg-button>
+      </div>
+    </form>
+  }
+
+  <ul class="ra__list" aria-label="Global routines">
+    @for (r of visible(); track r.id) {
+      <li class="ra__item" [class.ra__item--focused]="focusedId() === r.id">
+        <button type="button" class="ra__entry" (click)="select(r)">
+          <span class="ra__slot" [class]="'ra__slot ra__slot--' + slotFor(r)">{{ slotLabel[slotFor(r)] }}</span>
+          <span class="ra__info">
+            <span class="ra__name">{{ r.name }}</span>
+            <span class="ra__meta">{{ r.schedule }}{{ r.location ? ' · ' + r.location : '' }}</span>
+          </span>
+          <span class="ra__count" [title]="r.participantIds.length + ' souls keep it'">{{ r.participantIds.length }}</span>
+        </button>
+        <span class="ra__tools">
+          <button type="button" class="ra__mini" aria-label="Edit routine" (click)="edit(r)">
+            <app-lucide-icon [icon]="pencilIcon" iconClass="ic-13" [strokeWidth]="2" />
+          </button>
+          <button
+            type="button"
+            class="ra__mini ra__mini--danger"
+            [attr.aria-label]="confirmId() === r.id ? 'Click again to remove' : 'Remove routine'"
+            [title]="confirmId() === r.id ? 'Click again to remove' : 'Remove routine'"
+            (click)="remove(r)"
+          >{{ confirmId() === r.id ? '?' : '×' }}</button>
+        </span>
+      </li>
+    } @empty {
+      <li class="ra__empty">
+        <app-lucide-icon [icon]="calendarIcon" iconClass="ic-24" [strokeWidth]="1.6" />
+        <span>{{ filter() ? 'No routine matches this filter.' : 'No shared routines yet. Add the first one below.' }}</span>
+      </li>
+    }
+  </ul>
+
+  <app-rpg-button footer variant="gold" size="sm" [disabled]="editingId() !== null" (click)="openNew()">
+    <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+    New Global Routine
+  </app-rpg-button>
+</app-rpg-panel>

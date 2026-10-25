@@ -1,0 +1,928 @@
+/* Self-hosted fantasy fonts (Google Fonts via @fontsource, latin subset) */
+@import '@fontsource/cinzel/latin-400.css';
+@import '@fontsource/cinzel/latin-700.css';
+@import '@fontsource/cinzel/latin-800.css';
+@import '@fontsource/alegreya/latin-400.css';
+@import '@fontsource/alegreya/latin-700.css';
+@import '@fontsource/alegreya/latin-400-italic.css';
+@import '@fontsource/alegreya/latin-700-italic.css';
+@import '@fontsource/uncial-antiqua/latin-400.css';
+
+@import 'tailwindcss';
+
+/* ==========================================================================
+   CONGULATIO — RPG design system
+   Fantasy editor theme: carved oak, aged parchment, candle-lit stone.
+   Shared surfaces, bevels, ornamentation and form controls live here so
+   every component pulls from one "workshop" palette.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tokens
+   -------------------------------------------------------------------------- */
+@theme {
+  --font-display: 'Cinzel', 'Georgia', serif;
+  --font-rune: 'Uncial Antiqua', 'Cinzel', serif;
+  --font-body: 'Alegreya', 'Georgia', serif;
+
+  /* oak / walnut */
+  --color-wood-950: #150c04;
+  --color-wood-900: #221406;
+  --color-wood-800: #31200d;
+  --color-wood-700: #432c14;
+  --color-wood-600: #553a1d;
+  --color-wood-500: #694a26;
+  --color-wood-400: #816133;
+  --color-wood-300: #9b7947;
+  --color-wood-200: #b89763;
+  --color-wood-100: #d3b78a;
+
+  /* gilded brass */
+  --color-gold-700: #7a5c12;
+  --color-gold-600: #96761b;
+  --color-gold-500: #b4922a;
+  --color-gold-400: #d0ac3c;
+  --color-gold-300: #e2c25c;
+  --color-gold-200: #efd784;
+  --color-gold-100: #f6e7ab;
+
+  /* parchment */
+  --color-parchment-50: #faf3de;
+  --color-parchment-100: #f2e6c4;
+  --color-parchment-200: #e7d5a7;
+  --color-parchment-300: #d8c088;
+  --color-parchment-400: #c4a76a;
+  --color-parchment-500: #aa8b50;
+
+  /* ink & candle-smoke */
+  --color-ink-950: #180f04;
+  --color-ink-900: #251809;
+  --color-ink-800: #32220e;
+  --color-ink-700: #41301a;
+  --color-ink-600: #524025;
+  --color-ink-500: #665231;
+  --color-ink-400: #846e47;
+  --color-ink-300: #a38c63;
+
+  /* ground / stone */
+  --color-stone-950: #131110;
+  --color-stone-900: #1c1915;
+  --color-stone-800: #26221c;
+  --color-stone-700: #322d24;
+  --color-stone-600: #423b2f;
+  --color-stone-500: #574e3f;
+
+  /* accents */
+  --color-mana-600: #3d6a8c;
+  --color-mana-500: #4f82a6;
+  --color-mana-400: #6d9fc2;
+  --color-blood-600: #6e2418;
+  --color-blood-500: #8c3122;
+  --color-blood-400: #a84a35;
+  --color-moss-600: #3f5a2a;
+  --color-moss-500: #557a38;
+  --color-moss-400: #6f9a4a;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+html,
+body,
+app-root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-ink-900);
+  background: var(--color-stone-950);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* themed scrollbars — worn rope on dark oak */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-wood-500) var(--color-wood-950);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--color-wood-950);
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-wood-400), var(--color-wood-600));
+  border: 2px solid var(--color-wood-950);
+  border-radius: 8px;
+}
+
+/* Sidebar scrollbars — a wider, gilded rope so overflow is unmistakable:
+   applies to the split view itself and to every section body inside it */
+.nav__split,
+.nav__pane .rpanel__body {
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-gold-500) var(--color-wood-950);
+}
+.nav__split::-webkit-scrollbar,
+.nav__pane .rpanel__body::-webkit-scrollbar {
+  width: 14px;
+}
+/* the split's track is a carved groove (always visible — the split uses
+   overflow-y: scroll), sunken into the frame just left of the width
+   resizer bar */
+.nav__split::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, var(--color-wood-900), var(--color-wood-950));
+  border-left: 1px solid var(--color-wood-800);
+  box-shadow: inset 2px 0 5px rgba(0, 0, 0, 0.55);
+}
+.nav__pane .rpanel__body::-webkit-scrollbar-track {
+  background: var(--color-wood-950);
+  border-left: 1px solid var(--color-wood-800);
+}
+.nav__split::-webkit-scrollbar-thumb,
+.nav__pane .rpanel__body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-gold-400), var(--color-gold-600));
+  border: 3px solid var(--color-wood-950);
+  border-radius: 8px;
+}
+.nav__split::-webkit-scrollbar-thumb:hover,
+.nav__pane .rpanel__body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--color-gold-300), var(--color-gold-500));
+}
+
+/* --------------------------------------------------------------------------
+   Textures
+   -------------------------------------------------------------------------- */
+
+/* carved oak plank */
+.tx-wood {
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.1) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.03) 5px 6px,
+      transparent 6px 12px
+    ),
+    linear-gradient(180deg, var(--color-wood-500), var(--color-wood-700) 45%, var(--color-wood-800));
+}
+
+/* dark walnut, for bars & frames */
+.tx-wood-dark {
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.14) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.02) 5px 6px,
+      transparent 6px 13px
+    ),
+    linear-gradient(180deg, var(--color-wood-700), var(--color-wood-800) 50%, var(--color-wood-900));
+}
+
+/* aged parchment, stained at the edges */
+.tx-parchment {
+  background:
+    radial-gradient(130% 100% at 15% 0%, rgba(255, 252, 238, 0.8), transparent 55%),
+    radial-gradient(120% 90% at 90% 100%, rgba(140, 100, 45, 0.38), transparent 60%),
+    radial-gradient(50% 35% at 75% 25%, rgba(120, 84, 32, 0.14), transparent 65%),
+    linear-gradient(168deg, #f4e8c8 0%, #ebd9ad 52%, #dec692 100%);
+}
+
+/* candle-lit dungeon stone */
+.tx-stone {
+  background:
+    radial-gradient(90% 70% at 30% 12%, rgba(255, 244, 214, 0.06), transparent 60%),
+    radial-gradient(70% 60% at 82% 92%, rgba(0, 0, 0, 0.45), transparent 65%),
+    linear-gradient(180deg, var(--color-stone-700), var(--color-stone-800) 55%, var(--color-stone-900));
+}
+
+/* stone with a faint gilded survey grid (editor canvas ground) */
+.tx-stone-grid {
+  background:
+    linear-gradient(rgba(226, 194, 92, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 194, 92, 0.05) 1px, transparent 1px),
+    radial-gradient(90% 70% at 30% 12%, rgba(255, 244, 214, 0.06), transparent 60%),
+    radial-gradient(70% 60% at 82% 92%, rgba(0, 0, 0, 0.45), transparent 65%),
+    linear-gradient(180deg, var(--color-stone-700), var(--color-stone-800) 55%, var(--color-stone-900));
+  background-size:
+    28px 28px,
+    28px 28px,
+    auto,
+    auto,
+    auto;
+}
+
+/* fine paper grain, layered over any textured surface */
+.grain {
+  position: relative;
+}
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   Bevels & ornamentation
+   -------------------------------------------------------------------------- */
+
+/* raised, chiselled edge */
+.bevel-out {
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 224, 160, 0.22),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.35),
+    inset 2px 0 3px rgba(0, 0, 0, 0.12),
+    inset -2px 0 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* sunken, recessed edge */
+.bevel-in {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(255, 230, 170, 0.12);
+}
+
+/* four brass rivets in the corners */
+.rivets {
+  position: relative;
+}
+.rivets::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 9px 9px, var(--color-gold-400) 0 2px, rgba(0, 0, 0, 0.65) 2.5px 3.5px, transparent 4.5px),
+    radial-gradient(circle at calc(100% - 9px) 9px, var(--color-gold-400) 0 2px, rgba(0, 0, 0, 0.65) 2.5px 3.5px, transparent 4.5px),
+    radial-gradient(circle at 9px calc(100% - 9px), var(--color-gold-400) 0 2px, rgba(0, 0, 0, 0.65) 2.5px 3.5px, transparent 4.5px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), var(--color-gold-400) 0 2px, rgba(0, 0, 0, 0.65) 2.5px 3.5px, transparent 4.5px);
+}
+
+/* gilded small-caps heading */
+.rpg-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin: 0;
+  background: linear-gradient(180deg, var(--color-gold-100) 0%, var(--color-gold-400) 45%, var(--color-gold-600) 72%, var(--color-gold-300) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+
+/* ornamental divider with a centre gem */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-ink-400);
+  min-width: 0;
+}
+.ornament::before,
+.ornament::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+}
+.ornament--dark {
+  color: var(--color-gold-600);
+}
+
+/* small diamond gem */
+.gem {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  flex: none;
+  background: linear-gradient(135deg, var(--color-gold-200), var(--color-gold-600));
+  box-shadow: 0 0 6px rgba(226, 194, 92, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   Form controls
+   -------------------------------------------------------------------------- */
+.rpg-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-ink-600);
+}
+
+.rpg-input,
+.rpg-select,
+.rpg-textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-ink-900);
+  background: linear-gradient(180deg, #f7eed6, #efe0bb);
+  border: 1px solid var(--color-wood-700);
+  border-radius: 4px;
+  padding: 0.45rem 0.65rem;
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+  outline: none;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.rpg-input:focus,
+.rpg-select:focus,
+.rpg-textarea:focus {
+  border-color: var(--color-gold-500);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.14),
+    0 0 0 2px rgba(208, 172, 60, 0.35);
+}
+.rpg-input::placeholder,
+.rpg-textarea::placeholder {
+  color: var(--color-ink-400);
+  font-style: italic;
+}
+.rpg-textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   RPG buttons
+   -------------------------------------------------------------------------- */
+.rbtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* perfect icon/text centre: no line-box slack, icon grid-centred */
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 6px;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    filter 0.12s ease,
+    transform 0.05s ease,
+    box-shadow 0.12s ease;
+}
+.rbtn .lucide,
+.rtab .lucide {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.rbtn:active {
+  transform: translateY(1px);
+}
+.rbtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.rbtn--md {
+  font-size: 0.72rem;
+  padding: 0.5rem 1rem;
+}
+.rbtn--sm {
+  font-size: 0.62rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 5px;
+}
+.rbtn--lg {
+  font-size: 0.82rem;
+  padding: 0.7rem 1.4rem;
+}
+
+.rbtn--gold {
+  color: #241708;
+  background: linear-gradient(180deg, var(--color-gold-200) 0%, var(--color-gold-400) 45%, var(--color-gold-600) 100%);
+  border: 1px solid var(--color-gold-700);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -2px 3px rgba(90, 60, 10, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.5);
+}
+.rbtn--gold:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
+.rbtn--wood {
+  color: var(--color-parchment-100);
+  background: linear-gradient(180deg, var(--color-wood-500) 0%, var(--color-wood-700) 55%, var(--color-wood-800) 100%);
+  border: 1px solid var(--color-wood-950);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.28),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+.rbtn--wood:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.rbtn--ghost {
+  color: var(--color-parchment-200);
+  background: transparent;
+  border: 1px solid var(--color-wood-500);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.12);
+}
+.rbtn--ghost:hover:not(:disabled) {
+  background: rgba(255, 220, 150, 0.08);
+}
+
+.rbtn--danger {
+  color: #f6e3d9;
+  background: linear-gradient(180deg, var(--color-blood-400) 0%, var(--color-blood-600) 100%);
+  border: 1px solid #3f120a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 190, 160, 0.35),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+.rbtn--danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* --------------------------------------------------------------------------
+   Panels (wood header, swappable surface)
+   -------------------------------------------------------------------------- */
+.rpanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--color-wood-950);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    0 0 0 3px rgba(0, 0, 0, 0.22);
+}
+.rpanel__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.14) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.02) 5px 6px,
+      transparent 6px 13px
+    ),
+    linear-gradient(180deg, var(--color-wood-700), var(--color-wood-800) 55%, var(--color-wood-900));
+  border-bottom: 1px solid var(--color-wood-950);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.16),
+    0 2px 5px rgba(0, 0, 0, 0.35);
+  flex: none;
+}
+.rpanel__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--color-gold-300);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
+  margin: 0;
+  white-space: nowrap;
+}
+.rpanel__subtitle {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: var(--color-parchment-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rpanel__header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.rpanel__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.rpanel--parchment .rpanel__body {
+  background:
+    radial-gradient(130% 100% at 15% 0%, rgba(255, 252, 238, 0.8), transparent 55%),
+    radial-gradient(120% 90% at 90% 100%, rgba(140, 100, 45, 0.38), transparent 60%),
+    linear-gradient(168deg, #f4e8c8 0%, #ebd9ad 52%, #dec692 100%);
+}
+.rpanel--stone .rpanel__body {
+  background:
+    radial-gradient(90% 70% at 30% 12%, rgba(255, 244, 214, 0.06), transparent 60%),
+    linear-gradient(180deg, var(--color-stone-700), var(--color-stone-800) 55%, var(--color-stone-900));
+}
+.rpanel--wood .rpanel__body {
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.1) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.03) 5px 6px,
+      transparent 6px 12px
+    ),
+    linear-gradient(180deg, var(--color-wood-500), var(--color-wood-700) 45%, var(--color-wood-800));
+}
+.rpanel__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.14) 0 1px,
+      transparent 1px 5px,
+      rgba(255, 255, 255, 0.02) 5px 6px,
+      transparent 6px 13px
+    ),
+    linear-gradient(180deg, var(--color-wood-800), var(--color-wood-900));
+  border-top: 1px solid var(--color-wood-950);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.1);
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Tabs (wooden shelf)
+   -------------------------------------------------------------------------- */
+.rtabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  padding: 0.55rem 0.5rem 0;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.12) 0 1px,
+      transparent 1px 6px,
+      rgba(255, 255, 255, 0.02) 5px 6px,
+      transparent 6px 14px
+    ),
+    linear-gradient(180deg, var(--color-wood-800), var(--color-wood-900));
+  border-bottom: 2px solid var(--color-wood-950);
+  flex: 1;
+  min-width: 0;
+}
+.rtabs__track {
+  display: flex;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 0 0.2rem;
+  scroll-padding-inline: 0.5rem;
+}
+.rtabs__track::-webkit-scrollbar {
+  display: none;
+}
+.rtabs__arrow {
+  flex: none;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 26px;
+  margin-bottom: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--color-wood-950);
+  color: var(--color-gold-200);
+  background: linear-gradient(180deg, var(--color-wood-600), var(--color-wood-800));
+  cursor: pointer;
+}
+.rtabs__arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.rtab {
+  position: relative;
+  top: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  /* perfect icon/text centre: no line-box slack */
+  line-height: 1;
+  color: var(--color-parchment-300);
+  background: linear-gradient(180deg, var(--color-wood-600), var(--color-wood-700) 60%, var(--color-wood-800));
+  border: 1px solid var(--color-wood-950);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.55rem 1.1rem 0.5rem;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.15);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  transition: filter 0.12s ease;
+  flex: none;
+  white-space: nowrap;
+}
+.rtab--collapsed {
+  padding-inline: 0.75rem;
+}
+.rtab--collapsed .rtab__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.rtab:focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: -2px;
+}
+.rtab:hover {
+  filter: brightness(1.12);
+}
+.rtab--active {
+  background: linear-gradient(180deg, var(--color-wood-400), var(--color-wood-500) 60%, var(--color-wood-600));
+  color: var(--color-gold-200);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 180, 0.4),
+    0 -2px 6px rgba(0, 0, 0, 0.3);
+}
+.rtab--active::after {
+  content: '';
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -4px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-gold-400), transparent);
+}
+.rtab__icon {
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar sections enter / leave (Angular v22 `animate` API)
+   the framework adds these classes; on leave the element is removed from
+   the DOM after the transition ends
+   -------------------------------------------------------------------------- */
+.nav__split:not(.nav__split--dragging) .nav__pane {
+  transition:
+    height 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    flex-grow 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    flex-basis 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms ease;
+}
+.nav__pane.nav-enter {
+  animation: nav-pane-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.nav__divider.nav-fade,
+.nav__empty.nav-fade {
+  animation: nav-fade-in 240ms both;
+}
+.nav__pane.nav-leave {
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    height 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    flex-grow 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    flex-basis 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms ease-in;
+}
+.nav__divider.nav-leave {
+  height: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    height 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms ease-in;
+}
+@keyframes nav-pane-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Central stage enter / leave (Angular v22 `animate` API)
+   Smart crossfade, NO resizing: the outgoing workbench is taken out of the
+   flex flow (absolute) so the incoming one instantly owns the full stage —
+   pure opacity, zero layout shift.
+   -------------------------------------------------------------------------- */
+.stage-enter {
+  animation: stage-fade 240ms ease both;
+}
+.stage-leave {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+@keyframes stage-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Floating stone rune in the search trough — appears (and bobs) as soon as
+   any character is inscribed
+   -------------------------------------------------------------------------- */
+.topbar__search-rune {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-gold-300);
+  background: radial-gradient(circle at 35% 30%, var(--color-stone-500), var(--color-stone-800) 78%);
+  border: 1px solid var(--color-stone-950);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(226, 194, 92, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  animation: rune-float 3s ease-in-out infinite;
+}
+.topbar__search-rune-ic {
+  width: 14px;
+  height: 14px;
+}
+.topbar__search-rune.rune-in {
+  animation:
+    rune-appear 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    rune-float 3s ease-in-out infinite;
+}
+.topbar__search-rune.rune-out {
+  animation: rune-sink 220ms ease-in both;
+}
+@keyframes rune-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+@keyframes rune-appear {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes rune-sink {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.75);
+  }
+}
+
+/* left sidebar toggle — same carved wood as the rail runes */
+.topbar__side-toggle {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid var(--color-wood-950);
+  color: var(--color-parchment-300);
+  background: linear-gradient(180deg, var(--color-wood-600), var(--color-wood-800));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.18),
+    0 2px 3px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: filter 0.12s, box-shadow 0.12s, color 0.12s;
+}
+.topbar__side-toggle:hover {
+  filter: brightness(1.18);
+}
+.topbar__side-toggle--on {
+  color: var(--color-gold-200);
+  background: linear-gradient(180deg, var(--color-wood-400), var(--color-wood-600));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 180, 0.4),
+    0 0 0 1px var(--color-gold-600),
+    0 0 10px rgba(226, 194, 92, 0.35);
+}
+
+
+/* --------------------------------------------------------------------------
+   Lucide icons (rendered from `lucide` icon nodes)
+   -------------------------------------------------------------------------- */
+.lucide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: inherit;
+}
+.lucide svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ic-13 {
+  width: 13px;
+  height: 13px;
+}
+.ic-14 {
+  width: 14px;
+  height: 14px;
+}
+.ic-16 {
+  width: 16px;
+  height: 16px;
+}
+.ic-18 {
+  width: 18px;
+  height: 18px;
+}
+.ic-20 {
+  width: 20px;
+  height: 20px;
+}
+.ic-24 {
+  width: 24px;
+  height: 24px;
+}
+.ic-32 {
+  width: 32px;
+  height: 32px;
+}

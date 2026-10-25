@@ -1,0 +1,77 @@
+<app-rpg-panel
+  title="Dialogue Loom"
+  subtitle="Weave the words"
+  surface="stone"
+  [footer]="true"
+>
+  <!-- Loom toolbar -->
+  <div class="loom__toolbar">
+    <div class="loom__palette" aria-label="Node tools">
+      @for (tool of tools; track tool.label) {
+        <app-rpg-button variant="wood" size="sm" class="loom__tool">
+          <app-lucide-icon [icon]="tool.icon" iconClass="ic-14" [strokeWidth]="1.9" />
+          {{ tool.label }}
+        </app-rpg-button>
+      }
+    </div>
+    <div class="loom__zoom" aria-label="Zoom">
+      <button type="button" class="loom__zoom-btn" aria-label="Zoom out">
+        <app-lucide-icon [icon]="minusIcon" iconClass="ic-14" />
+      </button>
+      <span class="loom__zoom-value">100%</span>
+      <button type="button" class="loom__zoom-btn" aria-label="Zoom in">
+        <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" />
+      </button>
+      <span class="loom__sep" aria-hidden="true"></span>
+      <app-rpg-button variant="ghost" size="sm">
+        <app-lucide-icon [icon]="maximizeIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+        Fit
+      </app-rpg-button>
+    </div>
+  </div>
+
+  <!-- The loom: dark stone floor with a gilded survey grid -->
+  <div class="loom__canvas tx-stone-grid grain">
+    <svg class="loom__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      @for (path of wires; track path) {
+        <path [attr.d]="path" />
+      }
+    </svg>
+
+    @for (node of nodes; track node.id) {
+      <div
+        class="loom__node"
+        [class.loom__node--choice]="node.kind === 'choice'"
+        [class.loom__node--action]="node.kind === 'action'"
+        [style.left.%]="node.x"
+        [style.top.%]="node.y"
+        role="group"
+        [attr.aria-label]="kindLabel[node.kind] + ' node: ' + node.title"
+      >
+        <span class="loom__port loom__port--in" aria-hidden="true"></span>
+        <div class="loom__node__head">
+          <span class="loom__node__kind">{{ kindLabel[node.kind] }}</span>
+          <span class="loom__node__title">{{ node.title }}</span>
+        </div>
+        <div class="loom__node__body">{{ node.text }}</div>
+        <span class="loom__port loom__port--out" aria-hidden="true"></span>
+      </div>
+    }
+
+    <!-- minimap -->
+    <div class="loom__minimap" aria-hidden="true">
+      @for (node of nodes; track node.id) {
+        <span class="loom__minimap-dot" [style.left.%]="node.x / 2" [style.top.%]="node.y / 2"></span>
+      }
+    </div>
+  </div>
+
+  <app-rpg-button footer variant="gold" size="sm">
+    <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+    Add Branch
+  </app-rpg-button>
+  <app-rpg-button footer variant="wood" size="sm">
+    <app-lucide-icon [icon]="badgeCheckIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+    Validate Loom
+  </app-rpg-button>
+</app-rpg-panel>

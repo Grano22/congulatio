@@ -1,0 +1,41 @@
+<header class="topbar grain">
+  <!-- Left sidebar toggle -->
+  <button
+    type="button"
+    class="topbar__side-toggle"
+    [class.topbar__side-toggle--on]="leftSidebarOpen()"
+    [attr.title]="leftSidebarOpen() ? 'Hide the codex wing' : 'Show the codex wing'"
+    (click)="leftSidebarToggle.emit()"
+  >
+    <app-lucide-icon [icon]="panelIcon()" iconClass="ic-18" [strokeWidth]="1.8" />
+  </button>
+
+  <!-- Brand seal -->
+  <div class="topbar__brand">
+    <span class="topbar__seal" aria-hidden="true">
+      <app-lucide-icon [icon]="shieldIcon" iconClass="ic-24" [strokeWidth]="1.8" />
+    </span>
+    <div class="topbar__brand-text">
+      <h1 class="rpg-title topbar__name">Congulatio</h1>
+      <span class="topbar__tagline">Character &amp; Dialogue Forge</span>
+    </div>
+  </div>
+
+  <app-main-menu class="topbar__menu" />
+
+  <!-- Tools -->
+  <div class="topbar__tools">
+    <app-global-search />
+    <app-rpg-button variant="wood" size="sm" [attr.title]="'Export tome (' + exportKeys + ')'" (click)="commands.run('tome.export')">
+      <app-lucide-icon [icon]="downloadIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Export
+    </app-rpg-button>
+    <app-rpg-button variant="gold" size="sm" [attr.title]="'Save tome (' + saveKeys + ')'" (click)="commands.run('tome.save')">
+      <app-lucide-icon [icon]="saveIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+      Save
+      @if (history.dirty()) {
+        <span class="topbar__dirty" aria-label="unsaved changes"></span>
+      }
+    </app-rpg-button>
+  </div>
+</header>

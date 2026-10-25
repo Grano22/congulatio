@@ -1,0 +1,178 @@
+<div class="dl">
+  <div class="dl__filter">
+    <span class="dl__filter-label">Between</span>
+    <app-soul-multiselect
+      class="dl__picker"
+      [options]="soulOptions()"
+      [(selected)]="soulFilter"
+      placeholder="All souls — pick some to see their dialogues"
+    />
+    <span class="dl__count">{{ visibleScenes().length }} scenes · {{ entryCount() }} steps</span>
+  </div>
+
+  <div class="dl__filters" role="group" aria-label="Dialogue filters">
+    <input class="rpg-input dl__search" type="search" placeholder="Find text or speaker…" aria-label="Find in dialogue" [value]="query()" (input)="query.set($any($event.target).value)" />
+    <div class="dl__seg" role="radiogroup" aria-label="Scene status">
+      @for (opt of [['all', 'All'], ['connected', 'Connected'], ['standalone', 'Standalone']]; track opt[0]) {
+        <button type="button" role="radio" class="dl__seg-btn" [class.dl__seg-btn--on]="statusFilter() === opt[0]" [attr.aria-checked]="statusFilter() === opt[0]" (click)="statusFilter.set($any(opt[0]))">{{ opt[1] }}</button>
+      }
+    </div>
+    <select class="rpg-select dl__select" aria-label="Step kind" [value]="kindFilter()" (change)="kindFilter.set($any($event.target).value)">
+      <option value="all">Lines & options</option>
+      <option value="line">Lines only</option>
+      <option value="choice">Options only</option>
+    </select>
+    <select class="rpg-select dl__select" aria-label="Interaction" [value]="interactionFilter()" (change)="interactionFilter.set($any($event.target).value)">
+      <option value="all">Any interaction</option>
+      @for (k of interactionKinds; track k.key) {
+        <option [value]="k.key">{{ k.label }}</option>
+      }
+    </select>
+    <label class="dl__toggle"><input type="checkbox" [checked]="aiOnly()" (change)="aiOnly.set($any($event.target).checked)" /> AI drafts</label>
+    <label class="dl__toggle"><input type="checkbox" [checked]="impactOnly()" (change)="impactOnly.set($any($event.target).checked)" /> With impact</label>
+    <label class="dl__toggle">
+      Levels
+      <select class="rpg-select dl__level" aria-label="From level" [value]="levelFrom()" (change)="setLevelFrom(+$any($event.target).value)">
+        @for (l of levels(); track l) {
+          <option [value]="l">L{{ l }}</option>
+        }
+      </select>
+      to
+      <select class="rpg-select dl__level" aria-label="To level" [value]="levelTo() ?? maxLevel()" (change)="setLevelTo(+$any($event.target).value)">
+        @for (l of levels(); track l) {
+          <option [value]="l">L{{ l }}</option>
+        }
+      </select>
+    </label>
+    <div class="dl__seg" role="radiogroup" aria-label="Order">
+      <button type="button" role="radio" class="dl__seg-btn" [class.dl__seg-btn--on]="order() === 'reading'" [attr.aria-checked]="order() === 'reading'" (click)="order.set('reading')">Reading order</button>
+      <button type="button" role="radio" class="dl__seg-btn" [class.dl__seg-btn--on]="order() === 'level'" [attr.aria-checked]="order() === 'level'" (click)="order.set('level')">By level</button>
+    </div>
+    @if (activeFilters()) {
+      <button type="button" class="dl__clear" (click)="clearFilters()">Clear {{ activeFilters() }} filter{{ activeFilters() === 1 ? '' : 's' }}</button>
+    }
+    <button type="button" class="dl__new" [disabled]="newLine() !== null" (click)="openNewLine()">
+      <app-lucide-icon [icon]="plusIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+      Standalone line
+    </button>
+  </div>
+
+  @if (newLine(); as d) {
+    <form class="dl__create" (submit)="$event.preventDefault(); createNewLine()" aria-label="New standalone line">
+      <select class="rpg-select" aria-label="Kind" [value]="d.kind" (change)="patchNewLine({ kind: $any($event.target).value })">
+        <option value="line">Line</option>
+        <option value="choice">Player option</option>
+      </select>
+      @if (d.kind === 'line') {
+        <select class="rpg-select" aria-label="Speaker" [value]="d.speaker" (change)="patchNewLine({ speaker: $any($event.target).value })">
+          @for (sp of speakers(); track sp) {
+            <option [value]="sp">{{ sp }}</option>
+          }
+        </select>
+      }
+      <input class="rpg-input dl__create-text" placeholder="“What is said…”" aria-label="Line text" [value]="d.text" (input)="patchNewLine({ text: $any($event.target).value })" />
+      <button type="submit" class="dl__new">Add</button>
+      <button type="button" class="dl__clear" (click)="newLine.set(null)">Cancel</button>
+      @if (newLineError()) {
+        <span class="dl__create-error" role="alert">{{ newLineError() }}</span>
+      }
+    </form>
+  }
+
+  <div class="dl__scroll tx-stone-grid grain">
+    @for (scene of visibleScenes(); track scene.id) {
+      <section class="dl__scene" [attr.aria-label]="'Scene ' + scene.code + ': ' + scene.title" [attr.data-scene]="scene.id" [style.--scene-color]="scene.color">
+        <div class="dl__rail">
+          <button type="button" class="dl__pin" [attr.aria-label]="'Back to the start of scene ' + scene.code" [title]="scene.code + ' · ' + scene.id + ' · ' + scene.title" (click)="toSceneStart(scene.id)">
+            <b>{{ scene.code }}</b><span class="dl__pin-id">{{ scene.id }}</span><span class="dl__pin-title">{{ scene.title }}</span>
+          </button>
+        </div>
+        <div class="dl__scene-body">
+        <header class="dl__scene-head">
+          <h4 class="dl__scene-title">{{ scene.title }}</h4>
+          <span class="dl__status" [class.dl__status--standalone]="scene.status === 'standalone'" [title]="scene.linkedBy ? 'Opened by ' + scene.linkedBy : 'No routine or interaction leads here'">
+            {{ scene.status === 'standalone' ? 'Standalone' : 'Connected' }}{{ scene.linkedBy ? ' · ' + scene.linkedBy : '' }}
+          </span>
+          <span class="dl__souls">
+            @for (name of participantNames(scene); track name) {
+              <span class="dl__soul">{{ name }}</span>
+            }
+          </span>
+        </header>
+
+        @for (group of scene.groups; track group.level) {
+        @if (group.level !== null) {
+          <h5 class="dl__level-head">Level {{ group.level }} · {{ group.entries.length }} step{{ group.entries.length === 1 ? '' : 's' }}</h5>
+        }
+        <ol class="dl__entries">
+          @for (entry of group.entries; track entry.node.id) {
+            <li
+              class="dl__entry"
+              [class]="'dl__entry dl__entry--l' + (entry.level > 5 ? 5 : entry.level)"
+              [class.dl__entry--selected]="entry.node.id === selectedId()"
+              [class.dl__entry--flash]="entry.node.id === flashId()"
+              [attr.data-node]="entry.node.id"
+              tabindex="0"
+              (click)="select(entry.node.id)"
+              (keydown.enter)="select(entry.node.id)"
+              (keydown.delete)="remove(entry.node.id)"
+            >
+              <div class="dl__meta">
+                <span class="dl__level" [attr.aria-label]="'Level ' + entry.level">L{{ entry.level }}</span>
+                <span class="dl__kind" [class]="'dl__kind dl__kind--' + entry.interaction">{{ interactionLabel[entry.interaction] }}</span>
+                <span class="dl__speaker">@for (p of entry.speakerParts; track $index) {@if (p.hit) {<mark class="dl__hit">{{ p.text }}</mark>} @else {{{ p.text }}}}</span>
+                @if (entry.node.generated) {
+                  <span class="dl__ai" title="Drafted with Story AI">AI draft</span>
+                }
+                <button type="button" class="dl__trash" aria-label="Remove this step" title="Remove this step (Delete)" (click)="$event.stopPropagation(); remove(entry.node.id)">
+                  <app-lucide-icon [icon]="trashIcon" iconClass="ic-13" [strokeWidth]="2" />
+                </button>
+                @if (entry.parent; as parent) {
+                  <button type="button" class="dl__back" (click)="$event.stopPropagation(); goTo(parent.id)">
+                    <app-lucide-icon [icon]="backIcon" iconClass="ic-13" [strokeWidth]="2" />
+                    follows {{ parent.speaker }}: {{ clip(parent.text, 36) }}
+                  </button>
+                }
+              </div>
+
+              <p class="dl__text" [class.dl__text--choice]="entry.node.kind === 'choice'">@for (p of entry.textParts; track $index) {@if (p.hit) {<mark class="dl__hit">{{ p.text }}</mark>} @else {{{ p.text }}}}</p>
+
+              @if (entry.chips.length) {
+                <div class="dl__chips">
+                  @for (chip of entry.chips; track chip) {
+                    <span class="dl__chip">{{ chip }}</span>
+                  }
+                </div>
+              }
+
+              @if (entry.next.length) {
+                <div class="dl__next">
+                  <span class="dl__next-title">Next steps</span>
+                  <ol class="dl__next-list">
+                    @for (step of entry.next; track step.node.id; let i = $index) {
+                      <li>
+                        <button type="button" class="dl__next-item" (click)="$event.stopPropagation(); goTo(step.node.id)">
+                          <span class="dl__next-num">{{ i + 1 }}</span>
+                          <span class="dl__kind" [class]="'dl__kind dl__kind--' + step.interaction">{{ interactionLabel[step.interaction] }}</span>
+                          <span class="dl__next-speaker">{{ step.node.speaker }}</span>
+                          <span class="dl__next-text">@for (p of entry.nextParts[i]; track $index) {@if (p.hit) {<mark class="dl__hit">{{ p.text }}</mark>} @else {{{ p.text }}}}</span>
+                          <app-lucide-icon [icon]="nextIcon" iconClass="ic-13 dl__next-go" [strokeWidth]="2" />
+                        </button>
+                      </li>
+                    }
+                  </ol>
+                </div>
+              } @else {
+                <span class="dl__end">End of this branch</span>
+              }
+            </li>
+          }
+        </ol>
+        }
+        </div>
+      </section>
+    } @empty {
+      <p class="dl__empty">{{ activeFilters() ? 'No dialogue matches these filters.' : 'No dialogue yet. Add a standalone line to begin.' }}</p>
+    }
+  </div>
+</div>

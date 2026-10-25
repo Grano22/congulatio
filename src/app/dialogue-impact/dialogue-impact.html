@@ -1,0 +1,105 @@
+@let current = node();
+@let currentImpact = impact();
+@if (current && currentImpact) {
+  <div class="imp">
+    <header class="imp__head">
+      <span class="imp__speaker">{{ current.speaker }} · {{ current.kind === 'choice' ? 'Option' : 'Line' }}</span>
+      <p class="imp__text">{{ current.text }}</p>
+    </header>
+
+    <label class="field imp__interaction">
+      <span class="rpg-label">Interaction</span>
+      <select class="rpg-select" [value]="interaction()" (change)="setInteraction($any($event.target).value)">
+        @for (kind of interactionKinds; track kind.key) {
+          <option [value]="kind.key">{{ kind.label }}</option>
+        }
+      </select>
+    </label>
+
+    <section class="imp__section">
+      <h4 class="imp__title">Variants</h4>
+      <p class="imp__hint">Other ways to say it. In a simulation the speaker picks the tone that fits how they feel about the other soul.</p>
+      <ul class="imp__variants">
+        @for (variant of variants(); track variant.id) {
+          <li class="imp__variant">
+            <select
+              class="rpg-select imp__tone"
+              [class]="'rpg-select imp__tone imp__tone--' + variant.tone"
+              [value]="variant.tone"
+              (change)="setVariantTone(variant.id, $any($event.target).value)"
+              aria-label="Variant tone"
+            >
+              @for (tone of tones; track tone) {
+                <option [value]="tone">{{ tone }}</option>
+              }
+            </select>
+            <input
+              class="rpg-input"
+              [value]="variant.text"
+              (input)="setVariantText(variant.id, $any($event.target).value)"
+              aria-label="Variant text"
+            />
+            <button type="button" class="imp__remove" aria-label="Remove variant" (click)="removeVariant(variant.id)">
+              <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+            </button>
+          </li>
+        } @empty {
+          <li class="imp__hint">No variants yet. The line is always spoken as written.</li>
+        }
+      </ul>
+      <app-rpg-button variant="wood" size="sm" (click)="addVariant()">
+        <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+        Add Variant
+      </app-rpg-button>
+    </section>
+
+    <section class="imp__section">
+      <h4 class="imp__title">Impact on the world</h4>
+      <div class="imp__axes">
+        @for (axis of axes; track axis.key) {
+          <label class="imp__axis">
+            <span class="rpg-label">{{ axis.label }}</span>
+            <input
+              type="range"
+              class="imp__range"
+              [min]="-limit"
+              [max]="limit"
+              step="1"
+              [value]="currentImpact[axis.key]"
+              (input)="setAxis(axis.key, $any($event.target).value)"
+            />
+            <span
+              class="imp__value"
+              [class.imp__value--up]="currentImpact[axis.key] > 0"
+              [class.imp__value--down]="currentImpact[axis.key] < 0"
+            >{{ signed(currentImpact[axis.key]) }}</span>
+          </label>
+        }
+      </div>
+      <div class="imp__interests">
+        <div class="field">
+          <span class="rpg-label">Common goal</span>
+          <app-suggest-input
+            [suggestions]="goalSuggestions()"
+            [value]="currentImpact.goal"
+            (valueChange)="setInterest('goal', $event)"
+            placeholder="What this brings closer…"
+            label="Common goal"
+          />
+        </div>
+        <div class="field">
+          <span class="rpg-label">Obstacle</span>
+          <app-suggest-input
+            [suggestions]="obstacleSuggestions()"
+            [value]="currentImpact.obstacle"
+            (valueChange)="setInterest('obstacle', $event)"
+            placeholder="What this puts in the way…"
+            label="Obstacle"
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+} @else {
+  <p class="imp__empty">Pick a line or option in the Tree to shape its variants and impact.</p>
+}

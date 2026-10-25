@@ -1,0 +1,77 @@
+<div class="gs-wrap">
+  <label class="gs" [attr.title]="'Search the tome (' + shortcut + ')'">
+    <span class="gs__twig gs__twig--tl" aria-hidden="true"
+      ><app-lucide-icon [icon]="sproutIcon" iconClass="gs__twig-ic" [strokeWidth]="1.8"
+    /></span>
+    <span class="gs__twig gs__twig--tr" aria-hidden="true"
+      ><app-lucide-icon [icon]="sproutIcon" iconClass="gs__twig-ic" [strokeWidth]="1.8"
+    /></span>
+    <span class="gs__twig gs__twig--bl" aria-hidden="true"
+      ><app-lucide-icon [icon]="sproutIcon" iconClass="gs__twig-ic" [strokeWidth]="1.8"
+    /></span>
+    <span class="gs__twig gs__twig--br" aria-hidden="true"
+      ><app-lucide-icon [icon]="sproutIcon" iconClass="gs__twig-ic" [strokeWidth]="1.8"
+    /></span>
+
+    @if (engaged()) {
+      <span class="topbar__search-rune gs__rune" aria-hidden="true" animate.enter="rune-in" animate.leave="rune-out">
+        <app-lucide-icon [icon]="searchIcon" iconClass="gs__rune-ic" [strokeWidth]="1.8" />
+      </span>
+    }
+
+    <span class="gs__field">
+      <app-lucide-icon [icon]="searchIcon" iconClass="ic-16 gs__glass" [strokeWidth]="1.7" />
+      <input
+        #input
+        class="gs__input"
+        type="search"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-label="Search the tome"
+        placeholder="Search the tome…"
+        autocomplete="off"
+        [attr.aria-expanded]="showList()"
+        [attr.aria-controls]="listId"
+        [attr.aria-activedescendant]="showList() && hits().length ? optionId(active()) : null"
+        (input)="onInput($any($event.target).value)"
+        (focus)="open.set(true); focused.set(true)"
+        (blur)="focused.set(false)"
+        (keydown)="onKey($event)"
+      />
+      @if (!engaged()) {
+        <kbd class="gs__kbd" aria-hidden="true">{{ shortcut }}</kbd>
+      }
+      <app-lucide-icon [icon]="sparkleIcon" iconClass="ic-12 gs__fairy" [strokeWidth]="1.8" />
+    </span>
+  </label>
+
+  @if (showList()) {
+    <div class="gs__panel">
+      <ul class="gs__list" role="listbox" [id]="listId" aria-label="Search results">
+        @for (hit of hits(); track hit.key; let i = $index) {
+          <li
+            class="gs__hit"
+            role="option"
+            [id]="optionId(i)"
+            [class.gs__hit--active]="i === active()"
+            [attr.aria-selected]="i === active()"
+            (pointerdown)="$event.preventDefault()"
+            (pointerenter)="active.set(i)"
+            (click)="go(hit)"
+          >
+            <span class="gs__hit-text">
+              <span class="gs__hit-label">{{ hit.before }}<mark>{{ hit.match }}</mark>{{ hit.after }}</span>
+              <span class="gs__hit-sub">{{ hit.sub }}</span>
+            </span>
+            <span class="gs__tag" [class]="'gs__tag gs__tag--' + hit.kind">{{ tags[hit.kind] }}</span>
+          </li>
+        } @empty {
+          <li class="gs__none" role="presentation">Nothing in the tome matches “{{ query() }}”.</li>
+        }
+      </ul>
+      @if (hits().length) {
+        <p class="gs__foot" aria-hidden="true">{{ hits().length }} found · ↑↓ to move · Enter to open · Esc to clear</p>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,157 @@
+<app-rpg-modal title="About Congulatio" width="34rem" [open]="shell.dialog() === 'about'" (closed)="shell.closeDialog()">
+  <div class="dlg-about">
+    <p class="dlg-about__name">Congulatio <span class="dlg-about__version">v{{ version }}</span></p>
+    <p class="dlg-about__lead">
+      A forge for role-playing game worlds: create characters and their 3D builds, write branching dialogue, map
+      relations and routines, and simulate how souls with different motives play a scenario out.
+    </p>
+    <dl class="dlg-about__facts">
+      <div>
+        <dt>Author</dt>
+        <dd>Adrian Blasiak</dd>
+      </div>
+      <div>
+        <dt>Purpose</dt>
+        <dd>University project</dd>
+      </div>
+      <div>
+        <dt>Built with</dt>
+        <dd>Angular, NgRx Signals, three.js, Lucide icons, Mixamo animations</dd>
+      </div>
+    </dl>
+    <section class="dlg-about__ai">
+      <h3>Use of AI</h3>
+      <p>
+        Parts of this application were developed with the help of an AI assistant (Claude by Anthropic). The idea,
+        requirements, design decisions and the review and acceptance of every change are the author’s own, and the
+        author takes responsibility for the final work.
+      </p>
+      <p>
+        The Story AI panel in the app uses the language model built into Chrome. It runs on this device, and every
+        dialogue step it drafts is marked “AI draft” in the Tree.
+      </p>
+    </section>
+  </div>
+  <app-rpg-button modalFooter variant="gold" size="sm" (click)="shell.closeDialog()">Close</app-rpg-button>
+</app-rpg-modal>
+
+<app-rpg-modal title="Quick tour" width="44rem" [open]="shell.dialog() === 'tour'" (closed)="shell.closeDialog()">
+  <div class="dlg-tour__modes" role="tablist" aria-label="Quick tour">
+    <button type="button" role="tab" class="dlg-tour__mode" [class.dlg-tour__mode--on]="tourMode() === 'guide'" [attr.aria-selected]="tourMode() === 'guide'" (click)="openTour('guide')">Guide</button>
+    <button type="button" role="tab" class="dlg-tour__mode" [class.dlg-tour__mode--on]="tourMode() === 'shortcuts'" [attr.aria-selected]="tourMode() === 'shortcuts'" (click)="openTour('shortcuts')">Shortcuts</button>
+  </div>
+
+  @if (tourMode() === 'guide') {
+    @let step = tour[tourStep()];
+    <section class="dlg-tour__step" aria-live="polite">
+      <span class="dlg-tour__where">{{ tourStep() + 1 }} / {{ tour.length }} · {{ step.where }}</span>
+      <h3 class="dlg-tour__title">{{ step.title }}</h3>
+      <p class="dlg-tour__text">{{ step.text }}</p>
+      @if (step.tab) {
+        <app-rpg-button variant="wood" size="sm" (click)="goTo(step.tab)">Take me there</app-rpg-button>
+      }
+    </section>
+    <div class="dlg-tour__dots">
+      @for (s of tour; track s.title; let i = $index) {
+        <button
+          type="button"
+          class="dlg-tour__dot"
+          [class.dlg-tour__dot--on]="i === tourStep()"
+          [attr.aria-label]="'Step ' + (i + 1) + ': ' + s.title"
+          [attr.aria-current]="i === tourStep() ? 'step' : null"
+          (click)="tourStep.set(i)"
+        ></button>
+      }
+    </div>
+  } @else {
+    @for (group of shortcutGroups(); track group.group) {
+      <h3 class="dlg-keys__group">{{ group.group }}</h3>
+      <table class="dlg-keys">
+        <tbody>
+          @for (row of group.rows; track row.label) {
+            <tr>
+              <td>{{ row.label }}</td>
+              <td class="dlg-keys__keys"><kbd>{{ row.keys }}</kbd></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    <p class="dlg-keys__note">Undo and redo leave text fields alone, so typing keeps its own undo there.</p>
+  }
+
+  <ng-container modalFooter>
+    @if (tourMode() === 'guide') {
+      <app-rpg-button variant="wood" size="sm" [disabled]="tourStep() === 0" (click)="stepBy(-1)">Back</app-rpg-button>
+      @if (tourStep() < tour.length - 1) {
+        <app-rpg-button variant="gold" size="sm" (click)="stepBy(1)">Next</app-rpg-button>
+      } @else {
+        <app-rpg-button variant="gold" size="sm" (click)="shell.closeDialog()">Finish</app-rpg-button>
+      }
+    } @else {
+      <app-rpg-button variant="gold" size="sm" (click)="shell.closeDialog()">Close</app-rpg-button>
+    }
+  </ng-container>
+</app-rpg-modal>
+
+<app-rpg-modal title="History & changeset" width="40rem" [open]="shell.dialog() === 'history'" (closed)="shell.closeDialog()">
+  <p class="dlg-hist__lead">
+    {{ history.entries().length }} steps this session.
+    @if (history.savedAt()) {
+      Last saved {{ history.savedAt() | date: 'medium' }}.
+    } @else {
+      Not saved yet.
+    }
+  </p>
+  <ol class="dlg-hist">
+    @for (row of timeline(); track row.entry.id) {
+      <li class="dlg-hist__entry" [class]="'dlg-hist__entry dlg-hist__entry--' + row.state">
+        <div class="dlg-hist__head">
+          <span class="dlg-hist__label">{{ row.entry.label }}</span>
+          <span class="dlg-hist__time">{{ row.entry.at | date: 'HH:mm:ss' }}</span>
+          @if (row.state === 'current') {
+            <span class="dlg-hist__badge">Current</span>
+          } @else {
+            <button type="button" class="dlg-hist__jump" (click)="jump(row.index)">{{ row.state === 'undone' ? 'Redo to here' : 'Return here' }}</button>
+          }
+        </div>
+        @if (row.entry.details.length > 1) {
+          <ul class="dlg-hist__details">
+            @for (d of row.entry.details; track $index) {
+              <li>{{ d }}</li>
+            }
+          </ul>
+        }
+      </li>
+    }
+  </ol>
+  @if (history.archived().length) {
+    <h3 class="dlg-hist__older">Earlier sessions</h3>
+    <ol class="dlg-hist dlg-hist--archived">
+      @for (entry of history.archived(); track $index) {
+        <li class="dlg-hist__entry">
+          <div class="dlg-hist__head">
+            <span class="dlg-hist__label">{{ entry.label }}</span>
+            <span class="dlg-hist__time">{{ entry.at | date: 'short' }}</span>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+  <app-rpg-button modalFooter variant="wood" size="sm" [disabled]="!history.canUndo()" (click)="history.undo()">Undo</app-rpg-button>
+  <app-rpg-button modalFooter variant="wood" size="sm" [disabled]="!history.canRedo()" (click)="history.redo()">Redo</app-rpg-button>
+  <app-rpg-button modalFooter variant="gold" size="sm" (click)="history.exportTome(true)">Export with history</app-rpg-button>
+</app-rpg-modal>
+
+<app-rpg-modal title="Reset the tome?" width="30rem" [open]="shell.dialog() === 'reset'" (closed)="shell.closeDialog()">
+  <p class="dlg-reset">
+    Every soul, dialogue line, bond and routine returns to the starting sample. You can still bring your work back
+    with Undo, or export it first to keep a copy.
+  </p>
+  <app-rpg-button modalFooter variant="wood" size="sm" (click)="history.exportTome(true)">Export first</app-rpg-button>
+  <app-rpg-button modalFooter variant="wood" size="sm" (click)="shell.closeDialog()">Keep my tome</app-rpg-button>
+  <app-rpg-button modalFooter variant="danger" size="sm" (click)="confirmReset()">Reset tome</app-rpg-button>
+</app-rpg-modal>
+
+<app-remove-dialogue-dialog />
+<app-remove-soul-dialog />

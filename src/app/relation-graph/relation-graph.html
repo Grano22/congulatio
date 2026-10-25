@@ -1,0 +1,167 @@
+<app-rpg-panel
+  title="Relations"
+  subtitle="Souls, their routines & the dialogue they fork into"
+  surface="stone"
+  [footer]="true"
+>
+  <div class="rg">
+    <div class="rg__canvas tx-stone-grid grain" #canvas>
+      @let g = graph();
+      <svg
+        class="rg__svg"
+        [attr.width]="g.width"
+        [attr.height]="g.height"
+        [attr.viewBox]="'0 0 ' + g.width + ' ' + g.height"
+        role="group"
+        aria-label="Relation graph"
+      >
+        <g>
+          @for (edge of visibleEdges(); track edge.id) {
+            <path
+              [class]="'rg__edge rg__edge--' + edge.kind + (edge.relationKind ? ' rg__tone--' + edge.relationKind : '')"
+              [class.rg__edge--active]="isEdgeActive(edge)"
+              [class.rg__edge--dim]="isEdgeDimmed(edge)"
+              [attr.d]="edge.path"
+            />
+          }
+          @for (edge of visibleEdges(); track edge.id) {
+            @if (edge.kind === 'relation' || isEdgeActive(edge)) {
+              <text
+                [class]="'rg__edge-label' + (edge.relationKind ? ' rg__tone--' + edge.relationKind : '')"
+                [class.rg__edge-label--dim]="isEdgeDimmed(edge)"
+                [attr.x]="edge.labelX"
+                [attr.y]="edge.labelY"
+                text-anchor="middle"
+              >{{ edge.label }}</text>
+            }
+          }
+        </g>
+        <g>
+          @for (node of g.nodes; track node.id) {
+            <g
+              [class]="'rg__node rg__node--' + node.kind"
+              [class.rg__node--selected]="isSelected(node)"
+              [class.rg__node--dim]="isDimmed(node)"
+              [attr.transform]="'translate(' + node.x + ' ' + node.y + ')'"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="kindLabel[node.kind] + ': ' + node.title"
+              [attr.aria-pressed]="isSelected(node)"
+              (click)="step(node.id)"
+              (keydown.enter)="step(node.id)"
+              (keydown.space)="$event.preventDefault(); step(node.id)"
+            >
+              <rect class="rg__node-box" [attr.width]="nodeWidth" [attr.height]="nodeHeight" rx="8" />
+              <text class="rg__node-title" x="12" y="20">{{ node.title }}</text>
+              <text class="rg__node-sub" x="12" y="37">{{ node.subtitle }}</text>
+            </g>
+          }
+        </g>
+      </svg>
+    </div>
+
+    <aside class="rg__side" aria-label="Threads">
+      @if (trailNodes().length) {
+        <nav class="rg__trail" aria-label="Trail">
+          @for (step of trailNodes(); track $index; let i = $index, last = $last) {
+            <button type="button" class="rg__crumb" [class.rg__crumb--current]="last" (click)="backTo(i)">
+              {{ step.title }}
+            </button>
+          }
+        </nav>
+      }
+
+      @let node = selectedNode();
+      @let info = detail();
+      @if (node && info) {
+        <section class="rg__card">
+          <span class="rg__badge" [class]="'rg__badge rg__badge--' + node.kind">{{ kindLabel[node.kind] }}</span>
+          <h4 class="rg__card-title">{{ info.heading }}</h4>
+          <p class="rg__card-meta">{{ info.meta.join(' · ') }}</p>
+          @if (info.body) {
+            <p class="rg__card-body">{{ info.body }}</p>
+          }
+        </section>
+
+        @for (group of linkGroups(); track group.heading) {
+          <section class="rg__group">
+            <h5 class="rg__group-title">{{ group.heading }}</h5>
+            <ul class="rg__links">
+              @for (link of group.links; track link.edge.id) {
+                <li class="rg__link">
+                  <button type="button" class="rg__link-go" (click)="step(link.other.id, true)">
+                    <span [class]="'rg__link-label' + (link.edge.relationKind ? ' rg__tone--' + link.edge.relationKind : '')">
+                      {{ link.edge.label }}
+                    </span>
+                    <span class="rg__link-name">{{ link.other.title }}</span>
+                  </button>
+                  @if (link.edge.kind === 'relation') {
+                    <button type="button" class="rg__link-cut" aria-label="Sever bond" (click)="unbind(link.edge)">
+                      <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          </section>
+        } @empty {
+          <p class="rg__hint">No threads lead from here yet.</p>
+        }
+
+        @if (node.kind === 'character') {
+          <form class="rg__bind" (submit)="$event.preventDefault(); bindRelation()">
+            <h5 class="rg__group-title">Bind a relation</h5>
+            <label class="field">
+              <span class="rpg-label">With</span>
+              <select class="rpg-select" [value]="bindTargetId()" (change)="bindTargetId.set($any($event.target).value)">
+                <option value="">Choose a soul…</option>
+                @for (c of bindTargets(); track c.id) {
+                  <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span class="rpg-label">As</span>
+              <select class="rpg-select" [value]="bindKind()" (change)="bindKind.set($any($event.target).value)">
+                @for (kind of relationKinds; track kind) {
+                  <option [value]="kind">{{ kind }}</option>
+                }
+              </select>
+            </label>
+            <app-rpg-button variant="gold" size="sm" (click)="bindRelation()">
+              <app-lucide-icon [icon]="linkIcon" iconClass="ic-14" [strokeWidth]="2" />
+              Bind
+            </app-rpg-button>
+          </form>
+        }
+      } @else {
+        <p class="rg__hint">Pick a soul, routine or line to walk its threads. From any sentence you can step to the souls who take part in it.</p>
+        <ul class="rg__legend">
+          <li><span class="rg__swatch rg__swatch--character"></span>Soul</li>
+          <li><span class="rg__swatch rg__swatch--routine"></span>Routine</li>
+          <li><span class="rg__swatch rg__swatch--line"></span>Dialogue line</li>
+          <li><span class="rg__swatch rg__swatch--choice"></span>Player option</li>
+        </ul>
+      }
+    </aside>
+  </div>
+
+  <p footer class="rg__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="rg__notice-text" [class]="'rg__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    }
+  </p>
+  @if (selectedNode()?.kind === 'character') {
+    <app-rpg-button footer variant="gold" size="sm" (click)="openInForge()">
+      <app-lucide-icon [icon]="forgeIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Open in Forge
+    </app-rpg-button>
+  }
+  <app-rpg-button footer variant="wood" size="sm" [disabled]="!trail().length" (click)="clearTrail()">
+    <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    Clear Trail
+  </app-rpg-button>
+</app-rpg-panel>

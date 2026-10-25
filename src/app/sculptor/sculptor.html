@@ -1,0 +1,155 @@
+<app-rpg-panel title="Sculptor" subtitle="A low-poly build of a soul" surface="stone" [footer]="true">
+  <div class="sc">
+    <div class="sc__stage tx-stone-grid" #stage>
+      @if (webglFailed()) {
+        <p class="sc__fallback">This browser cannot draw in 3D (WebGL is unavailable).</p>
+      } @else {
+        <span class="sc__hint">Drag to orbit · scroll to zoom</span>
+      }
+    </div>
+
+    <aside class="sc__controls">
+      <label class="field">
+        <span class="rpg-label">Soul</span>
+        <select class="rpg-select" [value]="characterId()" (change)="pickSoul($any($event.target).value)">
+          @for (c of souls(); track c.id) {
+            <option [value]="c.id">{{ c.firstName }} {{ c.lastName }} · {{ c.race }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="sc__sections" role="tablist" aria-label="Sculptor sections">
+        @for (s of sections; track s.id) {
+          <button
+            type="button"
+            role="tab"
+            class="sc__section"
+            [class.sc__section--on]="section() === s.id"
+            [attr.aria-selected]="section() === s.id"
+            (click)="section.set(s.id)"
+          >{{ s.label }}</button>
+        }
+      </div>
+
+      @let d = draft();
+      @let l = look();
+      @if (!d || !l) {
+        <p class="sc__empty">The codex is empty. Forge a soul first.</p>
+      } @else {
+        @switch (section()) {
+          @case ('body') {
+            <span class="rpg-label">Presets</span>
+            <div class="sc__chips">
+              @for (p of presets; track p.id) {
+                <button
+                  type="button"
+                  class="sc__chip"
+                  [class.sc__chip--on]="activePreset() === p.id"
+                  [attr.aria-pressed]="activePreset() === p.id"
+                  (click)="applyPreset(p)"
+                >{{ p.label }}</button>
+              }
+            </div>
+            @for (range of ranges(); track range.key) {
+              <label class="sc__range">
+                <span class="sc__range-head">
+                  <span class="rpg-label">{{ range.label }}</span>
+                  <span class="sc__value">{{ format(d[range.key], range.key) }}</span>
+                </span>
+                <input
+                  type="range"
+                  [min]="range.min"
+                  [max]="range.max"
+                  [step]="range.step"
+                  [value]="d[range.key]"
+                  (input)="setValue(range.key, $any($event.target).value)"
+                />
+              </label>
+            }
+            <app-rpg-button variant="wood" size="sm" (click)="resetToDefault()">
+              <app-lucide-icon [icon]="resetIcon" iconClass="ic-14" [strokeWidth]="2" />
+              Race Default
+            </app-rpg-button>
+          }
+          @case ('hair') {
+            <span class="rpg-label">Style</span>
+            <div class="sc__chips">
+              @for (h of hairPresets; track h.id) {
+                <button
+                  type="button"
+                  class="sc__chip"
+                  [class.sc__chip--on]="l.hair === h.id"
+                  [attr.aria-pressed]="l.hair === h.id"
+                  (click)="setHair(h.id)"
+                >{{ h.label }}</button>
+              }
+            </div>
+            <span class="rpg-label">Colour</span>
+            <div class="sc__swatches">
+              @for (color of hairColors; track color.hex) {
+                <button
+                  type="button"
+                  class="sc__swatch"
+                  [class.sc__swatch--on]="l.hairColor === color.hex"
+                  [style.background]="color.hex"
+                  [attr.aria-label]="color.label"
+                  [attr.aria-pressed]="l.hairColor === color.hex"
+                  [title]="color.label"
+                  (click)="setHairColor(color.hex)"
+                ></button>
+              }
+            </div>
+          }
+          @case ('animate') {
+            <p class="sc__help">
+              Pick an animation on <a [href]="mixamoUrl" target="_blank" rel="noopener">Mixamo</a> ({{ mixamoUrl }}), choose
+              <b>Download → FBX Binary</b>, then load the file here. <i>With Skin</i> gives the most faithful motion.
+            </p>
+            <label class="sc__upload" [class.sc__upload--busy]="loading()">
+              <app-lucide-icon [icon]="uploadIcon" iconClass="ic-14" [strokeWidth]="2" />
+              {{ loading() ? 'Reading…' : 'Load Mixamo .fbx' }}
+              <input type="file" accept=".fbx" multiple [disabled]="loading()" (change)="loadAnimations($event)" />
+            </label>
+            <label class="sc__toggle">
+              <input type="checkbox" [checked]="inPlace()" (change)="inPlace.set($any($event.target).checked)" />
+              Keep in place
+            </label>
+            <ul class="sc__anims">
+              @for (a of animations(); track a.id) {
+                <li class="sc__anim" [class.sc__anim--on]="playingId() === a.id">
+                  <button type="button" class="sc__anim-play" (click)="playingId() === a.id ? stop() : play(a)">
+                    <app-lucide-icon [icon]="playingId() === a.id ? stopIcon : playIcon" iconClass="ic-13" [strokeWidth]="2.2" />
+                    <span class="sc__anim-name">{{ a.name }}</span>
+                    <span class="sc__anim-time">{{ a.duration.toFixed(1) }}s</span>
+                  </button>
+                  <button type="button" class="sc__anim-cut" aria-label="Remove animation" (click)="remove(a)">×</button>
+                </li>
+              } @empty {
+                <li class="sc__empty">No animations loaded yet.</li>
+              }
+            </ul>
+          }
+        }
+      }
+    </aside>
+  </div>
+
+  <p footer class="sc__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="sc__notice-text" [class]="'sc__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    } @else if (dirty()) {
+      <span class="sc__unsaved">Unsaved changes</span>
+    }
+  </p>
+  <app-rpg-button footer variant="wood" size="sm" (click)="makeAvatar()">
+    <app-lucide-icon [icon]="avatarIcon" iconClass="ic-14" [strokeWidth]="2" />
+    Make Avatar
+  </app-rpg-button>
+  <app-rpg-button footer variant="gold" size="sm" (click)="save()">
+    <app-lucide-icon [icon]="saveIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+    Save Build
+  </app-rpg-button>
+</app-rpg-panel>

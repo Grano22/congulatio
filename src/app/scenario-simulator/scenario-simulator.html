@@ -1,0 +1,105 @@
+<app-rpg-panel
+  title="Simulation"
+  subtitle="Let a soul walk a scenario by its motives"
+  surface="stone"
+  [footer]="true"
+>
+  <div class="sim">
+    <form class="sim__setup" (submit)="$event.preventDefault(); simulate()">
+      <label class="field">
+        <span class="rpg-label">Scenario</span>
+        <select class="rpg-select" [value]="scenarioId()" (change)="scenarioId.set($any($event.target).value)">
+          <option value="">Choose a scenario…</option>
+          @for (s of scenarios(); track s.id) {
+            <option [value]="s.id">{{ s.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span class="rpg-label">Soul in the world</span>
+        <select class="rpg-select" [value]="actorId()" (change)="pickActor($any($event.target).value)">
+          <option value="">Choose a soul…</option>
+          @for (c of souls(); track c.id) {
+            <option [value]="c.id">{{ c.firstName }} {{ c.lastName }} · {{ c.temperament }}</option>
+          }
+        </select>
+      </label>
+      <fieldset class="sim__motives">
+        <legend class="rpg-label">Motivations</legend>
+        @for (m of motivations; track m.key) {
+          <button
+            type="button"
+            class="sim__motive"
+            [class.sim__motive--on]="isChosen(m.key)"
+            [attr.aria-pressed]="isChosen(m.key)"
+            (click)="toggle(m.key)"
+          >{{ m.label }}</button>
+        }
+      </fieldset>
+      <p class="sim__hint">The soul’s temperament adds its own leaning on top of the motives you pick.</p>
+    </form>
+
+    <section class="sim__result tx-stone-grid grain" aria-live="polite">
+      @if (outcome(); as o) {
+        <ol class="sim__steps">
+          @for (step of o.steps; track $index) {
+            <li class="sim__step" [class.sim__step--choice]="step.kind === 'choice'">
+              <span class="sim__speaker">
+                {{ step.speaker }}
+                @if (step.tone) {
+                  <span class="sim__tone" [class]="'sim__tone sim__tone--' + step.tone">{{ step.tone }}</span>
+                }
+              </span>
+              <span class="sim__text">{{ step.text }}</span>
+              @if (step.reasons.length || step.passedOver) {
+                <span class="sim__why">
+                  @if (step.reasons.length) {
+                    driven by {{ step.reasons.join(' & ') }}
+                  }
+                  @if (step.passedOver) {
+                    · passed over {{ step.passedOver }}
+                  }
+                </span>
+              }
+            </li>
+          }
+        </ol>
+        <div class="sim__outcome">
+          <h4 class="sim__title">Outcome</h4>
+          <p class="sim__verdict">{{ o.verdict }}</p>
+          <div class="sim__totals">
+            @for (axis of axes; track axis.key) {
+              <span
+                class="sim__total"
+                [class.sim__total--up]="o.totals[axis.key] > 0"
+                [class.sim__total--down]="o.totals[axis.key] < 0"
+              >{{ axis.label }} {{ signed(o.totals[axis.key]) }}</span>
+            }
+          </div>
+          @if (o.obstacles.length) {
+            <p class="sim__obstacles">Obstacles raised: {{ o.obstacles.join('; ') }}</p>
+          }
+        </div>
+      } @else {
+        <p class="sim__empty">Pick a scenario, a soul and its motives, then simulate. The answers and the outcome appear here.</p>
+      }
+    </section>
+  </div>
+
+  <p footer class="sim__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="sim__notice-text" [class]="'sim__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    }
+  </p>
+  <app-rpg-button footer variant="wood" size="sm" (click)="reset()">
+    <app-lucide-icon [icon]="resetIcon" iconClass="ic-14" [strokeWidth]="2" />
+    Reset
+  </app-rpg-button>
+  <app-rpg-button footer variant="gold" size="sm" (click)="simulate()">
+    <app-lucide-icon [icon]="simulateIcon" iconClass="ic-14" [strokeWidth]="2" />
+    Simulate
+  </app-rpg-button>
+</app-rpg-panel>

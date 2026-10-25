@@ -1,0 +1,215 @@
+:host {
+  display: contents;
+}
+
+.dlg-about__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.dlg-about__version {
+  font-size: 0.8rem;
+  color: var(--color-ink-500);
+}
+.dlg-about__lead,
+.dlg-reset,
+.dlg-hist__lead {
+  margin: 0.5rem 0 1rem;
+  line-height: 1.5;
+}
+.dlg-about__facts {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+}
+.dlg-about__facts div {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 0.6rem;
+}
+.dlg-about__facts dt {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-500);
+}
+.dlg-about__facts dd {
+  margin: 0;
+}
+.dlg-about__ai {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-wood-500);
+  background: rgba(255, 250, 232, 0.5);
+}
+.dlg-about__ai h3,
+.dlg-hist__older,
+.dlg-keys__group {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-700);
+}
+.dlg-about__ai p {
+  margin: 0;
+  line-height: 1.5;
+}
+.dlg-about__ai p + p {
+  margin-top: 0.5rem;
+}
+
+.dlg-tour__modes {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-wood-600);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.dlg-tour__mode {
+  padding: 0.3rem 1rem;
+  border: none;
+  background: rgba(255, 250, 232, 0.4);
+  color: var(--color-ink-700);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.dlg-tour__mode--on {
+  background: var(--color-wood-700);
+  color: var(--color-gold-200);
+}
+.dlg-tour__step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 11rem;
+}
+.dlg-tour__where {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--color-ink-500);
+}
+.dlg-tour__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+.dlg-tour__text {
+  margin: 0;
+  line-height: 1.55;
+}
+.dlg-tour__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+.dlg-tour__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-wood-600);
+  background: transparent;
+  cursor: pointer;
+}
+.dlg-tour__dot--on {
+  background: var(--color-gold-600);
+}
+
+.dlg-keys {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.dlg-keys td {
+  padding: 0.3rem 0.2rem;
+  border-bottom: 1px dashed var(--color-parchment-400);
+}
+.dlg-keys__keys {
+  text-align: right;
+  white-space: nowrap;
+}
+.dlg-keys kbd {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-wood-500);
+  background: rgba(255, 250, 232, 0.7);
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+}
+.dlg-keys__note {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-ink-500);
+}
+
+.dlg-hist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+.dlg-hist__entry {
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-parchment-400);
+  background: rgba(255, 250, 232, 0.5);
+}
+.dlg-hist__entry--current {
+  border-color: var(--color-gold-600);
+  box-shadow: 0 0 0 2px rgba(208, 172, 60, 0.35);
+}
+.dlg-hist__entry--undone {
+  opacity: 0.6;
+  border-style: dashed;
+}
+.dlg-hist__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dlg-hist__label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+.dlg-hist__time {
+  font-size: 0.75rem;
+  color: var(--color-ink-500);
+}
+.dlg-hist__badge {
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--color-gold-700);
+  color: var(--color-parchment-50);
+  font-size: 0.7rem;
+}
+.dlg-hist__jump {
+  border: 1px solid var(--color-wood-500);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-ink-700);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.dlg-hist__details {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--color-ink-600);
+}
+.dlg-hist--archived .dlg-hist__entry {
+  opacity: 0.75;
+}

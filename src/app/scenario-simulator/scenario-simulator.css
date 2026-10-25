@@ -1,0 +1,201 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sim {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  color: var(--color-parchment-200);
+}
+
+.sim__setup {
+  width: 280px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 2px solid var(--color-wood-950);
+  background: linear-gradient(180deg, var(--color-stone-800), var(--color-stone-900));
+}
+.sim__setup .rpg-label {
+  color: var(--color-parchment-300);
+}
+.sim__motives {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.sim__motives legend {
+  margin-bottom: 0.4rem;
+}
+.sim__motive {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-wood-500);
+  background: var(--color-wood-800);
+  color: var(--color-parchment-300);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.sim__motive--on {
+  border-color: var(--color-gold-400);
+  background: var(--color-gold-700);
+  color: var(--color-gold-100);
+}
+.sim__hint,
+.sim__empty {
+  margin: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-parchment-400);
+}
+
+.sim__result {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 1rem 1.2rem 1.5rem;
+}
+.sim__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+.sim__step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 78%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-wood-800);
+  background: linear-gradient(168deg, #f4e8c8, #dcc48f);
+  color: var(--color-ink-900);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+.sim__step--choice {
+  align-self: flex-end;
+  border-color: var(--color-mana-600);
+  background: linear-gradient(168deg, #dbe8f2, #a9c3d8);
+}
+.sim__speaker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-500);
+}
+.sim__tone {
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  color: var(--color-parchment-50);
+  background: var(--color-stone-600);
+}
+.sim__tone--warm {
+  background: var(--color-moss-500);
+}
+.sim__tone--hostile {
+  background: var(--color-blood-500);
+}
+.sim__text {
+  font-style: italic;
+}
+.sim__why {
+  font-size: 0.72rem;
+  color: var(--color-ink-500);
+}
+
+.sim__outcome {
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-gold-600);
+  background: rgba(19, 17, 16, 0.7);
+}
+.sim__title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+}
+.sim__verdict {
+  margin: 0 0 0.6rem;
+  color: var(--color-parchment-100);
+}
+.sim__totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.sim__total {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-stone-500);
+  font-size: 0.78rem;
+}
+.sim__total--up {
+  border-color: var(--color-moss-500);
+  color: var(--color-moss-400);
+}
+.sim__total--down {
+  border-color: var(--color-blood-500);
+  color: var(--color-blood-400);
+}
+.sim__obstacles {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-parchment-300);
+}
+
+.sim__notice {
+  margin: 0 auto 0 0;
+  min-width: 0;
+}
+.sim__notice-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-parchment-50);
+  border: 1px solid var(--color-wood-950);
+}
+.sim__notice-text--success {
+  background: linear-gradient(180deg, var(--color-moss-500), var(--color-moss-600));
+}
+.sim__notice-text--error {
+  background: linear-gradient(180deg, var(--color-blood-500), var(--color-blood-600));
+}
+
+@media (max-width: 900px) {
+  .sim {
+    flex-direction: column;
+  }
+  .sim__setup {
+    width: auto;
+    border-right: none;
+    border-bottom: 2px solid var(--color-wood-950);
+  }
+}

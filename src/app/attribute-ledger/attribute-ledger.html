@@ -1,0 +1,89 @@
+<app-rpg-panel title="Attribute Ledger" [subtitle]="core.length + store.defs().length + ' attributes'" [footer]="true">
+  @if (closable()) {
+    <app-rpg-button headerActions variant="ghost" size="sm" class="al__close" aria-label="Close attribute ledger" (click)="close.emit()">
+      <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    </app-rpg-button>
+  }
+
+  <div class="al">
+    @if (draft(); as d) {
+      <form class="al__form" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New attribute' : 'Edit attribute'">
+        <div class="al__pair">
+          <label class="field al__key">
+            <span class="rpg-label">Key</span>
+            <input class="rpg-input" maxlength="6" [value]="d.key" placeholder="LCK" (input)="patch('key', $any($event.target).value.toUpperCase())" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Name</span>
+            <input class="rpg-input" [value]="d.name" placeholder="Luck" (input)="patch('name', $any($event.target).value)" />
+          </label>
+        </div>
+        <div class="al__triple">
+          <label class="field">
+            <span class="rpg-label">Lowest</span>
+            <input class="rpg-input" type="number" [value]="d.min" (input)="patchNumber('min', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Highest</span>
+            <input class="rpg-input" type="number" [value]="d.max" (input)="patchNumber('max', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Default</span>
+            <input class="rpg-input" type="number" [value]="d.defaultValue" (input)="patchNumber('defaultValue', $any($event.target).value)" />
+          </label>
+        </div>
+        <label class="field">
+          <span class="rpg-label">Description</span>
+          <input class="rpg-input" [value]="d.description" placeholder="What it measures…" (input)="patch('description', $any($event.target).value)" />
+        </label>
+        @if (error()) {
+          <p class="al__error" role="alert">{{ error() }}</p>
+        }
+        <div class="al__actions">
+          <app-rpg-button variant="wood" size="sm" (click)="cancel()">Cancel</app-rpg-button>
+          <app-rpg-button variant="gold" size="sm" (click)="save()">{{ editingId() === 'new' ? 'Add attribute' : 'Save' }}</app-rpg-button>
+        </div>
+      </form>
+    }
+
+    <h4 class="al__title">Your attributes</h4>
+    <ul class="al__list" aria-label="Custom attributes">
+      @for (a of store.defs(); track a.id) {
+        <li class="al__item">
+          <span class="al__badge">{{ a.key }}</span>
+          <span class="al__info">
+            <span class="al__name">{{ a.name }}</span>
+            <span class="al__meta">{{ a.min }} to {{ a.max }} · starts at {{ a.defaultValue }}{{ a.description ? ' · ' + a.description : '' }}</span>
+          </span>
+          <button type="button" class="al__mini" aria-label="Edit attribute" (click)="edit(a)">
+            <app-lucide-icon [icon]="pencilIcon" iconClass="ic-13" [strokeWidth]="2" />
+          </button>
+          <button
+            type="button"
+            class="al__mini al__mini--danger"
+            [attr.aria-label]="confirmId() === a.id ? 'Click again to remove' : 'Remove attribute'"
+            [title]="confirmId() === a.id ? 'Click again to remove' : 'Remove attribute'"
+            (click)="remove(a)"
+          >{{ confirmId() === a.id ? '?' : '×' }}</button>
+        </li>
+      } @empty {
+        <li class="al__empty">
+          <app-lucide-icon [icon]="slidersIcon" iconClass="ic-24" [strokeWidth]="1.6" />
+          No custom attributes yet. Add one below.
+        </li>
+      }
+    </ul>
+
+    <h4 class="al__title">Core attributes</h4>
+    <ul class="al__core" aria-label="Core attributes">
+      @for (c of core; track c.key) {
+        <li><span class="al__badge al__badge--core">{{ c.key }}</span>{{ c.name }}</li>
+      }
+    </ul>
+  </div>
+
+  <app-rpg-button footer variant="gold" size="sm" [disabled]="editingId() !== null" (click)="openNew()">
+    <app-lucide-icon [icon]="plusIcon" iconClass="ic-14" [strokeWidth]="2.4" />
+    New Attribute
+  </app-rpg-button>
+</app-rpg-panel>

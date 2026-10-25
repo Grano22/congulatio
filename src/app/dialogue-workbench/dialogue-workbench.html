@@ -1,0 +1,111 @@
+<app-rpg-panel
+  title="Dialogue"
+  subtitle="Options, next steps & a writable story"
+  surface="stone"
+  [footer]="true"
+>
+  <!-- subtabs: the vertical tree, or the writable story composer -->
+  <div class="wb__tabs">
+    <app-rpg-tabs
+      [tabs]="subTabs"
+      [active]="subTab()"
+      (activeChange)="setSubTab($event)"
+    />
+  </div>
+
+  <div class="wb__content">
+    @switch (subTab()) {
+      @case ('tree') {
+        <div class="wb__pane" animate.enter="stage-enter" animate.leave="stage-leave">
+          <app-dialogue-list [(selectedId)]="selectedId" />
+        </div>
+      }
+
+      @case ('impact') {
+        <div class="wb__pane" animate.enter="stage-enter" animate.leave="stage-leave">
+          <app-dialogue-impact [nodeId]="selectedId()" />
+        </div>
+      }
+
+      @case ('composer') {
+        <!-- old-school writable prompt: inscribe text, a new branch grows -->
+        <div class="wb__pane wb__pane--composer" animate.enter="stage-enter" animate.leave="stage-leave">
+          <div class="comp">
+            <div class="comp__context">
+              <span class="comp__context-label">Writing from</span>
+              @let selected = selectedNode();
+              @if (selected) {
+                <span class="comp__context-node">
+                  <span class="comp__context-speaker">{{ selected.speaker }}</span>
+                  <span class="comp__context-text">{{ selected.text }}</span>
+                </span>
+              } @else {
+                @let root = rootNode();
+                <span class="comp__context-node comp__context-node--muted">
+                  the opening line{{ root ? ' — ' + root.text : '' }}
+                </span>
+              }
+            </div>
+
+            <app-story-ai-panel
+              [cursorId]="selectedNode()?.id ?? rootNode()?.id ?? null"
+              [draftText]="draft()"
+              (polished)="draft.set($event)"
+              (added)="onAiAdded($event)"
+            />
+
+            <div class="comp__screen tx-stone-grid grain">
+              <div class="comp__log">
+                @if (log().length) {
+                  @for (entry of log(); track entry.id) {
+                    <p class="comp__log-line">
+                      <span class="comp__log-glyph" aria-hidden="true">❯</span>{{ entry.text }}
+                      <span class="comp__log-note">— {{ entry.note }}</span>
+                    </p>
+                  }
+                } @else {
+                  <p class="comp__log-line comp__log-line--dim">
+                    The page is blank. Inscribe what the player says or does to weave the first branch…
+                  </p>
+                }
+              </div>
+              <div class="comp__promptline">
+                <span class="comp__prompt" aria-hidden="true">❯</span>
+                <input
+                  class="comp__input"
+                  type="text"
+                  placeholder="Write what the player says or does…"
+                  [value]="draft()"
+                  (input)="setDraft($event)"
+                  (keydown.enter)="compose()"
+                  aria-label="Story composer"
+                />
+              </div>
+            </div>
+
+            <p class="comp__hint">
+              <app-lucide-icon [icon]="cornerIcon" iconClass="ic-14" />
+              Whatever you inscribe is woven into the tree — switch to the Tree tab to read it.
+            </p>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (selectedNode() && subTab() !== 'impact') {
+    <app-rpg-button footer variant="wood" size="sm" (click)="subTab.set('impact')">
+      <app-lucide-icon [icon]="scaleIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+      Shape Impact
+    </app-rpg-button>
+  }
+  <app-rpg-button
+    footer
+    variant="gold"
+    size="sm"
+    (click)="subTab.set('composer')"
+  >
+    <app-lucide-icon [icon]="penLineIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+    {{ selectedNode() ? 'Compose from here' : 'Open Story Composer' }}
+  </app-rpg-button>
+</app-rpg-panel>

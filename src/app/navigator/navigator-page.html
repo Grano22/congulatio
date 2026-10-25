@@ -1,0 +1,19 @@
+<app-rpg-panel [title]="title()" [subtitle]="subtitle()">
+  @if (closable()) {
+    <app-rpg-button
+      headerActions
+      variant="ghost"
+      size="sm"
+      class="npage__close"
+      aria-label="Close navigator"
+      (click)="close.emit()"
+    >
+      <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    </app-rpg-button>
+  }
+
+  <div class="npage__empty">
+    <span class="gem" aria-hidden="true"></span>
+    <p class="npage__empty-text">{{ emptyText() }}</p>
+  </div>
+</app-rpg-panel>

@@ -1,0 +1,150 @@
+<app-rpg-panel
+  title="Character Forge"
+  subtitle="Shape a soul"
+  [footer]="true"
+>
+  <div class="forge">
+    <!-- Portrait preview -->
+    <aside class="forge__portrait">
+      <div class="forge__frame rivets">
+        @if (summoned()) {
+          <app-pixel-avatar
+            class="forge__avatar"
+            [face]="sample().face"
+            [image]="sample().portrait"
+            [label]="sample().firstName + ' ' + sample().lastName + ' portrait'"
+          />
+        } @else {
+          <svg class="forge__silhouette" viewBox="0 0 100 120" aria-hidden="true">
+            <circle cx="50" cy="34" r="18" fill="currentColor" />
+            <path d="M18 120c3-27 16-40 32-40s29 13 32 40Z" fill="currentColor" />
+          </svg>
+        }
+        <span class="forge__frame-rune" aria-hidden="true">Æ</span>
+      </div>
+      <div class="forge__plate">
+        <span class="forge__plate-name">{{ sample().firstName }} {{ sample().lastName }} {{ sample().nickname }}</span>
+        <span class="forge__plate-sub">{{ sample().race }} · Lv {{ sample().level }}</span>
+      </div>
+      <div class="forge__traits">
+        <span class="forge__trait">👁 {{ sample().eyeColor }} eyes</span>
+        <span class="forge__trait">✦ {{ sample().hairColor }} hair</span>
+        <span class="forge__trait">◉ {{ sample().skin }} skin</span>
+        <span class="forge__trait">▣ {{ sample().bodyType }}</span>
+        <span class="forge__trait">❖ {{ sample().temperament }}</span>
+      </div>
+    </aside>
+
+    <!-- Form -->
+    <form class="forge__form" (submit)="$event.preventDefault()">
+      <section class="forge__section">
+        <h4 class="forge__section-title">
+          <span class="gem" aria-hidden="true"></span> Identity
+        </h4>
+        <div class="forge__grid">
+          <label class="field">
+            <span class="rpg-label">First Name</span>
+            <input class="rpg-input" [value]="sample().firstName" (input)="patch('firstName', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Last Name</span>
+            <input class="rpg-input" [value]="sample().lastName" (input)="patch('lastName', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Nickname</span>
+            <input class="rpg-input" [value]="sample().nickname" placeholder="“the Bold”" (input)="patch('nickname', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Breed</span>
+            <select class="rpg-select" [value]="sample().race" (change)="patch('race', $any($event.target).value)">
+              @for (race of races; track race) {
+                <option [value]="race">{{ race }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            <span class="rpg-label">Origin</span>
+            <input class="rpg-input" [value]="sample().origin" (input)="patch('origin', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Zodiac</span>
+            <select class="rpg-select" [value]="sample().zodiac" (change)="patch('zodiac', $any($event.target).value)">
+              @for (sign of zodiacs; track sign) {
+                <option [value]="sign">{{ sign }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            <span class="rpg-label">Birth Date</span>
+            <input class="rpg-input" [value]="sample().birthDate" placeholder="284-03-12" (input)="patch('birthDate', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Sex</span>
+            <select class="rpg-select" [value]="sample().sex" (change)="patch('sex', $any($event.target).value)">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="forge__section">
+        <h4 class="forge__section-title">
+          <span class="gem" aria-hidden="true"></span> Appearance
+        </h4>
+        <div class="forge__grid forge__grid--3">
+          <label class="field">
+            <span class="rpg-label">Eye Color</span>
+            <input class="rpg-input" [value]="sample().eyeColor" (input)="patch('eyeColor', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Hair Color</span>
+            <input class="rpg-input" [value]="sample().hairColor" (input)="patch('hairColor', $any($event.target).value)" />
+          </label>
+          <label class="field">
+            <span class="rpg-label">Body Type</span>
+            <select class="rpg-select" [value]="sample().bodyType" (change)="patch('bodyType', $any($event.target).value)">
+              @for (bodyType of bodyTypes; track bodyType) {
+                <option [value]="bodyType">{{ bodyType }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="forge__section">
+        <h4 class="forge__section-title">
+          <span class="gem" aria-hidden="true"></span> Scribe’s Notes
+        </h4>
+        <textarea
+          class="rpg-textarea"
+          rows="3"
+          [value]="sample().note"
+          (input)="patch('note', $any($event.target).value)"
+          placeholder="The chronicler whispers… (background, temperament, secrets)"
+        ></textarea>
+      </section>
+    </form>
+  </div>
+
+  <p footer class="forge__notice" role="status" aria-live="polite">
+    @if (notice(); as n) {
+      <span class="forge__notice-text" [class]="'forge__notice-text--' + n.kind">
+        <app-lucide-icon [icon]="n.kind === 'success' ? successIcon : errorIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        {{ n.text }}
+      </span>
+    }
+  </p>
+  <app-rpg-button footer variant="gold" size="sm" (click)="randomize()">
+    <app-lucide-icon [icon]="dicesIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+    Summon Soul
+  </app-rpg-button>
+  <app-rpg-button footer variant="gold" size="sm" (click)="saveToCodex()">
+    <app-lucide-icon [icon]="saveIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+    {{ isEditing() ? 'Edit' : 'Save to Codex' }}
+  </app-rpg-button>
+  <app-rpg-button footer variant="wood" size="sm" (click)="discard()">
+    <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    Discard
+  </app-rpg-button>
+</app-rpg-panel>

@@ -1,0 +1,95 @@
+<div class="shell">
+  <app-top-bar [leftSidebarOpen]="shell.leftVisible()" (leftSidebarToggle)="toggleLeftSidebar()" />
+
+  <div class="shell__body">
+    <aside
+      class="shell__side shell__side--left"
+      [class.shell__side--hidden]="shell.maximized() || !shell.leftVisible()"
+      aria-label="Navigators"
+    >
+      <app-navigator (focusCharacter)="openTab('character')" />
+    </aside>
+
+    <main class="shell__main">
+      <div class="shell__tabrow">
+        <app-rpg-tabs [tabs]="tabs" [active]="activeTab()" (activeChange)="onTabChange($event)" />
+        <span class="shell__tabrow-tools">
+          <button
+            type="button"
+            class="shell__tool"
+            [class.shell__tool--on]="shell.maximized()"
+            [attr.title]="shell.maximized() ? 'Restore the stage' : 'Maximize the stage to full width'"
+            (click)="toggleMainMaximized()"
+          >
+            <app-lucide-icon [icon]="maxSectionIcon()" iconClass="ic-16" [strokeWidth]="1.8" />
+          </button>
+          <button
+            type="button"
+            class="shell__tool"
+            [class.shell__tool--on]="shell.fullscreen()"
+            [attr.title]="shell.fullscreen() ? 'Leave fullscreen' : 'Fullscreen'"
+            (click)="toggleFullscreen()"
+          >
+            <app-lucide-icon [icon]="fullscreenIcon()" iconClass="ic-16" [strokeWidth]="1.8" />
+          </button>
+        </span>
+      </div>
+
+      <div class="shell__stage">
+        @switch (activeTab()) {
+          @case ('character') {
+            <app-character-editor animate.enter="stage-enter" animate.leave="stage-leave" />
+          }
+          @case ('dialogue') {
+            <!-- the node editor (Dialogue Loom) is hidden for now — its workbench
+                 lives on in ./dialogue-editor and can be swapped back in here -->
+            <!-- <app-dialogue-editor animate.enter="stage-enter" animate.leave="stage-leave" /> -->
+            @defer {
+              <app-dialogue-workbench animate.enter="stage-enter" animate.leave="stage-leave" />
+            }
+          }
+          @case ('routines') {
+            @defer {
+              <app-character-routines animate.enter="stage-enter" animate.leave="stage-leave" />
+            }
+          }
+          @case ('interactions') {
+            @defer {
+              <app-interactions-editor animate.enter="stage-enter" animate.leave="stage-leave" />
+            }
+          }
+          @case ('relations') {
+            @defer {
+              <app-relation-graph animate.enter="stage-enter" animate.leave="stage-leave" (focusCharacter)="openTab('character')" />
+            }
+          }
+          @case ('simulation') {
+            @defer {
+              <app-scenario-simulator animate.enter="stage-enter" animate.leave="stage-leave" />
+            }
+          }
+          @case ('sculptor') {
+            @defer {
+              <app-sculptor animate.enter="stage-enter" animate.leave="stage-leave" />
+            }
+          }
+        }
+      </div>
+    </main>
+
+    <aside
+      class="shell__side shell__side--right"
+      [class.shell__side--hidden]="shell.maximized() || !shell.inspectorVisible()"
+      [style.width.px]="shell.inspectorWidth()"
+      aria-label="Inspector"
+    >
+      <app-inspector />
+    </aside>
+  </div>
+
+  <app-status-bar />
+</div>
+
+@defer (when shell.dialog()) {
+  <app-shell-dialogs />
+}

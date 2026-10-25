@@ -1,0 +1,75 @@
+<app-rpg-panel
+  title="Codex of Characters"
+  [subtitle]="subtitleText()"
+  [footer]="true"
+>
+  @if (closable()) {
+    <app-rpg-button
+      headerActions
+      variant="ghost"
+      size="sm"
+      class="galery__close"
+      aria-label="Close codex"
+      (click)="close.emit()"
+    >
+      <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
+    </app-rpg-button>
+  }
+
+  <div class="galery__filter">
+    <input
+      class="rpg-input"
+      type="search"
+      placeholder="Filter the souls…"
+      aria-label="Filter characters"
+      [value]="filter()"
+      (input)="filter.set($any($event.target).value)"
+    />
+  </div>
+
+  <ul class="galery__list" role="listbox" aria-label="Characters">
+    @for (soul of filteredSouls(); track soul.id) {
+      <li class="galery__item">
+        <button
+          type="button"
+          class="galery__entry"
+          role="option"
+          [class.galery__entry--selected]="selectedId() === soul.id"
+          [attr.aria-selected]="selectedId() === soul.id"
+          (click)="select(soul.id)"
+          (keydown.delete)="remove(soul.id)"
+        >
+          <span class="galery__portrait" aria-hidden="true">
+            <app-pixel-avatar [face]="soul.face" [image]="soul.portrait" />
+          </span>
+          <span class="galery__info">
+            <span class="galery__name">{{ soul.firstName }} {{ soul.lastName }}</span>
+            <span class="galery__meta">{{ soul.race }} · Lv {{ soul.level }}</span>
+          </span>
+          <span class="galery__status" [class]="'galery__status--' + soul.status">
+            {{ statusLabel[soul.status] }}
+          </span>
+        </button>
+        <button
+          type="button"
+          class="galery__remove"
+          [attr.aria-label]="'Remove ' + soul.firstName + ' ' + soul.lastName + ' from the codex'"
+          title="Remove from the codex (Delete)"
+          (click)="remove(soul.id)"
+        >
+          <app-lucide-icon [icon]="trashIcon" iconClass="ic-13" [strokeWidth]="2" />
+        </button>
+      </li>
+    } @empty {
+      <li class="galery__empty">
+        <app-lucide-icon [icon]="flameIcon" iconClass="galery__empty-icon" [strokeWidth]="1.6" />
+        <span>No souls match this inscription…</span>
+      </li>
+    }
+  </ul>
+
+  <app-rpg-button footer variant="gold" size="sm" class="galery__new" (click)="engraveNew()">
+    <app-lucide-icon [icon]="swordsIcon" iconClass="ic-14" [strokeWidth]="1.9" />
+    Engrave New Character
+  </app-rpg-button>
+</app-rpg-panel>

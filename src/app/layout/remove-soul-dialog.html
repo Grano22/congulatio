@@ -1,0 +1,116 @@
+<app-rpg-modal title="Remove a soul from the codex" width="40rem" [open]="shell.dialog() === 'remove-soul'" (closed)="close()">
+  @if (plan(); as p) {
+    <div class="rs__soul">
+      <span class="rs__portrait"><app-pixel-avatar [face]="p.soul.face" [image]="p.soul.portrait" [label]="fullName() + ' portrait'" /></span>
+      <span class="rs__who">
+        <b>{{ fullName() }}</b>
+        <span>{{ p.soul.race }} · Lv {{ p.soul.level }} · {{ p.soul.origin }}</span>
+      </span>
+    </div>
+    <p class="rs__lead">
+      The soul goes with its portrait, 3D build and attribute values. Everything else tied to it is listed below.
+    </p>
+
+    <div class="rs__sections">
+      <details class="rs__section rs__section--gone" [open]="p.bonds.length > 0">
+        <summary><span class="rs__count">{{ p.bonds.length }}</span> bond{{ p.bonds.length === 1 ? '' : 's' }} removed</summary>
+        <ul>
+          @for (b of p.bonds; track b.id) {
+            <li><span class="rs__tag">{{ b.kind }}</span>with {{ other(b.fromId, b.toId) }}{{ b.note ? ' · ' + b.note : '' }}</li>
+          } @empty {
+            <li class="rs__none">No bonds.</li>
+          }
+        </ul>
+      </details>
+
+      <details class="rs__section rs__section--gone" [open]="p.interactions.length > 0">
+        <summary><span class="rs__count">{{ p.interactions.length }}</span> interaction{{ p.interactions.length === 1 ? '' : 's' }} removed</summary>
+        <ul>
+          @for (i of p.interactions; track i.id) {
+            <li><span class="rs__tag">{{ kindLabel(i.kind) }}</span>{{ party(i.sourceId) }} → {{ party(i.targetId) }} · {{ i.trigger }}</li>
+          } @empty {
+            <li class="rs__none">No interactions.</li>
+          }
+        </ul>
+      </details>
+
+      <details class="rs__section rs__section--gone" [open]="p.personalRoutines.length > 0">
+        <summary><span class="rs__count">{{ p.personalRoutines.length }}</span> personal routine{{ p.personalRoutines.length === 1 ? '' : 's' }} removed</summary>
+        <ul>
+          @for (r of p.personalRoutines; track r.id) {
+            <li><span class="rs__tag">{{ slotLabel(r) }}</span>{{ r.name }}{{ r.forks.length ? ' · ' + r.forks.length + ' fork' + (r.forks.length === 1 ? '' : 's') : '' }}</li>
+          } @empty {
+            <li class="rs__none">No personal routines.</li>
+          }
+        </ul>
+      </details>
+
+      <details class="rs__section" [open]="p.leftRoutines.length > 0">
+        <summary><span class="rs__count rs__count--kept">{{ p.leftRoutines.length }}</span> global routine{{ p.leftRoutines.length === 1 ? '' : 's' }} left (they stay for the others)</summary>
+        <ul>
+          @for (r of p.leftRoutines; track r.id) {
+            <li><span class="rs__tag rs__tag--kept">{{ slotLabel(r) }}</span>{{ r.name }} · {{ r.participantIds.length - 1 }} other{{ r.participantIds.length - 1 === 1 ? '' : 's' }} remain</li>
+          } @empty {
+            <li class="rs__none">Keeps no global routine.</li>
+          }
+        </ul>
+      </details>
+
+      <details class="rs__section" [open]="p.scenes.length > 0">
+        <summary>
+          <span class="rs__count" [class.rs__count--kept]="!chosenScenes().size">{{ chosenScenes().size }}/{{ p.scenes.length }}</span>
+          scene{{ p.scenes.length === 1 ? '' : 's' }} where {{ p.soul.firstName }} speaks — choose which to remove
+        </summary>
+        @if (p.sharedName) {
+          <p class="rs__warn">Another soul is also named {{ p.soul.firstName }}, so some of these lines may be theirs. Nothing is checked yet.</p>
+        }
+        @if (p.scenes.length) {
+          <div class="rs__quick">
+            <button type="button" (click)="chooseAllScenes(true)">Remove all</button>
+            <button type="button" (click)="chooseAllScenes(false)">Keep all</button>
+          </div>
+        }
+        <ul class="rs__scenes">
+          @for (s of p.scenes; track s.rootId) {
+            <li class="rs__scene" [class.rs__scene--kept]="!isChosen(s.rootId)">
+              <label class="rs__scene-head">
+                <input type="checkbox" [checked]="isChosen(s.rootId)" (change)="toggleScene(s.rootId)" />
+                <span class="rs__scene-title">{{ s.title }}</span>
+                <span class="rs__scene-meta">{{ s.steps }} step{{ s.steps === 1 ? '' : 's' }} · {{ s.spokenLines.length }} spoken</span>
+              </label>
+              <details class="rs__lines">
+                <summary>Lines {{ p.soul.firstName }} speaks</summary>
+                <ul>
+                  @for (l of s.spokenLines; track l.id) {
+                    <li>{{ l.text }}</li>
+                  }
+                </ul>
+              </details>
+            </li>
+          } @empty {
+            <li class="rs__none">{{ p.soul.firstName }} speaks in no scene.</li>
+          }
+        </ul>
+        @if (p.scenes.length && chosenScenes().size < p.scenes.length) {
+          <p class="rs__hint">Kept scenes stay as they are; {{ p.soul.firstName }}’s lines in them remain as text.</p>
+        }
+      </details>
+    </div>
+
+    <p class="rs__summary" aria-live="polite">
+      Removes {{ fullName() }}, {{ p.bonds.length }} bond{{ p.bonds.length === 1 ? '' : 's' }},
+      {{ p.interactions.length }} interaction{{ p.interactions.length === 1 ? '' : 's' }},
+      {{ p.personalRoutines.length }} personal routine{{ p.personalRoutines.length === 1 ? '' : 's' }}
+      and {{ removedSteps() }} dialogue step{{ removedSteps() === 1 ? '' : 's' }}. One undo brings it all back.
+    </p>
+  } @else {
+    <p>This soul is no longer in the codex.</p>
+  }
+
+  <ng-container modalFooter>
+    <app-rpg-button variant="wood" size="sm" (click)="close()">Keep the soul</app-rpg-button>
+    @if (plan()) {
+      <app-rpg-button variant="danger" size="sm" (click)="confirm()">Remove {{ plan()!.soul.firstName }}</app-rpg-button>
+    }
+  </ng-container>
+</app-rpg-modal>
