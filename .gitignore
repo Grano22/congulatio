@@ -44,10 +44,25 @@ __screenshots__/
 Thumbs.db
 
 # Firebase settings
+.env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
+.envrc
 /public/firebase-config.json
 .firebase/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+storage-debug.log
+
+# Keys and credentials
+*serviceAccount*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+*.p12
+*.pfx
+.claude/settings.local.json
