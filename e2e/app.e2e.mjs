@@ -157,7 +157,7 @@ export async function appSuite(baseUrl) {
       await a.waitForSelector('[data-tab=sheet]', { timeout: 4000 });
       const tabs = await a.$$eval('[data-tab]', (t) => t.map((x) => x.dataset.tab));
       if (tabs.includes('dialogue') || tabs.includes('routines')) throw new Error(`D&D tabs: ${tabs.join(', ')}`);
-      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'dragonfire') throw new Error('the D&D theme was not applied');
+      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'forge') throw new Error('switching the view changed the theme');
       await a.click('[data-tab=sheet]');
       await a.waitForSelector('app-dnd-sheet .dnd__abilities li', { timeout: 8000 });
       for (const [label, selector] of [['Print sheet', 'app-character-print .ps'], ['Print card', 'app-character-print .pc--back']]) {
@@ -175,7 +175,28 @@ export async function appSuite(baseUrl) {
       await a.waitForSelector('[data-tab=dialogue]', { timeout: 4000 });
       if ((await a.$eval('[data-mode=npc-flow]', (b) => b.getAttribute('aria-checked'))) !== 'true') throw new Error('opening a dialogue did not switch to the NPC flow view');
       if (await a.$('[data-tab=sheet]')) throw new Error('the sheet tab is still shown in the NPC flow view');
-      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'forge') throw new Error('the forge theme did not come back');
+    });
+
+    await step('themes are picked separately from the view mode and remembered', async () => {
+      await a.click('.tpk__trigger');
+      await a.waitForSelector('[data-theme-option=ebony]');
+      await a.click('[data-theme-option=ebony]');
+      await a.waitForFunction(() => document.documentElement.dataset.theme === 'ebony', { timeout: 4000 });
+      await wait(600);
+      await press(a, MOD, 'Alt', 'KeyT');
+      await a.waitForFunction(() => document.documentElement.dataset.theme === 'dragonfire', { timeout: 4000 });
+      await wait(600);
+      await a.click('[data-mode=dnd]');
+      await a.waitForSelector('[data-tab=sheet]', { timeout: 4000 });
+      await a.reload({ waitUntil: 'domcontentloaded' });
+      await a.waitForSelector('[data-tab=sheet]', { timeout: 15000 });
+      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'dragonfire') throw new Error('the theme was not remembered');
+      await a.click('.tpk__trigger');
+      await a.waitForSelector('[data-theme-option=forge]');
+      await a.click('[data-theme-option=forge]');
+      await wait(600);
+      await a.click('[data-mode=npc-flow]');
+      await a.waitForFunction(() => document.documentElement.dataset.theme === 'forge', { timeout: 4000 });
     });
 
     await step('navigator panes share the sidebar height equally and stay inside a narrow sidebar', async () => {

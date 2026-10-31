@@ -89,9 +89,24 @@ export async function a11ySuite(baseUrl) {
     await page.click('[data-tab=sheet]');
     await page.waitForSelector('app-dnd-sheet .dnd__abilities li', { timeout: 8000 });
     await wait(600);
-    record('D&D view · character sheet (Dragonfire theme)', await audit(page));
+    record('D&D view · character sheet', await audit(page));
+    for (const theme of ['ebony', 'dragonfire']) {
+      await page.evaluate((t) => (document.documentElement.dataset.theme = t), theme);
+      await wait(300);
+      record(`D&D view · character sheet (${theme} theme)`, await audit(page));
+    }
     await page.click('[data-mode=npc-flow]');
-    await wait(600);
+    await page.keyboard.down('Alt');
+    await page.keyboard.press('Digit1');
+    await page.keyboard.up('Alt');
+    await wait(900);
+    for (const theme of ['ebony', 'dragonfire']) {
+      await page.evaluate((t) => (document.documentElement.dataset.theme = t), theme);
+      await wait(300);
+      record(`workbench · Character tab (${theme} theme)`, await audit(page));
+    }
+    await page.evaluate(() => (document.documentElement.dataset.theme = 'forge'));
+    await wait(300);
 
     const dialogs = [
       ['account menu', async () => page.click('app-account-menu .amenu__trigger'), 'app-account-menu'],
