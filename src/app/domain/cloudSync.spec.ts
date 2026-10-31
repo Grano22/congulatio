@@ -8,6 +8,7 @@ import {
   META_KIND,
   RowTooLargeError,
   chunkWrites,
+  formatBytes,
   decideSync,
   hashesOf,
   planPush,
@@ -106,5 +107,13 @@ describe('write chunks', () => {
     const items = Array.from({ length: 5 }, () => ({ bytes: 4 }));
     expect(chunkWrites(items, 2).map((c) => c.length)).toEqual([2, 2, 1]);
     expect(chunkWrites(items, 10, 8).map((c) => c.length)).toEqual([2, 2, 1]);
+  });
+});
+
+describe('byte labels', () => {
+  it('picks a readable unit', () => {
+    expect(formatBytes(512)).toBe('512 B');
+    expect(formatBytes(1536)).toBe('1.5 KiB');
+    expect(formatBytes(20 * 1024 * 1024)).toBe('20 MiB');
   });
 });

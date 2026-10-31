@@ -37,5 +37,15 @@
         <span class="topbar__dirty" aria-label="unsaved changes"></span>
       }
     </app-rpg-button>
+    @if (session.user(); as user) {
+      <button type="button" class="topbar__account" [attr.title]="syncTitle()" aria-label="Account and storage" (click)="shell.open('account')">
+        @if (account.avatarUrl(); as url) {
+          <img [src]="url" alt="" width="30" height="30" referrerpolicy="no-referrer" />
+        } @else {
+          <span class="topbar__initial" aria-hidden="true">{{ initial() }}</span>
+        }
+        <span class="topbar__sync" [class]="'topbar__sync topbar__sync--' + (user.kind === 'offline' ? 'local' : sync.status())" aria-hidden="true"></span>
+      </button>
+    }
   </div>
 </header>

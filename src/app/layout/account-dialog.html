@@ -1,0 +1,122 @@
+<app-rpg-modal title="Account & storage" width="36rem" [open]="open()" (closed)="shell.closeDialog()">
+  @if (user(); as u) {
+    <section class="acc__who">
+      <div class="acc__avatar">
+        @if (account.avatarUrl(); as url) {
+          <img [src]="url" alt="Your portrait" width="88" height="88" referrerpolicy="no-referrer" />
+        } @else {
+          <span aria-hidden="true">{{ initial() }}</span>
+        }
+      </div>
+      <div class="acc__id">
+        <span class="acc__badge" [class]="'acc__badge acc__badge--' + u.kind">{{ kindLabel() }}</span>
+        @if (u.kind === 'offline') {
+          <p class="acc__name">{{ u.name }}</p>
+        } @else {
+          <div class="acc__rename">
+            <input class="rpg-input" aria-label="Display name" [value]="name()" (input)="name.set($any($event.target).value)" (keydown.enter)="saveName()" />
+            <app-rpg-button variant="wood" size="sm" [disabled]="session.busy() || name().trim() === u.name" (click)="saveName()">Rename</app-rpg-button>
+          </div>
+        }
+        @if (u.email) {
+          <p class="acc__mail">{{ u.email }}</p>
+        }
+        <div class="acc__pic">
+          <label class="rbtn rbtn--wood rbtn--sm acc__upload" [class.acc__upload--busy]="account.busy()">
+            {{ account.busy() ? 'Working…' : 'Upload portrait' }}
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" [disabled]="account.busy()" (change)="pickAvatar($event)" />
+          </label>
+          @if (account.avatarUrl()) {
+            <app-rpg-button variant="ghost" size="sm" [disabled]="account.busy()" (click)="account.removeAvatar()">Remove</app-rpg-button>
+          }
+        </div>
+        <p class="acc__hint">Pictures are cropped to a square and shrunk to 256 px before they are stored.</p>
+      </div>
+    </section>
+
+    @if (account.error(); as error) {
+      <p class="acc__msg acc__msg--error" role="alert">{{ error }}</p>
+    }
+    @if (session.error(); as error) {
+      <p class="acc__msg acc__msg--error" role="alert">{{ error }}</p>
+    }
+
+    @if (account.meter(); as m) {
+      <section class="acc__block">
+        <h3>Cloud storage</h3>
+        <div
+          class="acc__meter"
+          role="meter"
+          aria-label="Cloud storage used"
+          [attr.aria-valuenow]="m.used"
+          aria-valuemin="0"
+          [attr.aria-valuemax]="m.quota"
+          [class.acc__meter--warn]="m.ratio > 0.8"
+          [class.acc__meter--full]="m.ratio >= 1"
+        >
+          <span [style.width.%]="m.ratio * 100"></span>
+        </div>
+        <p class="acc__row">
+          <b>{{ bytes(m.used) }}</b> of {{ bytes(m.quota) }} used · {{ bytes(m.quota - m.used > 0 ? m.quota - m.used : 0) }} free
+        </p>
+        <p class="acc__row acc__row--muted">
+          Tome {{ bytes(m.tome) }} · portrait {{ bytes(m.avatar) }} ·
+          {{ m.custom ? 'limit granted to your account' : 'default limit for a ' + kindLabel().toLowerCase() }}
+          <button type="button" class="acc__link" [disabled]="session.busy()" (click)="refreshLimits()">refresh</button>
+        </p>
+        <p class="acc__row" [class.acc__row--bad]="sync.status() === 'error' || sync.status() === 'over-quota'">
+          <span class="acc__dot" [class]="'acc__dot acc__dot--' + sync.status()" aria-hidden="true"></span>
+          {{ syncLabel() }}
+          @if (sync.syncedAt(); as at) {
+            · last synced {{ at | date: 'medium' }}
+          }
+        </p>
+        @if (sync.error(); as error) {
+          <p class="acc__msg acc__msg--error">{{ error }}</p>
+        }
+        <app-rpg-button variant="wood" size="sm" [disabled]="sync.status() === 'syncing'" (click)="syncNow()">Save &amp; sync now</app-rpg-button>
+      </section>
+    }
+
+    <section class="acc__block">
+      <h3>This browser</h3>
+      @if (account.browser(); as b) {
+        <p class="acc__row">
+          The built-in database holds {{ bytes(b.usage) }} of about {{ bytes(b.quota) }} the browser allows this site.
+        </p>
+        <p class="acc__row acc__row--muted">
+          @if (b.persisted) {
+            Storage is marked persistent, so the browser will not clear it on its own.
+          } @else {
+            The browser may clear this storage when the disk runs low.
+            <button type="button" class="acc__link" (click)="account.askPersistence()">Ask to keep it</button>
+          }
+        </p>
+      } @else {
+        <p class="acc__row acc__row--muted">This browser does not report its storage.</p>
+      }
+    </section>
+
+    @if (u.kind === 'anonymous') {
+      <section class="acc__block acc__block--keep">
+        <h3>Keep this ledger</h3>
+        <p class="acc__row">Link a sign-in so your tome survives signing out and follows you to other devices.</p>
+        <app-rpg-button variant="gold" size="sm" [disabled]="session.busy()" (click)="linkWithGoogle()">Link Google account</app-rpg-button>
+        <form class="acc__link-form" (submit)="linkWithEmail($event)">
+          <input class="rpg-input" type="email" placeholder="E-mail" autocomplete="email" required [value]="linkEmail()" (input)="linkEmail.set($any($event.target).value)" />
+          <input class="rpg-input" type="password" placeholder="Password (6+ characters)" autocomplete="new-password" minlength="6" required [value]="linkPassword()" (input)="linkPassword.set($any($event.target).value)" />
+          <button type="submit" class="rbtn rbtn--wood rbtn--sm" [disabled]="session.busy()">Link e-mail</button>
+        </form>
+      </section>
+    }
+
+    @if (confirmSignOut() && signOutWarning(); as warning) {
+      <p class="acc__msg acc__msg--error" role="alert">{{ warning }} Press Sign out again to continue.</p>
+    }
+  }
+
+  <app-rpg-button modalFooter variant="wood" size="sm" (click)="shell.closeDialog()">Close</app-rpg-button>
+  <app-rpg-button modalFooter variant="danger" size="sm" [disabled]="session.busy()" (click)="signOut()">
+    {{ confirmSignOut() ? 'Sign out anyway' : 'Sign out' }}
+  </app-rpg-button>
+</app-rpg-modal>

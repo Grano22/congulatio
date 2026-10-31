@@ -3,6 +3,7 @@ import { CharactersStore } from '../store/charactersStore';
 import { EditorTabId, WorkspaceStore } from '../store/workspaceStore';
 import { LAYOUT_PRESETS, ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
+import { CloudSync } from '../cloud/cloudSync';
 import { generateRandomCharacter } from '../domain/randomCharacter';
 
 export type KeyChord = {
@@ -65,6 +66,7 @@ export class CommandsService {
   private readonly shell = inject(ShellStore);
   private readonly workspace = inject(WorkspaceStore);
   private readonly characters = inject(CharactersStore);
+  private readonly sync = inject(CloudSync);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -72,6 +74,8 @@ export class CommandsService {
     { id: 'tome.export', group: 'File', label: 'Export tome', keys: [{ code: 'KeyE', mod: true, shift: true, inText: true }], run: () => this.history.exportTome(false) },
     { id: 'tome.exportHistory', group: 'File', label: 'Export tome with history', run: () => this.history.exportTome(true) },
     { id: 'tome.reset', group: 'File', label: 'Reset tome…', run: () => this.shell.open('reset') },
+    { id: 'account.open', group: 'File', label: 'Account & storage…', run: () => this.shell.open('account') },
+    { id: 'account.sync', group: 'File', label: 'Sync with the cloud now', enabled: () => this.sync.active(), run: () => void this.history.persist().then(() => this.sync.sync()) },
 
     {
       id: 'edit.undo',

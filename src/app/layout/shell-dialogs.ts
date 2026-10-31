@@ -9,6 +9,7 @@ import { CommandsService, chordLabel } from './commands';
 import { APP_VERSION } from './app-version';
 import { RemoveDialogueDialog } from './remove-dialogue-dialog';
 import { RemoveSoulDialog } from './remove-soul-dialog';
+import { AccountDialog } from './account-dialog';
 
 
 type TourStep = { title: string; text: string; tab?: EditorTabId; where: string };
@@ -80,7 +81,7 @@ const TOUR: TourStep[] = [
 
 @Component({
   selector: 'app-shell-dialogs',
-  imports: [RpgModal, RpgButton, DatePipe, RemoveDialogueDialog, RemoveSoulDialog],
+  imports: [RpgModal, RpgButton, DatePipe, RemoveDialogueDialog, RemoveSoulDialog, AccountDialog],
   styleUrl: './shell-dialogs.css',
   templateUrl: './shell-dialogs.html',
 })

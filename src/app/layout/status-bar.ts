@@ -7,6 +7,8 @@ import { ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
 import { WorkspaceStore } from '../store/workspaceStore';
 import { APP_VERSION } from './app-version';
+import { CloudSync } from '../cloud/cloudSync';
+import { Session } from '../cloud/session';
 
 @Component({
   selector: 'app-status-bar',
@@ -22,7 +24,21 @@ export class StatusBar {
   private readonly dialogues = inject(DialoguesStore);
   private readonly relations = inject(RelationsStore);
 
+  private readonly session = inject(Session);
+  private readonly sync = inject(CloudSync);
   protected readonly version = APP_VERSION;
+  protected readonly cloudLabel = computed(() => {
+    const user = this.session.user();
+    if (!user) return null;
+    if (user.kind === 'offline') return 'This device only';
+    const status = this.sync.status();
+    if (status === 'idle') return 'Cloud in sync';
+    if (status === 'syncing') return 'Syncing…';
+    if (status === 'offline') return 'Cloud offline';
+    if (status === 'over-quota') return 'Cloud storage full';
+    if (status === 'error') return 'Cloud sync failed';
+    return 'Cloud';
+  });
   protected readonly counts = computed(
     () =>
       `${this.characters.characters().length} souls · ${this.dialogues.nodes().length} lines · ${this.relations.relations().length} bonds`,

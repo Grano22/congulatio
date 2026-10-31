@@ -13,7 +13,7 @@ const header = (label: string): MenuItem => ({ kind: 'header', label });
 const MENUS: MenuDef[] = [
   {
     label: 'File',
-    items: [cmd('tome.save'), cmd('tome.import'), SEP, cmd('tome.export'), cmd('tome.exportHistory'), SEP, cmd('tome.reset')],
+    items: [cmd('tome.save'), cmd('tome.import'), SEP, cmd('tome.export'), cmd('tome.exportHistory'), SEP, cmd('account.open'), cmd('account.sync'), SEP, cmd('tome.reset')],
   },
   { label: 'Edit', items: [cmd('edit.undo'), cmd('edit.redo'), SEP, cmd('edit.history')] },
   {
