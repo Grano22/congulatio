@@ -158,6 +158,11 @@ export class TomeHistory {
 
   async adopt(snapshot: TomeSnapshot, savedAt: string, label: string): Promise<void> {
     this.apply(snapshot, label);
+    await this.markSaved(savedAt);
+  }
+
+  async markSaved(savedAt: string): Promise<void> {
+    this.flush();
     const tome = this.current();
     this.savedAt.set(savedAt);
     this.savedSnapshot.set(tome);

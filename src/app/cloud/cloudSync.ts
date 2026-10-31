@@ -162,7 +162,9 @@ export class CloudSync {
     const localHashes = hashesOf(tomeToRows(owner, this.history.current(), meta.savedAt));
     const remoteHashes = hashesOf(rows);
     const same = Object.keys(remoteHashes).length === Object.keys(localHashes).length && Object.entries(remoteHashes).every(([id, h]) => localHashes[id] === h);
-    if (!same) {
+    if (same) {
+      await this.history.markSaved(meta.savedAt);
+    } else {
       await this.history.adopt(tome, meta.savedAt, conflict ? 'Took the newer tome from the cloud' : 'Synced from the cloud');
       this.shell.notify('info', conflict ? 'The cloud had a newer tome. Undo brings back the one from this browser.' : 'The tome was updated from the cloud.');
     }
