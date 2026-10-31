@@ -18,8 +18,9 @@ const context = { source: 'handler', route: '/', appVersion: '0.3.0', at, critic
 
 describe('error reports', () => {
   it('redacts e-mails, tokens, keys, long ids and URL hosts', () => {
+    const fakeKey = ['AI', 'za', 'Sy', 'X'.repeat(33)].join('');
     const text = redact(
-      'jan@example.com eyJhbGciOi.eyJzdWIiOi.c2lnbmF0dXJl AIzaSyA1234567890abcdefghijklmnopqrstu https://host.example/path/x.js?token=1 abcdefghijklmnopqrstuvwxyz0123456789',
+      `jan@example.com eyJhbGciOi.eyJzdWIiOi.c2lnbmF0dXJl ${fakeKey} https://host.example/path/x.js?token=1 abcdefghijklmnopqrstuvwxyz0123456789`,
     );
     expect(text).not.toContain('jan@example.com');
     expect(text).toContain('[email]');
