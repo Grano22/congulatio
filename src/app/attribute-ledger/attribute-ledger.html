@@ -1,6 +1,6 @@
 <app-rpg-panel title="Attribute Ledger" [subtitle]="core.length + store.defs().length + ' attributes'" [footer]="true">
   @if (closable()) {
-    <app-rpg-button headerActions variant="ghost" size="sm" class="al__close" aria-label="Close attribute ledger" (click)="close.emit()">
+    <app-rpg-button headerActions variant="ghost" size="sm" class="al__close" label="Close attribute ledger" (click)="close.emit()">
       <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
     </app-rpg-button>
   }
@@ -46,7 +46,7 @@
       </form>
     }
 
-    <h4 class="al__title">Your attributes</h4>
+    <h3 class="al__title">Your attributes</h3>
     <ul class="al__list" aria-label="Custom attributes">
       @for (a of store.defs(); track a.id) {
         <li class="al__item">
@@ -74,7 +74,7 @@
       }
     </ul>
 
-    <h4 class="al__title">Core attributes</h4>
+    <h3 class="al__title">Core attributes</h3>
     <ul class="al__core" aria-label="Core attributes">
       @for (c of core; track c.key) {
         <li><span class="al__badge al__badge--core">{{ c.key }}</span>{{ c.name }}</li>

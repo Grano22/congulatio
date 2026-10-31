@@ -8,7 +8,7 @@
       }
     </div>
 
-    <aside class="sc__controls">
+    <section class="sc__controls" aria-label="Sculpt controls">
       <label class="field">
         <span class="rpg-label">Soul</span>
         <select class="rpg-select" [value]="characterId()" (change)="pickSoul($any($event.target).value)">
@@ -131,7 +131,7 @@
           }
         }
       }
-    </aside>
+    </section>
   </div>
 
   <p footer class="sc__notice" role="status" aria-live="polite">

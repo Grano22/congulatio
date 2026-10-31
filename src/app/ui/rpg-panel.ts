@@ -28,7 +28,7 @@ export type RpgPanelSurface = 'parchment' | 'stone' | 'wood';
     <section class="rpanel" [class]="surfaceClass()">
       <header class="rpanel__header rivets">
         <span class="gem" aria-hidden="true"></span>
-        <h3 class="rpanel__title">{{ title() }}</h3>
+        <h2 class="rpanel__title">{{ title() }}</h2>
         @if (subtitle()) {
           <span class="rpanel__subtitle">{{ subtitle() }}</span>
         }

@@ -21,7 +21,7 @@
         <div class="cr__day">
           @if (draft(); as d) {
             <form class="cr__form" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New personal routine' : 'Edit routine'">
-              <h4 class="cr__form-title">{{ editingId() === 'new' ? 'New personal routine' : 'Edit ' + (d.scope === 'personal' ? 'personal' : 'global') + ' routine' }}</h4>
+              <h3 class="cr__form-title">{{ editingId() === 'new' ? 'New personal routine' : 'Edit ' + (d.scope === 'personal' ? 'personal' : 'global') + ' routine' }}</h3>
               @if (d.scope !== 'personal') {
                 <p class="cr__shared">This routine is shared. Changes apply to every soul that keeps it.</p>
               }
@@ -143,8 +143,8 @@
           </ol>
         </div>
 
-        <aside class="cr__join" aria-label="Join a global routine">
-          <h4 class="cr__join-title">Join a global routine</h4>
+        <section class="cr__join" aria-label="Join a global routine">
+          <h3 class="cr__join-title">Join a global routine</h3>
           <ul class="cr__join-list">
             @for (j of joinable(); track j.routine.id) {
               <li class="cr__join-item">
@@ -161,7 +161,7 @@
               <li class="cr__hint">Keeps every global routine, or none exist. Add some in the Routine Almanac.</li>
             }
           </ul>
-        </aside>
+        </section>
       </div>
     }
   </div>

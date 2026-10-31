@@ -89,7 +89,7 @@
         </div>
         <div class="dl__scene-body">
         <header class="dl__scene-head">
-          <h4 class="dl__scene-title">{{ scene.title }}</h4>
+          <h3 class="dl__scene-title">{{ scene.title }}</h3>
           <span class="dl__status" [class.dl__status--standalone]="scene.status === 'standalone'" [title]="scene.linkedBy ? 'Opened by ' + scene.linkedBy : 'No routine or interaction leads here'">
             {{ scene.status === 'standalone' ? 'Standalone' : 'Connected' }}{{ scene.linkedBy ? ' · ' + scene.linkedBy : '' }}
           </span>

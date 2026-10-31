@@ -26,7 +26,7 @@
       <div class="ornament" aria-hidden="true"></div>
 
       <section class="insp__section">
-        <h4 class="insp__section-title">Properties</h4>
+        <h3 class="insp__section-title">Properties</h3>
         <div class="insp__fields">
           <label class="insp__field">
             <span class="insp__key">Level</span>
@@ -64,7 +64,7 @@
 
       @if (attributeRows().length) {
         <section class="insp__section">
-          <h4 class="insp__section-title">Attributes</h4>
+          <h3 class="insp__section-title">Attributes</h3>
           <p class="insp__tip">Click a number to copy it, double-click to type a value.</p>
           <ul class="insp__stats">
             @for (row of attributeRows(); track row.id) {
@@ -109,7 +109,7 @@
 
       @if (soulLinks(); as links) {
         <section class="insp__section">
-          <h4 class="insp__section-title">Relations</h4>
+          <h3 class="insp__section-title">Relations</h3>
           <ul class="insp__links">
             @for (link of links.relations; track link.focus.id) {
               <li>
@@ -124,7 +124,7 @@
           </ul>
         </section>
         <section class="insp__section">
-          <h4 class="insp__section-title">Routines</h4>
+          <h3 class="insp__section-title">Routines</h3>
           <ul class="insp__links">
             @for (link of links.routines; track link.focus.id) {
               <li>
@@ -138,7 +138,7 @@
           </ul>
         </section>
         <section class="insp__section">
-          <h4 class="insp__section-title">Interactions</h4>
+          <h3 class="insp__section-title">Interactions</h3>
           <ul class="insp__links">
             @for (link of links.acts; track link.focus.id) {
               <li>
@@ -150,7 +150,7 @@
           </ul>
         </section>
         <section class="insp__section">
-          <h4 class="insp__section-title">Scenes</h4>
+          <h3 class="insp__section-title">Scenes</h3>
           <ul class="insp__links">
             @for (link of links.scenes; track link.focus.id) {
               <li>
@@ -166,7 +166,7 @@
       }
     } @else if (routine(); as r) {
       <section class="insp__section insp__section--top">
-        <h4 class="insp__section-title">Routine</h4>
+        <h3 class="insp__section-title">Routine</h3>
         <div class="insp__fields">
           <label class="insp__field insp__field--wide">
             <span class="insp__key">Name</span>
@@ -200,7 +200,7 @@
       </section>
       @if (routineLinks(); as links) {
         <section class="insp__section">
-          <h4 class="insp__section-title">Kept by</h4>
+          <h3 class="insp__section-title">Kept by</h3>
           <ul class="insp__links">
             @for (link of links.participants; track link.focus.id) {
               <li><button type="button" class="insp__link" (click)="follow(link)">{{ link.label }}</button></li>
@@ -210,7 +210,7 @@
           </ul>
         </section>
         <section class="insp__section">
-          <h4 class="insp__section-title">Forks</h4>
+          <h3 class="insp__section-title">Forks</h3>
           <ul class="insp__links">
             @for (link of links.forks; track link.focus.id) {
               <li>
@@ -226,7 +226,7 @@
       }
     } @else if (interactionDetail(); as d) {
       <section class="insp__section insp__section--top">
-        <h4 class="insp__section-title">{{ d.kind }}</h4>
+        <h3 class="insp__section-title">{{ d.kind }}</h3>
         <p class="insp__summary">{{ d.sourceName }} → {{ d.targetName }}</p>
         <p class="insp__summary insp__summary--muted">{{ interaction()?.trigger }}</p>
         @if (interaction()?.note) {
@@ -234,7 +234,7 @@
         }
       </section>
       <section class="insp__section">
-        <h4 class="insp__section-title">Souls</h4>
+        <h3 class="insp__section-title">Souls</h3>
         <ul class="insp__links">
           @for (link of d.souls; track link.focus.id) {
             <li><button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button></li>
@@ -244,7 +244,7 @@
         </ul>
       </section>
       <section class="insp__section">
-        <h4 class="insp__section-title">Opens dialogue</h4>
+        <h3 class="insp__section-title">Opens dialogue</h3>
         @if (d.dialogue; as link) {
           <button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button>
         } @else {
@@ -254,7 +254,7 @@
     } @else if (step(); as n) {
       @if (stepDetail(); as d) {
         <section class="insp__section insp__section--top">
-          <h4 class="insp__section-title">{{ n.speaker }} · {{ n.kind === 'choice' ? 'Option' : 'Line' }}</h4>
+          <h3 class="insp__section-title">{{ n.speaker }} · {{ n.kind === 'choice' ? 'Option' : 'Line' }}</h3>
           <div class="insp__fields">
             <label class="insp__field insp__field--wide">
               <span class="insp__key">Interaction</span>
@@ -272,12 +272,12 @@
         </section>
         @if (d.follows; as f) {
           <section class="insp__section">
-            <h4 class="insp__section-title">Follows</h4>
+            <h3 class="insp__section-title">Follows</h3>
             <button type="button" class="insp__link" (click)="follow(f)"><span class="insp__tag">{{ f.tag }}</span>{{ f.label }}</button>
           </section>
         }
         <section class="insp__section">
-          <h4 class="insp__section-title">Next steps</h4>
+          <h3 class="insp__section-title">Next steps</h3>
           <ol class="insp__links">
             @for (link of d.next; track link.focus.id) {
               <li>
@@ -291,7 +291,7 @@
           </ol>
         </section>
         <section class="insp__section">
-          <h4 class="insp__section-title">Souls in the scene</h4>
+          <h3 class="insp__section-title">Souls in the scene</h3>
           <ul class="insp__links">
             @for (link of d.souls; track link.focus.id) {
               <li><button type="button" class="insp__link" (click)="follow(link)"><span class="insp__tag">{{ link.tag }}</span>{{ link.label }}</button></li>

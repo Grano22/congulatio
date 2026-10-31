@@ -53,6 +53,10 @@ let modalCounter = 0;
         font-size: 1.1rem;
         cursor: pointer;
       }
+      .rmodal__body:focus-visible {
+        outline: 2px solid var(--color-gold-500);
+        outline-offset: -2px;
+      }
       .rmodal__body {
         flex: 1;
         min-height: 0;
@@ -86,7 +90,7 @@ let modalCounter = 0;
           <h2 class="rmodal__title" [id]="titleId">{{ title() }}</h2>
           <button type="button" class="rmodal__close" aria-label="Close" (click)="closed.emit()">×</button>
         </header>
-        <div class="rmodal__body">
+        <div class="rmodal__body" tabindex="0" role="region" [attr.aria-labelledby]="titleId">
           <ng-content />
         </div>
         <footer class="rmodal__foot"><ng-content select="[modalFooter]" /></footer>

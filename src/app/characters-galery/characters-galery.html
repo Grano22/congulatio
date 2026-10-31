@@ -9,7 +9,7 @@
       variant="ghost"
       size="sm"
       class="galery__close"
-      aria-label="Close codex"
+      label="Close codex"
       (click)="close.emit()"
     >
       <app-lucide-icon [icon]="xIcon" iconClass="ic-13" [strokeWidth]="2.4" />
@@ -27,15 +27,14 @@
     />
   </div>
 
-  <ul class="galery__list" role="listbox" aria-label="Characters">
+  <ul class="galery__list" aria-label="Characters">
     @for (soul of filteredSouls(); track soul.id) {
       <li class="galery__item">
         <button
           type="button"
           class="galery__entry"
-          role="option"
           [class.galery__entry--selected]="selectedId() === soul.id"
-          [attr.aria-selected]="selectedId() === soul.id"
+          [attr.aria-current]="selectedId() === soul.id ? 'true' : null"
           (click)="select(soul.id)"
           (keydown.delete)="remove(soul.id)"
         >

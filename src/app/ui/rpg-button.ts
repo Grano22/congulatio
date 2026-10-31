@@ -36,6 +36,8 @@ const SIZE_CLASS: Record<RpgButtonSize, string> = {
       type="button"
       [class]="classes()"
       [disabled]="disabled()"
+      [attr.aria-label]="label() || null"
+      [attr.aria-pressed]="pressed() ?? null"
     >
       <ng-content />
     </button>
@@ -45,6 +47,8 @@ export class RpgButton {
   readonly variant = input<RpgButtonVariant>('wood');
   readonly size = input<RpgButtonSize>('md');
   readonly disabled = input(false, { transform: booleanAttribute });
+  readonly label = input('');
+  readonly pressed = input<boolean | undefined>(undefined);
 
   protected readonly classes = computed(
     () => `${VARIANT_CLASS[this.variant()]} ${SIZE_CLASS[this.size()]}`,

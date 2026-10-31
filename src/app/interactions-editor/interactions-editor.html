@@ -28,7 +28,7 @@
 
     @if (draft(); as d) {
       <form class="acts__editor" (submit)="$event.preventDefault(); save()" [attr.aria-label]="editingId() === 'new' ? 'New interaction' : 'Edit interaction'">
-        <h4 class="acts__editor-title">{{ editingId() === 'new' ? 'Inscribe a new interaction' : 'Edit interaction' }}</h4>
+        <h3 class="acts__editor-title">{{ editingId() === 'new' ? 'Inscribe a new interaction' : 'Edit interaction' }}</h3>
         <div class="acts__grid">
           <label class="field">
             <span class="rpg-label">Kind</span>

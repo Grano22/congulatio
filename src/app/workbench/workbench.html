@@ -1,4 +1,5 @@
 <div class="shell">
+  <button type="button" class="skip-link" (click)="skipToStage()">Skip to the workspace</button>
   <app-top-bar [leftSidebarOpen]="shell.leftVisible()" (leftSidebarToggle)="toggleLeftSidebar()" />
   <app-sync-banner />
 
@@ -11,7 +12,7 @@
       <app-navigator (focusCharacter)="openTab('character')" />
     </aside>
 
-    <main class="shell__main">
+    <main class="shell__main" id="stage" tabindex="-1" #stage>
       <div class="shell__tabrow">
         <app-rpg-tabs [tabs]="tabs" [active]="activeTab()" (activeChange)="onTabChange($event)" />
         <span class="shell__tabrow-tools">

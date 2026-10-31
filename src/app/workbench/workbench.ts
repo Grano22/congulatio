@@ -1,4 +1,4 @@
-import { Component, afterNextRender, computed, inject } from '@angular/core';
+import { Component, ElementRef, afterNextRender, computed, inject, viewChild } from '@angular/core';
 import { Cog, Expand, FlaskConical, ListTree, Minimize2, Maximize2, Network, PersonStanding, Shrink, Swords, CalendarClock } from 'lucide';
 import { LucideIcon } from '../ui/lucide-icon';
 import { RpgTabs, RpgTab } from '../ui/rpg-tabs';
@@ -73,10 +73,15 @@ export class Workbench {
   protected readonly fullscreenIcon = computed(() => (this.shell.fullscreen() ? Shrink : Expand));
   private readonly welcome = inject(WelcomeStore);
   private readonly persistence = inject(Persistence);
+  private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
 
   constructor() {
     this.persistence.start();
     afterNextRender(() => void this.welcome.check());
+  }
+
+  protected skipToStage(): void {
+    this.stage().nativeElement.focus();
   }
 
   protected openTab(id: EditorTabId): void {

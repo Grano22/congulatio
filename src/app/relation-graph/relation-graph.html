@@ -60,7 +60,7 @@
       </svg>
     </div>
 
-    <aside class="rg__side" aria-label="Threads">
+    <section class="rg__side" aria-label="Threads">
       @if (trailNodes().length) {
         <nav class="rg__trail" aria-label="Trail">
           @for (step of trailNodes(); track $index; let i = $index, last = $last) {
@@ -76,7 +76,7 @@
       @if (node && info) {
         <section class="rg__card">
           <span class="rg__badge" [class]="'rg__badge rg__badge--' + node.kind">{{ kindLabel[node.kind] }}</span>
-          <h4 class="rg__card-title">{{ info.heading }}</h4>
+          <h3 class="rg__card-title">{{ info.heading }}</h3>
           <p class="rg__card-meta">{{ info.meta.join(' · ') }}</p>
           @if (info.body) {
             <p class="rg__card-body">{{ info.body }}</p>
@@ -143,7 +143,7 @@
           <li><span class="rg__swatch rg__swatch--choice"></span>Player option</li>
         </ul>
       }
-    </aside>
+    </section>
   </div>
 
   <p footer class="rg__notice" role="status" aria-live="polite">

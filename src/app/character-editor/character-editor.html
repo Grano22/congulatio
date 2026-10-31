@@ -5,7 +5,7 @@
 >
   <div class="forge">
     <!-- Portrait preview -->
-    <aside class="forge__portrait">
+    <section class="forge__portrait" aria-label="Portrait">
       <div class="forge__frame rivets">
         @if (summoned()) {
           <app-pixel-avatar
@@ -33,14 +33,14 @@
         <span class="forge__trait">▣ {{ sample().bodyType }}</span>
         <span class="forge__trait">❖ {{ sample().temperament }}</span>
       </div>
-    </aside>
+    </section>
 
     <!-- Form -->
     <form class="forge__form" (submit)="$event.preventDefault()">
       <section class="forge__section">
-        <h4 class="forge__section-title">
+        <h3 class="forge__section-title">
           <span class="gem" aria-hidden="true"></span> Identity
-        </h4>
+        </h3>
         <div class="forge__grid">
           <label class="field">
             <span class="rpg-label">First Name</span>
@@ -89,9 +89,9 @@
       </section>
 
       <section class="forge__section">
-        <h4 class="forge__section-title">
+        <h3 class="forge__section-title">
           <span class="gem" aria-hidden="true"></span> Appearance
-        </h4>
+        </h3>
         <div class="forge__grid forge__grid--3">
           <label class="field">
             <span class="rpg-label">Eye Color</span>
@@ -113,9 +113,9 @@
       </section>
 
       <section class="forge__section">
-        <h4 class="forge__section-title">
+        <h3 class="forge__section-title">
           <span class="gem" aria-hidden="true"></span> Scribe’s Notes
-        </h4>
+        </h3>
         <textarea
           class="rpg-textarea"
           rows="3"
