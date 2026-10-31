@@ -4,6 +4,7 @@ import { CrashScreen } from './layout/crash-screen';
 import { Session } from './cloud/session';
 import { CloudSync } from './cloud/cloudSync';
 import { TomeHistory } from './store/tomeHistory';
+import { Seo } from './layout/seo';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +16,10 @@ export class App {
   private readonly session = inject(Session);
   private readonly history = inject(TomeHistory);
   protected readonly sync = inject(CloudSync);
+  private readonly seo = inject(Seo);
 
   constructor() {
+    this.seo.start();
     effect(() => {
       if (!this.session.ready()) return;
       const uid = this.session.user().uid;

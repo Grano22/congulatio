@@ -1,0 +1,5 @@
+Contact: https://github.com/Grano22/congulatio/security/advisories/new
+Expires: 2027-10-31T00:00:00.000Z
+Preferred-Languages: en, pl
+Canonical: https://grano22.github.io/congulatio/.well-known/security.txt
+Policy: https://github.com/Grano22/congulatio/blob/master/SECURITY.md

@@ -1,0 +1,12 @@
+/* TEAM */
+Author: Adrian Blasiak
+Role: Design, development and testing
+Site: https://github.com/Grano22/congulatio
+
+/* THANKS */
+Built with the help of an AI assistant (Claude by Anthropic); the author reviewed and accepted every change.
+
+/* SITE */
+Standards: HTML5, CSS3, WAI-ARIA, Web App Manifest, Service Worker
+Components: Angular, NgRx Signals, three.js, Firebase, Lucide icons, Fontsource fonts
+Language: English (interface), Polish (documentation)

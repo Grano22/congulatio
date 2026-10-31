@@ -57,6 +57,18 @@ jobs:
           echo "Building with base href $BASE_HREF"
           npx ng build --base-href "$BASE_HREF"
 
+      - name: Point canonical links, sitemap and security.txt at this site
+        run: |
+          OWNER="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          REPO="${{ github.event.repository.name }}"
+          if [[ "$REPO" == *.github.io ]]; then SITE_URL="https://$REPO/"; BASE_HREF="/"; else SITE_URL="https://$OWNER.github.io/$REPO/"; BASE_HREF="/$REPO/"; fi
+          if [[ "$SITE_URL" != "https://grano22.github.io/congulatio/" ]]; then
+            grep -rl --include='*.html' --include='*.txt' --include='*.xml' 'https://grano22.github.io/congulatio/' dist/congulatio/browser \
+              | xargs -r sed -i "s#https://grano22.github.io/congulatio/#$SITE_URL#g"
+            npx ngsw-config dist/congulatio/browser ngsw-config.json "$BASE_HREF"
+          fi
+          echo "Site URL: $SITE_URL"
+
       - name: Add SPA fallback and disable Jekyll
         run: |
           cp dist/congulatio/browser/index.html dist/congulatio/browser/404.html

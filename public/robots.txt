@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /congulatio/login
+
+Sitemap: https://grano22.github.io/congulatio/sitemap.xml
