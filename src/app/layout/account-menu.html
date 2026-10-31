@@ -1,0 +1,52 @@
+<button
+  #trigger
+  type="button"
+  class="amenu__trigger"
+  aria-haspopup="menu"
+  [attr.aria-expanded]="open()"
+  [attr.aria-label]="'Account menu: ' + session.user().name + ', ' + status()"
+  [attr.title]="session.user().name + ' · ' + status()"
+  (click)="toggle()"
+>
+  @if (account.avatarUrl(); as url) {
+    <img [src]="url" alt="" width="30" height="30" referrerpolicy="no-referrer" />
+  } @else {
+    <span class="amenu__initial" aria-hidden="true">{{ initial() }}</span>
+  }
+  <span class="amenu__dot" [class]="'amenu__dot amenu__dot--' + dot()" aria-hidden="true"></span>
+</button>
+
+@if (open()) {
+  <div class="amenu__panel" role="menu" aria-label="Account" (keydown)="onMenuKey($event)">
+    <div class="amenu__who">
+      <span class="amenu__name">{{ session.user().name }}</span>
+      <span class="amenu__meta">{{ kindLabel() }}{{ session.user().email ? ' · ' + session.user().email : '' }}</span>
+      <span class="amenu__status">
+        <span class="amenu__dot amenu__dot--inline" [class]="'amenu__dot amenu__dot--inline amenu__dot--' + dot()" aria-hidden="true"></span>
+        {{ status() }}
+      </span>
+    </div>
+    @if (!session.cloud()) {
+      @if (session.configured()) {
+        <button type="button" role="menuitem" class="amenu__item amenu__item--primary" (click)="signIn()">
+          <app-lucide-icon [icon]="signInIcon" iconClass="ic-14" [strokeWidth]="2" />
+          Sign in or create an account
+        </button>
+      }
+    }
+    <button type="button" role="menuitem" class="amenu__item" (click)="openAccount()">
+      <app-lucide-icon [icon]="accountIcon" iconClass="ic-14" [strokeWidth]="2" />
+      Account &amp; storage…
+    </button>
+    @if (session.cloud()) {
+      <button type="button" role="menuitem" class="amenu__item" [disabled]="sync.status() === 'syncing'" (click)="saveAndSync()">
+        <app-lucide-icon [icon]="syncIcon" iconClass="ic-14" [strokeWidth]="2" />
+        Save &amp; sync now
+      </button>
+      <button type="button" role="menuitem" class="amenu__item amenu__item--danger" (click)="signOut()">
+        <app-lucide-icon [icon]="signOutIcon" iconClass="ic-14" [strokeWidth]="2" />
+        Sign out
+      </button>
+    }
+  </div>
+}

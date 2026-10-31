@@ -6,6 +6,8 @@ import { cloudErrorMessage } from './authErrors';
 import { AVATAR_MAX_BYTES, AVATAR_SIDE } from './firebaseConfig';
 import { AvatarError, blobToDataUrl, squareAvatar } from './avatarImage';
 import { TomeVault } from '../store/tomeVault';
+import { TomeHistory } from '../store/tomeHistory';
+import { ShellStore } from '../store/shellStore';
 
 const USERS = 'users';
 const LOCAL_AVATAR_KEY = 'avatar.local';
@@ -28,12 +30,27 @@ export class AccountStore {
   private readonly session = inject(Session);
   private readonly sync = inject(CloudSync);
   private readonly vault = inject(TomeVault);
+  private readonly history = inject(TomeHistory);
+  private readonly shell = inject(ShellStore);
 
   readonly profile = signal<Profile>({ avatarPath: null, avatarBytes: 0 });
   readonly localAvatar = signal<LocalAvatar | null>(null);
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly browser = signal<{ usage: number; quota: number; persisted: boolean } | null>(null);
+
+  readonly confirmSignOut = signal(false);
+  readonly signOutWarning = computed(() => {
+    const user = this.session.user();
+    if (user.kind === 'offline') return null;
+    if (user.kind === 'anonymous') {
+      return 'A wanderer cannot come back after signing out. The cloud copy of this tome will be lost unless you link an e-mail or Google first.';
+    }
+    if (this.history.dirty() || this.sync.pending() || this.sync.status() === 'error' || this.sync.status() === 'offline') {
+      return 'Some changes have not reached the cloud yet. They will be saved in this browser first; whatever cannot be synced now stays here and syncs the next time you sign in on this browser.';
+    }
+    return null;
+  });
 
   readonly avatarUrl = computed(() => {
     const user = this.session.user();
@@ -55,6 +72,24 @@ export class AccountStore {
       const user = this.session.user();
       untracked(() => void this.load(user));
     });
+  }
+
+  async saveAndSync(): Promise<void> {
+    if (!(await this.history.persist())) return;
+    if (this.sync.active()) await this.sync.sync();
+  }
+
+  async signOut(): Promise<'signed-out' | 'needs-confirmation'> {
+    if (this.signOutWarning() && !this.confirmSignOut()) {
+      this.confirmSignOut.set(true);
+      return 'needs-confirmation';
+    }
+    this.confirmSignOut.set(false);
+    if (this.history.dirty()) await this.history.persist();
+    if (this.sync.active()) await this.sync.sync();
+    await this.session.signOut();
+    this.shell.notify('info', 'Signed out. You are back on the tome kept in this browser.');
+    return 'signed-out';
   }
 
   async refreshBrowser(): Promise<void> {

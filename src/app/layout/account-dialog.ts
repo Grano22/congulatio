@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { RpgModal } from '../ui/rpg-modal';
 import { RpgButton } from '../ui/rpg-button';
 import { ShellStore } from '../store/shellStore';
-import { TomeHistory } from '../store/tomeHistory';
 import { Session } from '../cloud/session';
 import { CloudSync, SyncStatus } from '../cloud/cloudSync';
 import { AccountStore } from '../cloud/account';
@@ -33,7 +32,6 @@ export class AccountDialog {
   protected readonly session = inject(Session);
   protected readonly sync = inject(CloudSync);
   protected readonly account = inject(AccountStore);
-  private readonly history = inject(TomeHistory);
   private readonly router = inject(Router);
 
   protected readonly open = computed(() => this.shell.dialog() === 'account');
@@ -47,21 +45,17 @@ export class AccountDialog {
   protected readonly name = signal('');
   protected readonly linkEmail = signal('');
   protected readonly linkPassword = signal('');
-  protected readonly confirmSignOut = signal(false);
-
-  protected readonly signOutWarning = computed(() => {
-    const kind = this.user()?.kind;
-    if (kind === 'anonymous') return 'A wanderer cannot come back after signing out. The cloud copy of this tome will be lost unless you link an e-mail or Google first.';
-    if (this.history.dirty()) return 'You have unsaved changes. They will be saved in this browser and synced before you leave.';
-    return null;
-  });
+  protected readonly confirmSignOut = this.account.confirmSignOut;
+  protected readonly signOutWarning = this.account.signOutWarning;
 
   constructor() {
     effect(() => {
-      if (!this.open()) return;
+      if (!this.open()) {
+        untracked(() => this.account.confirmSignOut.set(false));
+        return;
+      }
       untracked(() => {
         this.name.set(this.user()?.name ?? '');
-        this.confirmSignOut.set(false);
         this.session.error.set(null);
         this.account.error.set(null);
         void this.account.refreshBrowser();
@@ -80,9 +74,8 @@ export class AccountDialog {
     if (await this.account.rename(this.name())) this.shell.notify('success', 'Your name was updated.');
   }
 
-  protected async syncNow(): Promise<void> {
-    await this.history.persist();
-    await this.sync.sync();
+  protected syncNow(): Promise<void> {
+    return this.account.saveAndSync();
   }
 
   protected async linkWithGoogle(): Promise<void> {
@@ -107,14 +100,6 @@ export class AccountDialog {
   }
 
   protected async signOut(): Promise<void> {
-    if (this.signOutWarning() && !this.confirmSignOut()) {
-      this.confirmSignOut.set(true);
-      return;
-    }
-    if (this.history.dirty()) await this.history.persist();
-    if (this.sync.active()) await this.sync.sync();
-    this.shell.closeDialog();
-    await this.session.signOut();
-    this.shell.notify('info', 'Signed out. You are back on the tome kept in this browser.');
+    if ((await this.account.signOut()) === 'signed-out') this.shell.closeDialog();
   }
 }
