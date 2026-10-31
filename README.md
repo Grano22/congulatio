@@ -268,8 +268,9 @@ npm run start:emulators   # aplikacja z projektem demo-congulatio podłączona d
 ```
 
 Emulatory używają reguł z `firestore.rules` i `storage.rules`, więc to najlepsze miejsce, żeby je sprawdzać. W UI
-emulatorów widać użytkowników, wiersze `app_tables` i pliki portretów. `npm start` po pracy na emulatorach znów
-generuje ustawienia z `.env.local` (albo usuwa wygenerowany plik, jeśli ustawień nie ma).
+emulatorów widać użytkowników, wiersze `app_tables` i pliki portretów. Konfiguracja `emulators` w `angular.json`
+bierze ustawienia demo z `e2e/fixtures/firebase-config.json` zamiast z wygenerowanego pliku w `public/`, więc praca na
+emulatorach nie nadpisuje ustawień projektu testowego.
 
 ### GitHub Pages: sekrety repozytorium
 
@@ -381,7 +382,7 @@ Pełna informacja o przetwarzaniu danych jest w aplikacji: **Help → Privacy & 
 | Skrypt | Działanie |
 | --- | --- |
 | `npm start` | Generuje ustawienia Firebase z `.env.local` i uruchamia serwer deweloperski (`ng serve`). |
-| `npm run start:emulators` | Serwer deweloperski podłączony do lokalnych emulatorów Firebase. |
+| `npm run start:emulators` | Serwer deweloperski podłączony do lokalnych emulatorów Firebase (ustawienia demo z `e2e/fixtures/`). |
 | `npm run emulators` | Emulatory Firebase (Auth, Firestore, Storage) z regułami z repozytorium. |
 | `npm run config:firebase` | Tylko generuje `public/firebase-config.json` (zmienne `FIREBASE_*` lub `.env.local`). |
 | `npm run build` | Generuje ustawienia Firebase i buduje wersję produkcyjną do `dist/congulatio/browser`. |

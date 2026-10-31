@@ -31,7 +31,8 @@ E2E_BASE_URL=http://localhost:4200 node e2e/run.mjs
   refuses to run if the project id does not start with `demo-` or a host is not local, so they can never touch a real
   Firebase project, even with `.env.local` filled in.
 - They need no secrets; nothing in this folder reads `.env.local` or GitHub secrets.
-- `run.mjs` writes a temporary emulator `public/firebase-config.json` and puts your previous one back afterwards.
+- `run.mjs` serves the app with `ng serve --configuration emulators`, which takes the demo settings from
+  `e2e/fixtures/firebase-config.json` and never reads or writes your own generated settings file.
 
 ## Requirements
 

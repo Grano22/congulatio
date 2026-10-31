@@ -48,6 +48,21 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "emulators": {
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public",
+                  "ignore": [
+                    "firebase-config.json"
+                  ]
+                },
+                {
+                  "glob": "firebase-config.json",
+                  "input": "e2e/fixtures"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -60,6 +75,9 @@
             },
             "development": {
               "buildTarget": "congulatio:build:development"
+            },
+            "emulators": {
+              "buildTarget": "congulatio:build:development,emulators"
             }
           },
           "defaultConfiguration": "development"

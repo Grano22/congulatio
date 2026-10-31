@@ -12,7 +12,7 @@
     "build:pages": "node scripts/firebase-config.mjs && ng build --base-href /congulatio/",
     "config:firebase": "node scripts/firebase-config.mjs",
     "emulators": "npx -y firebase-tools@15.34.2 emulators:start --project demo-congulatio",
-    "start:emulators": "FIREBASE_EMULATORS=true FIREBASE_ENV_FILE=.env.emulators node scripts/firebase-config.mjs && ng serve",
+    "start:emulators": "ng serve --configuration emulators",
     "e2e": "node e2e/run.mjs"
   },
   "private": true,

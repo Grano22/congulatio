@@ -1,12 +1,10 @@
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { AUTH_URL, PROJECT_ID, assertSafeTarget, wait } from './support.mjs';
 import { rulesSuite } from './rules.e2e.mjs';
 import { appSuite } from './app.e2e.mjs';
 
 const root = resolve(import.meta.dirname, '..');
-const configFile = resolve(root, 'public/firebase-config.json');
 const port = Number(process.env.E2E_PORT ?? 4300);
 const attachedUrl = process.env.E2E_BASE_URL;
 const baseUrl = attachedUrl ?? `http://localhost:${port}`;
@@ -56,7 +54,6 @@ async function stop(child) {
   if (!done) signal(child, 'SIGKILL');
 }
 
-const previousConfig = existsSync(configFile) ? readFileSync(configFile, 'utf8') : null;
 let server;
 let emulators;
 
@@ -69,15 +66,8 @@ try {
     await waitForUrl('http://127.0.0.1:9199', 60_000);
   }
   if (!attachedUrl && wants('app')) {
-    const emulatorConfig = {
-      generated: true,
-      stage: 'e2e',
-      firebase: { apiKey: 'demo-api-key', authDomain: `${PROJECT_ID}.firebaseapp.com`, projectId: PROJECT_ID, storageBucket: `${PROJECT_ID}.firebasestorage.app`, appId: '1:000000000000:web:e2e' },
-      emulators: { host: '127.0.0.1', authPort: 9099, firestorePort: 8080, storagePort: 9199 },
-    };
-    writeFileSync(configFile, `${JSON.stringify(emulatorConfig, null, 2)}\n`);
-    console.log(`Starting the dev server on ${baseUrl}…`);
-    server = start('npx', ['ng', 'serve', '--port', String(port)]);
+    console.log(`Starting the dev server on ${baseUrl} with the emulator settings from e2e/fixtures…`);
+    server = start('npx', ['ng', 'serve', '--configuration', 'emulators', '--port', String(port)]);
     await waitForUrl(baseUrl, 180_000);
   }
 
@@ -94,8 +84,4 @@ try {
   process.exitCode = 1;
 } finally {
   await Promise.all([stop(server), stop(emulators)]);
-  if (!attachedUrl) {
-    if (previousConfig === null) rmSync(configFile, { force: true });
-    else writeFileSync(configFile, previousConfig);
-  }
 }

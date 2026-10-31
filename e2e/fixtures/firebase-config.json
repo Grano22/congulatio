@@ -1,0 +1,17 @@
+{
+  "generated": true,
+  "stage": "emulators",
+  "firebase": {
+    "apiKey": "demo-api-key",
+    "authDomain": "demo-congulatio.firebaseapp.com",
+    "projectId": "demo-congulatio",
+    "storageBucket": "demo-congulatio.firebasestorage.app",
+    "appId": "1:000000000000:web:demo"
+  },
+  "emulators": {
+    "host": "127.0.0.1",
+    "authPort": 9099,
+    "firestorePort": 8080,
+    "storagePort": 9199
+  }
+}
