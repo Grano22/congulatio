@@ -23,6 +23,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/.well-known",
+                "output": ".well-known"
               }
             ],
             "styles": ["src/styles.css"]
@@ -42,7 +47,15 @@
                 }
               ],
               "outputHashing": "all",
-              "serviceWorker": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json",
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": true
+              }
             },
             "development": {
               "optimization": false,
@@ -57,6 +70,11 @@
                   "ignore": [
                     "firebase-config.json"
                   ]
+                },
+                {
+                  "glob": "**/*",
+                  "input": "public/.well-known",
+                  "output": ".well-known"
                 },
                 {
                   "glob": "firebase-config.json",

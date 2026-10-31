@@ -1,19 +1,102 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <title>Congulatio — Character &amp; Dialogue Forge</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://*.googleusercontent.com http://127.0.0.1:9199 http://localhost:9199; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://firebasestorage.googleapis.com http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; worker-src 'self'; manifest-src 'self'; media-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Congulatio — Character &amp; Dialogue Forge for RPG Worlds</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Congulatio is a free, offline-first forge for RPG worlds: create characters and 3D sculpts, write branching dialogue, plan routines, map relations and simulate scenes in your browser."
+    />
+    <meta name="keywords" content="RPG character creator, NPC generator, dialogue tree editor, branching dialogue, game writing tool, worldbuilding, offline PWA" />
+    <meta name="author" content="Adrian Blasiak" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="application-name" content="Congulatio" />
+    <meta name="apple-mobile-web-app-title" content="Congulatio" />
+    <meta name="theme-color" content="#31200d" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href="https://grano22.github.io/congulatio/" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="theme-color" content="#31200d" />
-    <meta name="description" content="Create RPG characters, branching dialogue, routines and relations. Works offline." />
+    <link rel="author" href="humans.txt" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Congulatio" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://grano22.github.io/congulatio/" />
+    <meta property="og:title" content="Congulatio — Character &amp; Dialogue Forge for RPG Worlds" />
+    <meta
+      property="og:description"
+      content="Create RPG characters and 3D sculpts, write branching dialogue, plan routines, map relations and simulate scenes. Free, works offline, no account needed."
+    />
+    <meta property="og:image" content="https://grano22.github.io/congulatio/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Congulatio shield logo with the tagline Character and Dialogue Forge for RPG worlds" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Congulatio — Character &amp; Dialogue Forge for RPG Worlds" />
+    <meta name="twitter:description" content="Create RPG characters, branching dialogue, routines and relations. Free, offline-first, no account needed." />
+    <meta name="twitter:image" content="https://grano22.github.io/congulatio/og-image.png" />
+    <meta name="twitter:image:alt" content="Congulatio shield logo with the tagline Character and Dialogue Forge for RPG worlds" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Congulatio",
+        "alternateName": "Congulatio — Character & Dialogue Forge",
+        "url": "https://grano22.github.io/congulatio/",
+        "image": "https://grano22.github.io/congulatio/og-image.png",
+        "description": "A free, offline-first web app for RPG designers: create characters and 3D sculpts, write branching dialogue, plan routines, map relations and simulate scenes.",
+        "applicationCategory": "DesignApplication",
+        "applicationSubCategory": "Game writing and worldbuilding",
+        "operatingSystem": "Any modern web browser",
+        "browserRequirements": "Requires JavaScript and IndexedDB",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "featureList": [
+          "Random character generator with 8-bit portraits",
+          "Low-poly 3D sculptor with Mixamo animations",
+          "Branching dialogue tree editor",
+          "Daily routines and relations map",
+          "Scenario simulation",
+          "Works offline as an installable app",
+          "Optional cloud sync"
+        ],
+        "author": { "@type": "Person", "name": "Adrian Blasiak" },
+        "sourceOrganization": { "@type": "Organization", "name": "Congulatio", "url": "https://github.com/Grano22/congulatio" }
+      }
+    </script>
   </head>
   <body>
     <app-root></app-root>
-    <noscript>Congulatio needs JavaScript to run.</noscript>
+    <noscript>
+      <main style="max-width: 40rem; margin: 10vh auto; padding: 1.5rem; font: 16px/1.5 Georgia, serif; color: #f2e6c4; background: #131110">
+        <h1>Congulatio — Character &amp; Dialogue Forge for RPG Worlds</h1>
+        <p>
+          Congulatio is a free, offline-first web app for game designers and writers. It runs entirely in your browser and
+          needs JavaScript turned on.
+        </p>
+        <h2>What you can do</h2>
+        <ul>
+          <li>Summon coherent random characters with names, traits and 8-bit portraits.</li>
+          <li>Sculpt low-poly 3D builds and play Mixamo animations.</li>
+          <li>Write branching dialogue with tone variants and world impact.</li>
+          <li>Plan daily routines, record interactions and map relations.</li>
+          <li>Simulate how characters with different motives play a scene out.</li>
+          <li>Install it as an app, work offline, and optionally sync with an account.</li>
+        </ul>
+        <p><a href="https://github.com/Grano22/congulatio" style="color: #e2c25c">Source code and documentation on GitHub</a></p>
+      </main>
+    </noscript>
   </body>
 </html>
