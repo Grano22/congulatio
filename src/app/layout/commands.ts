@@ -4,6 +4,7 @@ import { EditorTabId, WorkspaceStore } from '../store/workspaceStore';
 import { LAYOUT_PRESETS, ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
 import { CloudSync } from '../cloud/cloudSync';
+import { WelcomeStore } from '../store/welcomeStore';
 import { generateRandomCharacter } from '../domain/randomCharacter';
 
 export type KeyChord = {
@@ -67,6 +68,7 @@ export class CommandsService {
   private readonly workspace = inject(WorkspaceStore);
   private readonly characters = inject(CharactersStore);
   private readonly sync = inject(CloudSync);
+  private readonly welcome = inject(WelcomeStore);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -170,6 +172,7 @@ export class CommandsService {
     { id: 'tools.map', group: 'Tools', label: 'Show focus on the relations map', run: () => this.workspace.open('relations') },
 
     { id: 'help.tour', group: 'Help', label: 'Quick tour & shortcuts', keys: [{ code: 'F1', inText: true }, { code: 'Slash', shift: true }], run: () => this.shell.open('tour') },
+    { id: 'help.whatsNew', group: 'Help', label: 'What’s new', run: () => this.welcome.showAgain() },
     { id: 'help.about', group: 'Help', label: 'About Congulatio', run: () => this.shell.open('about') },
   ];
 

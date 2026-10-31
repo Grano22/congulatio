@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, afterNextRender, computed, inject } from '@angular/core';
 import { Cog, Expand, FlaskConical, ListTree, Minimize2, Maximize2, Network, PersonStanding, Shrink, Swords, CalendarClock } from 'lucide';
 import { LucideIcon } from '../ui/lucide-icon';
 import { RpgTabs, RpgTab } from '../ui/rpg-tabs';
@@ -19,6 +19,7 @@ import { ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
 import { CommandsService } from '../layout/commands';
 import { ShellDialogs } from '../layout/shell-dialogs';
+import { WelcomeStore } from '../store/welcomeStore';
 
 export type { EditorTabId };
 
@@ -65,6 +66,11 @@ export class Workbench {
 
   protected readonly maxSectionIcon = computed(() => (this.shell.maximized() ? Minimize2 : Maximize2));
   protected readonly fullscreenIcon = computed(() => (this.shell.fullscreen() ? Shrink : Expand));
+  private readonly welcome = inject(WelcomeStore);
+
+  constructor() {
+    afterNextRender(() => void this.welcome.check());
+  }
 
   protected openTab(id: EditorTabId): void {
     this.workspace.open(id);

@@ -10,6 +10,7 @@ import { APP_VERSION } from './app-version';
 import { RemoveDialogueDialog } from './remove-dialogue-dialog';
 import { RemoveSoulDialog } from './remove-soul-dialog';
 import { AccountDialog } from './account-dialog';
+import { WelcomeDialog } from './welcome-dialog';
 
 
 type TourStep = { title: string; text: string; tab?: EditorTabId; where: string };
@@ -81,7 +82,7 @@ const TOUR: TourStep[] = [
 
 @Component({
   selector: 'app-shell-dialogs',
-  imports: [RpgModal, RpgButton, DatePipe, RemoveDialogueDialog, RemoveSoulDialog, AccountDialog],
+  imports: [RpgModal, RpgButton, DatePipe, RemoveDialogueDialog, RemoveSoulDialog, AccountDialog, WelcomeDialog],
   styleUrl: './shell-dialogs.css',
   templateUrl: './shell-dialogs.html',
 })

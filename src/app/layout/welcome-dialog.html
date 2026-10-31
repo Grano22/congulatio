@@ -1,0 +1,50 @@
+<app-rpg-modal [title]="title()" width="38rem" [open]="open()" (closed)="close()">
+  @if (firstVisit()) {
+    <p class="wel__lead">
+      A forge for role-playing worlds: summon characters, sculpt them in 3D, write branching dialogue, plan their days,
+      map their bonds and simulate how they play a scene out.
+    </p>
+    <p class="wel__offline">
+      <b>No account needed.</b> Everything you make is kept in this browser’s built-in database and survives closing
+      it. Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>S</kbd> to save.
+    </p>
+  }
+
+  <section class="wel__news" aria-label="Release notes">
+    @for (release of releases(); track release.version) {
+      <article class="wel__release">
+        <header>
+          <span class="wel__version">v{{ release.version }}</span>
+          <h3>{{ release.title }}</h3>
+          <time [attr.datetime]="release.date">{{ release.date }}</time>
+        </header>
+        <ul>
+          @for (item of release.highlights; track $index) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </article>
+    }
+  </section>
+
+  @if (offerAccount()) {
+    <section class="wel__perks">
+      <h3>Why sign in?</h3>
+      <ul>
+        <li><b>Every device.</b> Your tome syncs to the cloud and opens wherever you sign in.</li>
+        <li><b>A safety net.</b> A cloud copy survives clearing browser data or losing the laptop.</li>
+        <li><b>Your portrait</b> and up to {{ accountQuota }} of cloud storage.</li>
+        <li><b>No commitment.</b> Start as an anonymous wanderer and link an e-mail or Google later.</li>
+      </ul>
+      <p>Your current tome comes with you into a brand-new account.</p>
+    </section>
+  }
+
+  @if (firstVisit()) {
+    <app-rpg-button modalFooter variant="wood" size="sm" (click)="tour()">Take the quick tour</app-rpg-button>
+  }
+  @if (offerAccount()) {
+    <app-rpg-button modalFooter variant="wood" size="sm" (click)="signIn()">Sign in or create an account</app-rpg-button>
+  }
+  <app-rpg-button modalFooter variant="gold" size="sm" (click)="close()">{{ firstVisit() ? 'Start forging' : 'Back to the forge' }}</app-rpg-button>
+</app-rpg-modal>
