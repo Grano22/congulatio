@@ -9,7 +9,7 @@ import { Seo } from './layout/seo';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, CrashScreen],
-  template: '<router-outlet /><app-crash-screen />',
+  template: '<router-outlet /><app-crash-screen class="print-hide" />',
   styles: [':host { display: block; min-height: 100dvh; }'],
 })
 export class App {

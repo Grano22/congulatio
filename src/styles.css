@@ -969,3 +969,48 @@ body {
   outline: 2px solid var(--color-gold-500);
   outline-offset: -2px;
 }
+
+@page sheet {
+  size: A4;
+  margin: 12mm;
+}
+@page card {
+  size: 63mm 88mm;
+  margin: 0;
+}
+@media print {
+  html,
+  body,
+  app-root,
+  app-workbench {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .print-hide,
+  router-outlet,
+  noscript {
+    display: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+:root[data-theme='dragonfire'] {
+  --color-gold-700: #6e1a12;
+  --color-gold-600: #8f2618;
+  --color-gold-500: #b5381f;
+  --color-gold-400: #d4522f;
+  --color-gold-300: #ec7a55;
+  --color-gold-200: #f5a585;
+  --color-gold-100: #fbd2bf;
+  --color-stone-950: #120d0d;
+  --color-stone-900: #1b1414;
+  --color-stone-800: #261b1a;
+  --color-stone-700: #332422;
+  --color-stone-600: #45302c;
+  --color-stone-500: #5b3f39;
+}

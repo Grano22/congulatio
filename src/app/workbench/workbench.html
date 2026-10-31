@@ -1,4 +1,4 @@
-<div class="shell">
+<div class="shell print-hide">
   <button type="button" class="skip-link" (click)="skipToStage()">Skip to the workspace</button>
   <app-top-bar [leftSidebarOpen]="shell.leftVisible()" (leftSidebarToggle)="toggleLeftSidebar()" />
   <app-sync-banner />
@@ -14,8 +14,9 @@
 
     <main class="shell__main" id="stage" tabindex="-1" #stage>
       <div class="shell__tabrow">
-        <app-rpg-tabs [tabs]="tabs" [active]="activeTab()" (activeChange)="onTabChange($event)" />
+        <app-rpg-tabs [tabs]="visibleTabs()" [active]="activeTab()" (activeChange)="onTabChange($event)" />
         <span class="shell__tabrow-tools">
+          <app-view-mode-switch />
           <button
             type="button"
             class="shell__tool"
@@ -41,6 +42,13 @@
         @switch (activeTab()) {
           @case ('character') {
             <app-character-editor animate.enter="stage-enter" animate.leave="stage-leave" />
+          }
+          @case ('sheet') {
+            @defer {
+              <app-dnd-sheet animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The character sheet" />
+            }
           }
           @case ('dialogue') {
             <!-- the node editor (Dialogue Loom) is hidden for now — its workbench
@@ -105,7 +113,13 @@
 </div>
 
 @defer (when shell.dialog()) {
-  <app-shell-dialogs />
+  <app-shell-dialogs class="print-hide" />
 } @error {
   <app-load-failed what="This dialog" />
+}
+
+@defer (when print.job()) {
+  <app-character-print />
+} @error {
+  <app-load-failed what="Printing" class="print-hide" />
 }

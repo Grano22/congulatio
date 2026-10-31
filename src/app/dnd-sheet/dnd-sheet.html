@@ -1,0 +1,76 @@
+<app-rpg-panel title="Character Sheet" subtitle="5e-style summary · beta" [footer]="true">
+  @if (souls().length) {
+    <label headerActions class="dnd__pick">
+      <span class="sr-only">Character</span>
+      <select class="rpg-input dnd__select" [value]="soul()?.id" (change)="choose($any($event.target).value)">
+        @for (c of souls(); track c.id) {
+          <option [value]="c.id" [selected]="c.id === soul()?.id">{{ c.firstName }} {{ c.lastName }}</option>
+        }
+      </select>
+    </label>
+  }
+
+  @if (sheet(); as d) {
+    <div class="dnd" tabindex="0" role="region" [attr.aria-label]="'D&D sheet for ' + d.name">
+      <header class="dnd__head">
+        <div class="dnd__portrait"><app-pixel-avatar [face]="soul()!.face" [image]="soul()!.portrait" [label]="d.name + ' portrait'" /></div>
+        <div class="dnd__id">
+          <h3 class="dnd__name">{{ d.name }} @if (d.nickname) {<small>{{ d.nickname }}</small>}</h3>
+          <p class="dnd__line">{{ d.species }} {{ d.className }} {{ d.level }} · {{ d.alignment }} · {{ d.background }}</p>
+        </div>
+      </header>
+
+      <ul class="dnd__combat" aria-label="Combat">
+        <li><b>{{ d.armorClass }}</b><span>Armor class</span><small>{{ d.armor }}</small></li>
+        <li><b>{{ d.hitPoints }}</b><span>Hit points</span><small>{{ d.hitDice }}</small></li>
+        <li><b>{{ mod(d.initiative) }}</b><span>Initiative</span></li>
+        <li><b>{{ d.speed }} ft</b><span>Speed</span></li>
+        <li><b>{{ mod(d.proficiencyBonus) }}</b><span>Proficiency</span></li>
+        <li><b>{{ d.passivePerception }}</b><span>Passive perception</span></li>
+      </ul>
+
+      <ul class="dnd__abilities" aria-label="Abilities">
+        @for (a of d.abilities; track a.key) {
+          <li [attr.aria-label]="a.name + ' ' + a.score + ', modifier ' + mod(a.modifier) + ', saving throw ' + mod(a.save)">
+            <span class="dnd__ab-name" aria-hidden="true">{{ a.key }}</span>
+            <b aria-hidden="true">{{ mod(a.modifier) }}</b>
+            <span class="dnd__ab-score" aria-hidden="true">{{ a.score }}</span>
+            <small aria-hidden="true" [class.dnd__on]="a.proficientSave">Save {{ mod(a.save) }}</small>
+          </li>
+        }
+      </ul>
+
+      <div class="dnd__cols">
+        <section aria-labelledby="dnd-skills">
+          <h4 class="dnd__h" id="dnd-skills">Skills</h4>
+          <ul class="dnd__skills">
+            @for (k of d.skills; track k.id) {
+              <li [class.dnd__on]="k.proficient">
+                <span>{{ k.name }} <small>{{ k.ability }}</small>@if (k.proficient) {<span class="sr-only"> (proficient)</span>}</span>
+                <b>{{ mod(k.bonus) }}</b>
+              </li>
+            }
+          </ul>
+        </section>
+        <section aria-labelledby="dnd-traits">
+          <h4 class="dnd__h" id="dnd-traits">Senses &amp; languages</h4>
+          <p>{{ d.darkvision ? 'Darkvision ' + d.darkvision + ' ft · ' : '' }}{{ d.languages.join(', ') }}</p>
+          <h4 class="dnd__h">Notes</h4>
+          <p>{{ d.notes }}</p>
+          <p class="dnd__hint">Scores come from the soul's attributes (1–100 mapped to 3–20). The class follows the best ability. Edit attributes in the Character tab or the Attribute Ledger.</p>
+        </section>
+      </div>
+    </div>
+  } @else {
+    <p class="dnd__empty">The codex is empty. Summon or engrave a soul to fill a sheet.</p>
+  }
+
+  <app-rpg-button footer variant="wood" size="sm" [disabled]="!sheet()" (click)="printAs('card')">
+    <app-lucide-icon [icon]="cardIcon" iconClass="ic-14" [strokeWidth]="2" />
+    Print card
+  </app-rpg-button>
+  <app-rpg-button footer variant="gold" size="sm" [disabled]="!sheet()" (click)="printAs('sheet')">
+    <app-lucide-icon [icon]="printIcon" iconClass="ic-14" [strokeWidth]="2" />
+    Print sheet / save as PDF
+  </app-rpg-button>
+</app-rpg-panel>

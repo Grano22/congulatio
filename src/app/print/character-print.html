@@ -1,0 +1,104 @@
+@if (job(); as j) {
+  @if (soul(); as s) {
+    @if (sheet(); as d) {
+      @if (j.kind === 'sheet') {
+        <article class="ps" [attr.aria-label]="'Character sheet for ' + d.name">
+          <header class="ps__head">
+            <div class="ps__portrait"><app-pixel-avatar [face]="s.face" [image]="s.portrait" [label]="d.name + ' portrait'" /></div>
+            <div class="ps__title">
+              <h1 class="ps__name">{{ d.name }}</h1>
+              @if (d.nickname) {
+                <p class="ps__nick">{{ d.nickname }}</p>
+              }
+              <dl class="ps__facts">
+                <div><dt>Class &amp; level</dt><dd>{{ d.className }} {{ d.level }}</dd></div>
+                <div><dt>Species</dt><dd>{{ d.species }}</dd></div>
+                <div><dt>Background</dt><dd>{{ d.background }}</dd></div>
+                <div><dt>Alignment</dt><dd>{{ d.alignment }}</dd></div>
+              </dl>
+            </div>
+          </header>
+
+          <section class="ps__combat" aria-label="Combat">
+            <div class="ps__stat"><span class="ps__big">{{ d.armorClass }}</span><span>Armor class</span><small>{{ d.armor }}</small></div>
+            <div class="ps__stat"><span class="ps__big">{{ d.hitPoints }}</span><span>Hit points</span><small>Hit dice {{ d.hitDice }}</small></div>
+            <div class="ps__stat"><span class="ps__big">{{ mod(d.initiative) }}</span><span>Initiative</span></div>
+            <div class="ps__stat"><span class="ps__big">{{ d.speed }} ft</span><span>Speed</span></div>
+            <div class="ps__stat"><span class="ps__big">{{ mod(d.proficiencyBonus) }}</span><span>Proficiency</span></div>
+            <div class="ps__stat"><span class="ps__big">{{ d.passivePerception }}</span><span>Passive perception</span></div>
+          </section>
+
+          <section class="ps__abilities" aria-label="Abilities">
+            @for (a of d.abilities; track a.key) {
+              <div class="ps__ability">
+                <span class="ps__ab-key">{{ a.name }}</span>
+                <span class="ps__ab-mod">{{ mod(a.modifier) }}</span>
+                <span class="ps__ab-score">{{ a.score }}</span>
+                <span class="ps__ab-save">Save {{ mod(a.save) }}{{ a.proficientSave ? ' ●' : '' }}</span>
+              </div>
+            }
+          </section>
+
+          <div class="ps__cols">
+            <section aria-label="Skills">
+              <h2 class="ps__h">Skills</h2>
+              <ul class="ps__skills">
+                @for (k of d.skills; track k.id) {
+                  <li [class.ps__prof]="k.proficient">
+                    <span>{{ k.proficient ? '●' : '○' }} {{ k.name }} <small>({{ k.ability }})</small></span><b>{{ mod(k.bonus) }}</b>
+                  </li>
+                }
+              </ul>
+            </section>
+            <section aria-label="Traits">
+              <h2 class="ps__h">Senses &amp; languages</h2>
+              <p>{{ d.darkvision ? 'Darkvision ' + d.darkvision + ' ft · ' : '' }}{{ d.languages.join(', ') }}</p>
+              <h2 class="ps__h">Appearance</h2>
+              <p>{{ s.age }} years · {{ s.bodyType }} · {{ s.skin }} skin · {{ s.hairColor }} hair · {{ s.eyeColor }} eyes</p>
+              <h2 class="ps__h">Personality &amp; notes</h2>
+              <p>{{ s.temperament }}. {{ d.notes }}</p>
+            </section>
+          </div>
+
+          <footer class="ps__foot">Congulatio · 5e-compatible summary using rules from the System Reference Document 5.2 (CC BY 4.0). Not affiliated with Wizards of the Coast.</footer>
+        </article>
+      } @else {
+        <article class="pc pc--front" [attr.aria-label]="'Character card for ' + d.name">
+          <div class="pc__portrait"><app-pixel-avatar [face]="s.face" [image]="s.portrait" [label]="d.name + ' portrait'" /></div>
+          <h1 class="pc__name">{{ d.name }}</h1>
+          <p class="pc__sub">{{ d.species }} {{ d.className }} · Level {{ d.level }}</p>
+          <div class="pc__vitals">
+            <span><b>{{ d.armorClass }}</b>AC</span>
+            <span><b>{{ d.hitPoints }}</b>HP</span>
+            <span><b>{{ d.speed }}</b>ft</span>
+            <span><b>{{ mod(d.initiative) }}</b>Init</span>
+          </div>
+          <div class="pc__abilities">
+            @for (a of d.abilities; track a.key) {
+              <span><small>{{ a.key }}</small><b>{{ a.score }}</b>{{ mod(a.modifier) }}</span>
+            }
+          </div>
+          <p class="pc__meta pc__foot">{{ d.alignment }} · Passive perception {{ d.passivePerception }} · Proficiency {{ mod(d.proficiencyBonus) }}</p>
+        </article>
+        <article class="pc pc--back" aria-label="Card back">
+          <h2 class="pc__h">Saves</h2>
+          <p class="pc__list">
+            @for (a of d.abilities; track a.key) {
+              <span [class.pc__prof]="a.proficientSave">{{ a.key }} {{ mod(a.save) }}</span>
+            }
+          </p>
+          <h2 class="pc__h">Skills</h2>
+          <p class="pc__list">
+            @for (k of d.skills; track k.id) {
+              @if (k.proficient) {
+                <span class="pc__prof">{{ k.name }} {{ mod(k.bonus) }}</span>
+              }
+            }
+          </p>
+          <p class="pc__meta">{{ d.darkvision ? 'Darkvision ' + d.darkvision + ' ft · ' : '' }}{{ d.languages.join(', ') }}</p>
+          <p class="pc__note">{{ d.notes }}</p>
+        </article>
+      }
+    }
+  }
+}

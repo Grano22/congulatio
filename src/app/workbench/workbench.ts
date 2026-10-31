@@ -1,5 +1,5 @@
 import { Component, ElementRef, afterNextRender, computed, inject, viewChild } from '@angular/core';
-import { Cog, Expand, FlaskConical, ListTree, Minimize2, Maximize2, Network, PersonStanding, Shrink, Swords, CalendarClock } from 'lucide';
+import { Cog, Expand, FlaskConical, ListTree, Minimize2, Maximize2, Network, PersonStanding, ScrollText, Shrink, Swords, CalendarClock } from 'lucide';
 import { LucideIcon } from '../ui/lucide-icon';
 import { RpgTabs, RpgTab } from '../ui/rpg-tabs';
 import { TopBar } from '../layout/top-bar';
@@ -23,6 +23,11 @@ import { SyncBanner } from '../layout/sync-banner';
 import { LoadFailed } from '../ui/load-failed';
 import { WelcomeStore } from '../store/welcomeStore';
 import { Persistence } from '../store/persistence';
+import { ViewStore } from '../store/viewStore';
+import { ViewModeSwitch } from '../layout/view-mode-switch';
+import { DndSheet } from '../dnd-sheet/dnd-sheet';
+import { CharacterPrint } from '../print/character-print';
+import { PrintJob } from '../print/printJob';
 
 export type { EditorTabId };
 
@@ -46,6 +51,9 @@ export type { EditorTabId };
     ShellDialogs,
     SyncBanner,
     LoadFailed,
+    ViewModeSwitch,
+    DndSheet,
+    CharacterPrint,
   ],
   styleUrl: './workbench.css',
   templateUrl: './workbench.html',
@@ -54,6 +62,7 @@ export type { EditorTabId };
 export class Workbench {
   protected readonly tabs: RpgTab[] = [
     { id: 'character', label: 'Character', icon: Swords },
+    { id: 'sheet', label: 'Sheet', icon: ScrollText },
     { id: 'sculptor', label: 'Sculptor', icon: PersonStanding },
     // { id: 'dialogue', label: 'Dialogue Loom', icon: MessagesSquare }, // node editor — hidden for now
     { id: 'dialogue', label: 'Dialogue', icon: ListTree },
@@ -64,6 +73,9 @@ export class Workbench {
   ];
   private readonly workspace = inject(WorkspaceStore);
   protected readonly activeTab = this.workspace.tab;
+  protected readonly view = inject(ViewStore);
+  protected readonly print = inject(PrintJob);
+  protected readonly visibleTabs = computed(() => this.tabs.filter((t) => this.view.allowsTab(t.id as EditorTabId)));
 
   protected readonly shell = inject(ShellStore);
   private readonly commands = inject(CommandsService);
