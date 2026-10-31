@@ -1,0 +1,94 @@
+import { spawn } from 'node:child_process';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { AUTH_URL, PROJECT_ID, assertSafeTarget, wait } from './support.mjs';
+import { rulesSuite } from './rules.e2e.mjs';
+import { appSuite } from './app.e2e.mjs';
+
+const root = resolve(import.meta.dirname, '..');
+const configFile = resolve(root, 'public/firebase-config.json');
+const port = Number(process.env.E2E_PORT ?? 4300);
+const attachedUrl = process.env.E2E_BASE_URL;
+const baseUrl = attachedUrl ?? `http://localhost:${port}`;
+const only = process.argv.slice(2);
+const wants = (suite) => !only.length || only.includes(suite);
+
+assertSafeTarget(baseUrl);
+
+async function waitForUrl(url, ms) {
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try {
+      await fetch(url);
+      return;
+    } catch {
+      await wait(500);
+    }
+  }
+  throw new Error(`${url} did not answer within ${ms / 1000}s`);
+}
+
+async function reachable(url) {
+  try {
+    await fetch(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const start = (command, args) => spawn(command, args, { cwd: root, stdio: 'ignore', detached: process.platform !== 'win32' });
+
+function stop(child) {
+  if (!child?.pid) return;
+  try {
+    process.kill(process.platform === 'win32' ? child.pid : -child.pid);
+  } catch {
+    child.kill();
+  }
+}
+
+const previousConfig = existsSync(configFile) ? readFileSync(configFile, 'utf8') : null;
+let server;
+let emulators;
+
+try {
+  if (!(await reachable(AUTH_URL))) {
+    console.log('Starting the Firebase emulators…');
+    emulators = start('npx', ['-y', 'firebase-tools@15.34.2', 'emulators:start', '--project', PROJECT_ID, '--only', 'auth,firestore,storage']);
+    await waitForUrl(AUTH_URL, 180_000);
+    await waitForUrl('http://127.0.0.1:8080', 60_000);
+    await waitForUrl('http://127.0.0.1:9199', 60_000);
+  }
+  if (!attachedUrl && wants('app')) {
+    const emulatorConfig = {
+      generated: true,
+      stage: 'e2e',
+      firebase: { apiKey: 'demo-api-key', authDomain: `${PROJECT_ID}.firebaseapp.com`, projectId: PROJECT_ID, storageBucket: `${PROJECT_ID}.firebasestorage.app`, appId: '1:000000000000:web:e2e' },
+      emulators: { host: '127.0.0.1', authPort: 9099, firestorePort: 8080, storagePort: 9199 },
+    };
+    writeFileSync(configFile, `${JSON.stringify(emulatorConfig, null, 2)}\n`);
+    console.log(`Starting the dev server on ${baseUrl}…`);
+    server = start('npx', ['ng', 'serve', '--port', String(port)]);
+    await waitForUrl(baseUrl, 180_000);
+  }
+
+  const suites = [];
+  if (wants('rules')) suites.push(await rulesSuite());
+  if (wants('app')) suites.push(await appSuite(baseUrl));
+  for (const suite of suites) suite.print();
+  const failed = suites.reduce((n, s) => n + s.failed, 0);
+  const total = suites.reduce((n, s) => n + s.results.length, 0);
+  console.log(`\n${total - failed} of ${total} checks passed`);
+  process.exitCode = failed ? 1 : 0;
+} catch (e) {
+  console.error(`\nEnd-to-end run stopped: ${e.message}`);
+  process.exitCode = 1;
+} finally {
+  stop(server);
+  stop(emulators);
+  if (!attachedUrl) {
+    if (previousConfig === null) rmSync(configFile, { force: true });
+    else writeFileSync(configFile, previousConfig);
+  }
+}
