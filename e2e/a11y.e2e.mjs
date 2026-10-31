@@ -84,6 +84,15 @@ export async function a11ySuite(baseUrl) {
       record(`workbench · ${name} tab`, await audit(page));
     }
 
+    await page.click('[data-mode=dnd]');
+    await page.waitForSelector('[data-tab=sheet]', { timeout: 4000 });
+    await page.click('[data-tab=sheet]');
+    await page.waitForSelector('app-dnd-sheet .dnd__abilities li', { timeout: 8000 });
+    await wait(600);
+    record('D&D view · character sheet (Dragonfire theme)', await audit(page));
+    await page.click('[data-mode=npc-flow]');
+    await wait(600);
+
     const dialogs = [
       ['account menu', async () => page.click('app-account-menu .amenu__trigger'), 'app-account-menu'],
       ['account dialog', async () => clickText(page, 'Account & storage', '[role=menuitem]'), 'dialog[open]'],

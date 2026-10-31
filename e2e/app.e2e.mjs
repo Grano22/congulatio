@@ -140,6 +140,63 @@ export async function appSuite(baseUrl) {
       await a.waitForFunction(() => !document.querySelector('dialog[open]'), { timeout: 4000 });
     });
 
+    await step('the beta D&D view shows only tabletop parts and prints a sheet and a card', async () => {
+      await a.evaluateOnNewDocument(() => {
+        window.print = () => {
+          window.__prints = (window.__prints ?? 0) + 1;
+          setTimeout(() => window.dispatchEvent(new Event('afterprint')), 50);
+        };
+      });
+      await a.evaluate(() => {
+        window.print = () => {
+          window.__prints = (window.__prints ?? 0) + 1;
+          setTimeout(() => window.dispatchEvent(new Event('afterprint')), 50);
+        };
+      });
+      await a.click('[data-mode=dnd]');
+      await a.waitForSelector('[data-tab=sheet]', { timeout: 4000 });
+      const tabs = await a.$$eval('[data-tab]', (t) => t.map((x) => x.dataset.tab));
+      if (tabs.includes('dialogue') || tabs.includes('routines')) throw new Error(`D&D tabs: ${tabs.join(', ')}`);
+      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'dragonfire') throw new Error('the D&D theme was not applied');
+      await a.click('[data-tab=sheet]');
+      await a.waitForSelector('app-dnd-sheet .dnd__abilities li', { timeout: 8000 });
+      for (const [label, selector] of [['Print sheet', 'app-character-print .ps'], ['Print card', 'app-character-print .pc--back']]) {
+        await clickText(a, label, 'app-dnd-sheet button');
+        await a.waitForSelector(selector, { timeout: 8000 });
+        await a.waitForFunction(() => !document.querySelector('app-character-print article'), { timeout: 4000 });
+      }
+      if ((await a.evaluate(() => window.__prints)) !== 2) throw new Error('the print dialog did not open twice');
+    });
+
+    await step('dialogues stay in the NPC flow view and the view choice survives a reload', async () => {
+      await a.reload({ waitUntil: 'domcontentloaded' });
+      await a.waitForSelector('[data-tab=sheet]', { timeout: 15000 });
+      await press(a, 'Alt', 'Digit3');
+      await a.waitForSelector('[data-tab=dialogue]', { timeout: 4000 });
+      if ((await a.$eval('[data-mode=npc-flow]', (b) => b.getAttribute('aria-checked'))) !== 'true') throw new Error('opening a dialogue did not switch to the NPC flow view');
+      if (await a.$('[data-tab=sheet]')) throw new Error('the sheet tab is still shown in the NPC flow view');
+      if ((await a.evaluate(() => document.documentElement.dataset.theme)) !== 'forge') throw new Error('the forge theme did not come back');
+    });
+
+    await step('navigator panes share the sidebar height equally and stay inside a narrow sidebar', async () => {
+      await a.evaluate(() => localStorage.setItem('congulatio.layout.v1', JSON.stringify({ leftVisible: true, leftWidth: 260, inspectorVisible: true, inspectorWidth: 292 })));
+      await a.reload({ waitUntil: 'domcontentloaded' });
+      await a.waitForSelector('.nav__rail-btn', { timeout: 15000 });
+      for (const title of ['Routine Almanac', 'Attribute Ledger']) {
+        await a.click(`.nav__rail-btn[title="${title}"]`);
+        await wait(450);
+      }
+      const layout = await a.evaluate(() => {
+        const split = document.querySelector('.nav__split').getBoundingClientRect();
+        const heights = [...document.querySelectorAll('.nav__pane')].map((p) => Math.round(p.getBoundingClientRect().height));
+        const closes = [...document.querySelectorAll('.nav__pane .rpanel__header-actions')].map((c) => c.getBoundingClientRect().right);
+        return { heights, offPane: closes.filter((r) => r > split.right + 0.5).length };
+      });
+      if (layout.heights.length !== 3 || Math.max(...layout.heights) - Math.min(...layout.heights) > 2) throw new Error(`pane heights ${layout.heights.join(', ')}`);
+      if (layout.offPane) throw new Error(`${layout.offPane} close buttons sit outside the sidebar`);
+      await a.evaluate(() => localStorage.removeItem('congulatio.layout.v1'));
+    });
+
     await step('settings turn autosave off and remember it', async () => {
       await wait(300);
       await press(a, MOD, 'Alt', 'KeyP');
