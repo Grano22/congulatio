@@ -101,7 +101,7 @@ export class CommandsService {
       enabled: () => this.history.canRedo(),
       run: () => this.history.redo(),
     },
-    { id: 'edit.settings', group: 'Edit', label: 'Settings…', keys: [{ code: 'Comma', mod: true, inText: true }], run: () => this.shell.open('settings') },
+    { id: 'edit.settings', group: 'Edit', label: 'Settings…', keys: [{ code: 'KeyP', mod: true, alt: true, inText: true }], run: () => this.shell.open('settings') },
     {
       id: 'edit.autosave',
       group: 'Edit',
