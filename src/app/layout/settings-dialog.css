@@ -1,0 +1,57 @@
+.set__block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.set__block h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-800);
+}
+.set__layers {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--color-ink-700);
+}
+.set__toggle {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.set__toggle input {
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-wood-600);
+}
+.set__toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.set__toggle small {
+  font-size: 0.8rem;
+  color: var(--color-ink-500);
+}
+.set__row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  padding-left: 1.6rem;
+  font-size: 0.88rem;
+}
+.set__row--off {
+  opacity: 0.55;
+}
+.set__hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--color-ink-500);
+}

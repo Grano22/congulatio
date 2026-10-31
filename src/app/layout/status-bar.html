@@ -8,8 +8,10 @@
       <span role="status" aria-live="polite">
         @if (history.dirty()) {
           Unsaved changes
-        } @else {
+        } @else if (history.savedAt()) {
           Saved {{ history.savedAt() | date: 'HH:mm' }}
+        } @else {
+          Sample tome
         }
       </span>
       <span class="statusbar__sep" aria-hidden="true">·</span>

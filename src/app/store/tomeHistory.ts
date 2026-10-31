@@ -84,6 +84,7 @@ export class TomeHistory {
 
   constructor() {
     this.entries.set([{ id: this.nextId++, label: 'Opened tome', details: [], at: now(), snapshot: this.current() }]);
+    this.savedSnapshot.set(this.current());
     effect(() => {
       const snapshot = this.current();
       untracked(() => this.schedule(snapshot));
@@ -302,7 +303,7 @@ export class TomeHistory {
     this.pending.set(false);
     this.restore(snapshot);
     this.savedAt.set(savedAt);
-    this.savedSnapshot.set(savedAt ? this.current() : null);
+    this.savedSnapshot.set(this.current());
     this.archived.set(changeset);
     this.entries.set([{ id: this.nextId++, label, details: [], at: now(), snapshot: this.current() }]);
     this.index.set(0);

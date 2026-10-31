@@ -15,7 +15,7 @@ const MENUS: MenuDef[] = [
     label: 'File',
     items: [cmd('tome.save'), cmd('tome.import'), SEP, cmd('tome.export'), cmd('tome.exportHistory'), SEP, cmd('account.open'), cmd('account.sync'), SEP, cmd('tome.reset')],
   },
-  { label: 'Edit', items: [cmd('edit.undo'), cmd('edit.redo'), SEP, cmd('edit.history')] },
+  { label: 'Edit', items: [cmd('edit.undo'), cmd('edit.redo'), SEP, cmd('edit.history'), SEP, cmd('edit.autosave'), cmd('edit.settings')] },
   {
     label: 'View',
     items: [

@@ -20,6 +20,7 @@ import { TomeHistory } from '../store/tomeHistory';
 import { CommandsService } from '../layout/commands';
 import { ShellDialogs } from '../layout/shell-dialogs';
 import { WelcomeStore } from '../store/welcomeStore';
+import { Persistence } from '../store/persistence';
 
 export type { EditorTabId };
 
@@ -67,8 +68,10 @@ export class Workbench {
   protected readonly maxSectionIcon = computed(() => (this.shell.maximized() ? Minimize2 : Maximize2));
   protected readonly fullscreenIcon = computed(() => (this.shell.fullscreen() ? Shrink : Expand));
   private readonly welcome = inject(WelcomeStore);
+  private readonly persistence = inject(Persistence);
 
   constructor() {
+    this.persistence.start();
     afterNextRender(() => void this.welcome.check());
   }
 

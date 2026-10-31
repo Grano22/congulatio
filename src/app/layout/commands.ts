@@ -5,6 +5,7 @@ import { LAYOUT_PRESETS, ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
 import { CloudSync } from '../cloud/cloudSync';
 import { WelcomeStore } from '../store/welcomeStore';
+import { SettingsStore } from '../store/settingsStore';
 import { generateRandomCharacter } from '../domain/randomCharacter';
 
 export type KeyChord = {
@@ -69,6 +70,7 @@ export class CommandsService {
   private readonly characters = inject(CharactersStore);
   private readonly sync = inject(CloudSync);
   private readonly welcome = inject(WelcomeStore);
+  private readonly settings = inject(SettingsStore);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -94,6 +96,14 @@ export class CommandsService {
       keys: [{ code: 'KeyZ', mod: true, shift: true }, { code: 'KeyY', mod: true }],
       enabled: () => this.history.canRedo(),
       run: () => this.history.redo(),
+    },
+    { id: 'edit.settings', group: 'Edit', label: 'Settings…', keys: [{ code: 'Comma', mod: true, inText: true }], run: () => this.shell.open('settings') },
+    {
+      id: 'edit.autosave',
+      group: 'Edit',
+      label: 'Autosave',
+      checked: () => this.settings.settings().autosave,
+      run: () => this.settings.update({ autosave: !this.settings.settings().autosave }),
     },
     { id: 'edit.history', group: 'Edit', label: 'History & changeset…', keys: [{ code: 'KeyH', mod: true, shift: true, inText: true }], run: () => this.shell.open('history') },
 

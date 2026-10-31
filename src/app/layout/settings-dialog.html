@@ -1,0 +1,42 @@
+<app-rpg-modal title="Settings" width="32rem" [open]="open()" (closed)="shell.closeDialog()">
+  <section class="set__block">
+    <h3>Saving</h3>
+    <p class="set__layers">
+      Your work moves through three layers: edits live <b>in memory</b>, saving writes them to this browser’s
+      <b>built-in database</b>, and when you are signed in the saved tome syncs to the <b>cloud</b>.
+    </p>
+
+    <label class="set__toggle">
+      <input type="checkbox" [checked]="settings().autosave" (change)="setAutosave($event)" />
+      <span>
+        <b>Autosave</b>
+        <small>Save unsaved edits to this browser on a timer and whenever you switch away from the tab.</small>
+      </span>
+    </label>
+
+    <label class="set__row" [class.set__row--off]="!settings().autosave">
+      <span>Autosave</span>
+      <select class="rpg-select" [disabled]="!settings().autosave" [value]="settings().autosaveSeconds" (change)="setInterval($event)">
+        @for (option of intervals; track option.seconds) {
+          <option [value]="option.seconds" [selected]="option.seconds === settings().autosaveSeconds">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+    @if (persistence.autosavedAt(); as at) {
+      <p class="set__hint">Last autosave at {{ at | date: 'HH:mm:ss' }}.</p>
+    }
+
+    <label class="set__toggle">
+      <input type="checkbox" [checked]="settings().warnBeforeLeaving" (change)="setWarn($event)" />
+      <span>
+        <b>Warn before leaving</b>
+        <small>
+          Ask before closing the page while edits are unsaved{{ session.cloud() ? ' or not yet synced to the cloud' : '' }}.
+        </small>
+      </span>
+    </label>
+  </section>
+
+  <p class="set__hint">Settings are kept in this browser.</p>
+  <app-rpg-button modalFooter variant="gold" size="sm" (click)="shell.closeDialog()">Done</app-rpg-button>
+</app-rpg-modal>
