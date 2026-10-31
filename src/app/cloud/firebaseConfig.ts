@@ -19,7 +19,7 @@ export const MIB = 1024 * 1024;
 
 export const DEFAULT_QUOTA = {
   anonymous: 2 * MIB,
-  account: 20 * MIB,
+  account: 50 * MIB,
 };
 
 export const AVATAR_MAX_BYTES = 512 * 1024;

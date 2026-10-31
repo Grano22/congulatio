@@ -128,7 +128,7 @@ przycisku **Sign in**, okna powitalnego i okna konta:
 | Tryb | Co się dzieje |
 | --- | --- |
 | **Bez konta** (domyślnie) | Nic nie opuszcza przeglądarki; Tom żyje w IndexedDB i przetrwa zamknięcie przeglądarki. Działa też wtedy, gdy build nie ma konfiguracji Firebase. |
-| **Account** (e-mail i hasło lub Google) | Tom jest zapisywany w przeglądarce i synchronizowany z Firestore, więc działa na każdym urządzeniu. Domyślnie 20 MiB w chmurze i portret konta. |
+| **Account** (e-mail i hasło lub Google) | Tom jest zapisywany w przeglądarce i synchronizowany z Firestore, więc działa na każdym urządzeniu. Domyślnie 50 MiB w chmurze i portret konta. |
 | **Wanderer** (anonimowo) | Konto anonimowe Firebase przypięte do tej przeglądarki, z synchronizacją i limitem 2 MiB. W oknie konta można je później **połączyć** z e-mailem lub Google — dane i identyfikator zostają. Wylogowanie wędrowca bez połączenia traci kopię w chmurze (aplikacja ostrzega). |
 
 - **Nowe** konto lub wędrowiec zaczyna z Tomem, który jest właśnie otwarty. Logowanie do **istniejącego** konta
@@ -189,7 +189,7 @@ flowchart LR
 - **Konflikty:** gdy Tom zmienił się i w chmurze, i w przeglądarce, wygrywa nowszy zapis. Pobranie z chmury jest
   zwykłym krokiem historii, więc **Undo** przywraca wersję z przeglądarki.
 - **Limity miejsca:** okno konta pokazuje zajętość (Tom + portret) względem limitu. Domyślnie 2 MiB dla wędrowca i
-  20 MiB dla konta; limit można nadać indywidualnie przez custom claim `storageQuota` (w bajtach), patrz niżej.
+  50 MiB dla konta; limit można nadać indywidualnie przez custom claim `storageQuota` (w bajtach), patrz niżej.
   Gdy Tom przekracza limit, synchronizacja się zatrzymuje, a Tom zostaje bezpiecznie w przeglądarce.
 - **Portrety** są przycinane do kwadratu i zmniejszane do 256 px (WebP, maks. 512 KiB) przed wysłaniem do Storage
   (`avatars/<uid>/`). W trybie offline portret zostaje w IndexedDB.
