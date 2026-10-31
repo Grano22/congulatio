@@ -32,9 +32,17 @@ const firebase = {
 
 const missing = ['apiKey', 'projectId', 'appId'].filter((key) => !firebase[key]);
 
+function handWritten() {
+  try {
+    return JSON.parse(readFileSync(target, 'utf8')).generated !== true;
+  } catch {
+    return false;
+  }
+}
+
 if (missing.length) {
-  if (existsSync(target) && env.FIREBASE_KEEP_EXISTING !== 'false') {
-    console.log(`firebase-config: no Firebase settings found, keeping the existing ${target}`);
+  if (existsSync(target) && handWritten() && env.FIREBASE_KEEP_EXISTING !== 'false') {
+    console.log(`firebase-config: no Firebase settings found, keeping the hand-written ${target}`);
   } else {
     rmSync(target, { force: true });
     console.log('firebase-config: no Firebase settings found, the build works on this device only');
@@ -43,6 +51,7 @@ if (missing.length) {
 }
 
 const config = {
+  generated: true,
   stage: env.FIREBASE_STAGE || (emulators ? 'emulators' : 'production'),
   firebase: Object.fromEntries(Object.entries(firebase).filter(([, v]) => v)),
   emulators: emulators
