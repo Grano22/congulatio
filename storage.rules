@@ -2,13 +2,22 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function allowedName(fileName) {
+      return fileName.matches('^avatar[.](webp|jpg)$');
+    }
+
     match /avatars/{userId}/{fileName} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create, update: if request.auth != null
-        && request.auth.uid == userId
+      allow read: if isOwner(userId) && allowedName(fileName);
+      allow create, update: if isOwner(userId)
+        && allowedName(fileName)
+        && request.resource.size > 0
         && request.resource.size <= 512 * 1024
-        && request.resource.contentType.matches('image/(webp|png|jpeg)');
-      allow delete: if request.auth != null && request.auth.uid == userId;
+        && request.resource.contentType.matches('^image/(webp|jpeg)$');
+      allow delete: if isOwner(userId) && allowedName(fileName);
     }
 
     match /{allPaths=**} {

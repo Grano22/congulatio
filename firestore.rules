@@ -30,21 +30,32 @@ service cloud.firestore {
       let row = request.resource.data;
       return row.keys().hasOnly(['owner', 'kind', 'entityId', 'position', 'json', 'hash', 'bytes', 'updatedAt'])
         && row.keys().hasAll(['owner', 'kind', 'json', 'bytes', 'updatedAt'])
-        && row.kind is string && row.kind.size() <= 32
+        && row.kind in ['meta', 'characters', 'dialogue', 'relations', 'routines', 'interactions', 'attributeDefs']
+        && (!('entityId' in row) || (row.entityId is string && row.entityId.size() <= 300))
+        && (!('position' in row) || (row.position is int && row.position >= 0 && row.position <= 1000000))
+        && (!('hash' in row) || (row.hash is string && row.hash.size() <= 40))
         && row.json is string && row.json.size() <= 900000
-        && row.bytes is int && row.bytes >= 0
-        && row.updatedAt is string;
+        && row.bytes is int && row.bytes >= 0 && row.bytes <= 3600000
+        && row.updatedAt is string && row.updatedAt.size() <= 40;
     }
 
-    function validProfile() {
+    function validProfile(userId) {
       let profile = request.resource.data;
       return profile.keys().hasOnly(['displayName', 'photoURL', 'avatarPath', 'avatarBytes', 'kind', 'updatedAt'])
-        && (!('avatarBytes' in profile) || (profile.avatarBytes is int && profile.avatarBytes <= 524288));
+        && (!('displayName' in profile) || (profile.displayName is string && profile.displayName.size() <= 100))
+        && (!('photoURL' in profile) || profile.photoURL == null
+          || (profile.photoURL is string && profile.photoURL.size() <= 2048
+            && profile.photoURL.matches('^(https://|http://(127[.]0[.]0[.]1|localhost)[:/]).*')))
+        && (!('avatarPath' in profile) || profile.avatarPath == null
+          || (profile.avatarPath is string && profile.avatarPath.matches('^avatars/' + userId + '/avatar[.](webp|jpg)$')))
+        && (!('avatarBytes' in profile) || (profile.avatarBytes is int && profile.avatarBytes >= 0 && profile.avatarBytes <= 524288))
+        && (!('kind' in profile) || profile.kind in ['anonymous', 'account'])
+        && (!('updatedAt' in profile) || (profile.updatedAt is string && profile.updatedAt.size() <= 40));
     }
 
     match /users/{userId} {
       allow read: if isSelf(userId) || isAdmin();
-      allow create, update: if isSelf(userId) && validProfile();
+      allow create, update: if isSelf(userId) && validProfile(userId);
       allow delete: if isSelf(userId);
     }
 
@@ -53,6 +64,34 @@ service cloud.firestore {
       allow create: if claimsIncoming() && idBelongsToCaller(documentId) && validTableRow();
       allow update: if ownsStored() && claimsIncoming() && validTableRow();
       allow delete: if ownsStored();
+    }
+
+    function validErrorReport() {
+      let r = request.resource.data;
+      return r.keys().hasOnly(['fingerprint', 'name', 'message', 'stack', 'source', 'route', 'appVersion', 'browser', 'online', 'count', 'firstSeen', 'lastSeen', 'note', 'createdAt', 'expireAt'])
+        && r.keys().hasAll(['fingerprint', 'message', 'appVersion', 'count', 'createdAt', 'expireAt'])
+        && r.fingerprint is string && r.fingerprint.matches('^[0-9a-f]{16}$')
+        && r.message is string && r.message.size() <= 500
+        && (!('name' in r) || (r.name is string && r.name.size() <= 100))
+        && (!('stack' in r) || (r.stack is string && r.stack.size() <= 4000))
+        && (!('source' in r) || (r.source is string && r.source.size() <= 40))
+        && (!('route' in r) || (r.route is string && r.route.size() <= 100))
+        && r.appVersion is string && r.appVersion.size() <= 20
+        && (!('browser' in r) || (r.browser is string && r.browser.size() <= 60))
+        && (!('online' in r) || r.online is bool)
+        && r.count is int && r.count >= 1 && r.count <= 100000
+        && (!('firstSeen' in r) || (r.firstSeen is string && r.firstSeen.size() <= 40))
+        && (!('lastSeen' in r) || (r.lastSeen is string && r.lastSeen.size() <= 40))
+        && (!('note' in r) || (r.note is string && r.note.size() <= 1000))
+        && r.createdAt == request.time
+        && r.expireAt is timestamp
+        && r.expireAt > request.time + duration.value(360, 'd')
+        && r.expireAt < request.time + duration.value(370, 'd');
+    }
+
+    match /error_reports/{reportId} {
+      allow create: if signedIn() && validErrorReport();
+      allow read, delete: if isAdmin();
     }
 
     match /admin_tables/{documentId} {
