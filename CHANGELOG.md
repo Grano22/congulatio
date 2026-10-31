@@ -7,6 +7,48 @@ All notable changes to Congulatio are written down here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-31
+
+### Added
+
+- Error handling: a global `ErrorHandler` (also fed by `window` error and unhandled rejection events) keeps a
+  de-duplicated, redacted log of distinct errors in IndexedDB; a recovery screen for critical errors (failed lazy
+  chunks, bursts of errors) offers Save my work & reload, Reload, Keep working and an optional report; lazy tabs and
+  dialogs show a Reload fallback when they cannot load; a static fallback appears if the app cannot start.
+- Help → Problems & error reports lists distinct errors with counts and lets you report one.
+- Consent-based error reports: the exact payload is shown before sending, addresses, e-mails and tokens are removed,
+  no account id is attached; signed-in users send to a create-only `error_reports` collection with a server timestamp
+  and a one-year `expireAt` for TTL deletion, everyone can copy the report or open a prefilled GitHub issue.
+- SEO: canonical link, Open Graph and Twitter cards with a social preview image, JSON-LD `WebApplication` data, a
+  crawlable `<noscript>` description, per-route titles, descriptions and `noindex` for the sign-in page, `robots.txt`,
+  `sitemap.xml`, `humans.txt` and `.well-known/security.txt`; CI rewrites the site URL for forks.
+- Accessibility: a skip link, an axe-core WCAG 2.2 AA audit suite (`npm run e2e -- a11y`) covering every tab, dialog
+  and the sign-in page.
+- `SECURITY.md` policy, CodeQL code scanning and Dependabot updates with a 14-day cooldown.
+- Project `.claude/settings.json` and a hook that keep AI assistants away from secret and generated settings files.
+
+### Changed
+
+- The privacy notice describes error reports (consent, contents, 12-month retention).
+- Emulator runs and the e2e suite read demo settings from `e2e/fixtures/` instead of rewriting the generated settings
+  file.
+- Production builds no longer inline critical CSS, so no inline script is needed.
+
+### Fixed
+
+- Accessibility: the codex list no longer misuses listbox roles, icon-only buttons have names, quick tour dots meet
+  the 24 px target size, scrollable dialog bodies are keyboard focusable, heading levels no longer skip and nested
+  landmarks were removed.
+
+### Security
+
+- Content-Security-Policy limiting scripts, frames and connections to the app and Google Firebase, plus a strict
+  referrer policy.
+- Firestore rules validate row kinds, sizes and positions, profile names, portrait links (https only) and portrait
+  paths (own folder only); Storage only accepts `avatar.webp` or `avatar.jpg` as WebP or JPEG up to 512 KiB.
+- npm overrides lift `@grpc/grpc-js`, `vite` and `fast-uri` past known advisories; CI fails on high-severity
+  production advisories and no longer leaves the checkout token in the workspace.
+
 ## [0.2.0] - 2026-10-31
 
 ### Added
@@ -82,7 +124,8 @@ All notable changes to Congulatio are written down here. The format follows
 - Custom attributes, inspector with read-only mode, global search, menus, shortcuts and quick tour.
 - Tome history with undo, redo, save, import and export; GitHub Pages deployment.
 
-[Unreleased]: https://github.com/Grano22/congulatio/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Grano22/congulatio/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Grano22/congulatio/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Grano22/congulatio/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Grano22/congulatio/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/Grano22/congulatio/releases/tag/v0.0.1

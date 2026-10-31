@@ -7,6 +7,19 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.3.0',
+    date: '2026-10-31',
+    title: 'Sturdier, safer and easier to use',
+    highlights: [
+      'If something breaks, a recovery screen lets you save your work and reload, keep working, or report the problem.',
+      'Problems are listed in Help → Problems & error reports. Nothing is sent unless you tick the consent box, and reports carry no name, e-mail or account id.',
+      'A part that fails to load now shows a clear message with a Reload button instead of an empty space.',
+      'Better keyboard and screen reader support: a skip link, clearer labels and larger tap targets, checked against WCAG 2.2 AA.',
+      'Stricter security: a Content-Security-Policy, tighter cloud rules and automatic dependency checks.',
+      'Richer link previews when you share Congulatio.',
+    ],
+  },
+  {
     version: '0.2.0',
     date: '2026-10-31',
     title: 'Install it, work offline, never lose a line',
