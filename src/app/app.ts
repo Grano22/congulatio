@@ -1,6 +1,7 @@
 import { Component, effect, inject, untracked } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { Session } from './cloud/session';
+import { CloudSync } from './cloud/cloudSync';
 import { TomeHistory } from './store/tomeHistory';
 
 @Component({
@@ -13,6 +14,7 @@ export class App {
   private readonly session = inject(Session);
   private readonly history = inject(TomeHistory);
   private readonly router = inject(Router);
+  protected readonly sync = inject(CloudSync);
 
   constructor() {
     effect(() => {
