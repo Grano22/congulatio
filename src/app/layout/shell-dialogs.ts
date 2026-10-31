@@ -78,7 +78,7 @@ const TOUR: TourStep[] = [
   {
     title: 'Keeping your work',
     where: 'File & Edit menus',
-    text: 'Undo and redo walk the history. Save keeps the tome and its changeset in this browser’s built-in database, no account needed; sign in from the top bar to sync it across devices. Export writes a file you can open again, with or without the full history.',
+    text: 'Undo and redo walk the history. Save keeps the tome and its changeset in this browser’s built-in database, no account needed, and autosave does it for you every 30 seconds (Edit → Settings). Sign in from the account icon to sync it across devices. Export writes a file you can open again, with or without the full history.',
   },
 ];
 
