@@ -44,7 +44,7 @@ const MENUS: MenuDef[] = [
     ],
   },
   { label: 'Tools', items: [cmd('tools.summon'), cmd('tools.sculpt'), cmd('tools.simulate'), cmd('tools.map')] },
-  { label: 'Help', items: [cmd('help.tour'), cmd('help.whatsNew'), cmd('help.about')] },
+  { label: 'Help', items: [cmd('help.tour'), cmd('help.whatsNew'), cmd('help.privacy'), cmd('help.about')] },
 ];
 
 @Component({

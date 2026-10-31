@@ -7,6 +7,7 @@ import { WelcomeStore } from '../store/welcomeStore';
 import { Session } from '../cloud/session';
 import { DEFAULT_QUOTA, MIB } from '../cloud/firebaseConfig';
 import { RELEASES } from '../domain/releaseNotes';
+import { PRIVACY_SUMMARY } from '../domain/privacyNotice';
 import { APP_VERSION } from './app-version';
 
 @Component({
@@ -22,6 +23,7 @@ export class WelcomeDialog {
   private readonly router = inject(Router);
 
   protected readonly version = APP_VERSION;
+  protected readonly privacy = PRIVACY_SUMMARY;
   protected readonly accountQuota = `${DEFAULT_QUOTA.account / MIB} MiB`;
   protected readonly open = computed(() => this.shell.dialog() === 'welcome');
   private readonly snapshotFirstVisit = signal(true);
@@ -47,6 +49,11 @@ export class WelcomeDialog {
   protected tour(): void {
     void this.welcome.dismiss();
     this.shell.open('tour');
+  }
+
+  protected readPrivacy(): void {
+    void this.welcome.dismiss();
+    this.shell.open('privacy');
   }
 
   protected signIn(): void {

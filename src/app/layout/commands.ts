@@ -183,6 +183,7 @@ export class CommandsService {
 
     { id: 'help.tour', group: 'Help', label: 'Quick tour & shortcuts', keys: [{ code: 'F1', inText: true }, { code: 'Slash', shift: true }], run: () => this.shell.open('tour') },
     { id: 'help.whatsNew', group: 'Help', label: 'What’s new', run: () => this.welcome.showAgain() },
+    { id: 'help.privacy', group: 'Help', label: 'Privacy & your data (GDPR)', run: () => this.shell.open('privacy') },
     { id: 'help.about', group: 'Help', label: 'About Congulatio', run: () => this.shell.open('about') },
   ];
 

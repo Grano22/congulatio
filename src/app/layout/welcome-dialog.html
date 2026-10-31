@@ -40,6 +40,16 @@
     </section>
   }
 
+  <section class="wel__privacy">
+      <h3>How we handle your data</h3>
+      <ul>
+        @for (line of privacy; track $index) {
+          <li>{{ line }}</li>
+        }
+      </ul>
+      <button type="button" class="wel__link" (click)="readPrivacy()">Read the full privacy notice (GDPR)</button>
+    </section>
+
   @if (firstVisit()) {
     <app-rpg-button modalFooter variant="wood" size="sm" (click)="tour()">Take the quick tour</app-rpg-button>
   }

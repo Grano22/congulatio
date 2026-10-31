@@ -131,6 +131,19 @@ export class Session {
     });
   }
 
+  deleteAccount(): Promise<boolean> {
+    return this.run(async (sdk, auth) => {
+      const user = this.requireUser(auth.currentUser);
+      this.signingIn = true;
+      try {
+        await sdk.deleteUser(user);
+      } finally {
+        this.signingIn = false;
+      }
+      this.user.set(OFFLINE_USER);
+    });
+  }
+
   async signOut(): Promise<void> {
     this.error.set(null);
     if (!this.cloud()) return;

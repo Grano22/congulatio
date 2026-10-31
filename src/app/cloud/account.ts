@@ -5,7 +5,7 @@ import { firebaseFirestore, firebaseStorage } from './firebase';
 import { cloudErrorMessage } from './authErrors';
 import { AVATAR_MAX_BYTES, AVATAR_SIDE } from './firebaseConfig';
 import { AvatarError, blobToDataUrl, squareAvatar } from './avatarImage';
-import { TomeVault } from '../store/tomeVault';
+import { SYNC, TOMES, TomeVault } from '../store/tomeVault';
 import { TomeHistory } from '../store/tomeHistory';
 import { ShellStore } from '../store/shellStore';
 
@@ -90,6 +90,59 @@ export class AccountStore {
     await this.session.signOut();
     this.shell.notify('info', 'Signed out. You are back on the tome kept in this browser.');
     return 'signed-out';
+  }
+
+  async deleteCloudData(): Promise<boolean> {
+    const user = this.session.user();
+    if (user.kind === 'offline') return false;
+    this.busy.set(true);
+    this.error.set(null);
+    try {
+      await this.wipeCloud(user);
+      this.shell.notify('success', 'Your cloud data was deleted. The tome is still saved in this browser and will upload again on the next save.');
+      return true;
+    } catch (e) {
+      this.error.set(cloudErrorMessage(e, 'Your cloud data could not be deleted.'));
+      return false;
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  async deleteAccount(): Promise<boolean> {
+    const user = this.session.user();
+    if (user.kind === 'offline') return false;
+    this.busy.set(true);
+    this.error.set(null);
+    try {
+      await this.wipeCloud(user);
+      if (!(await this.session.deleteAccount())) {
+        this.error.set(this.session.error());
+        return false;
+      }
+      await Promise.all([this.vault.remove(TOMES, user.uid), this.vault.remove(SYNC, user.uid)]).catch(() => undefined);
+      this.shell.notify('success', 'Your account and its cloud data were deleted. You are back on the tome kept in this browser without an account.');
+      return true;
+    } catch (e) {
+      this.error.set(cloudErrorMessage(e, 'Your account could not be deleted.'));
+      return false;
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  private async wipeCloud(user: SessionUser): Promise<void> {
+    const path = this.profile().avatarPath;
+    if (path) {
+      const [storage, sdk] = await Promise.all([firebaseStorage(), import('firebase/storage')]);
+      await sdk.deleteObject(sdk.ref(storage, path)).catch((e: { code?: string }) => {
+        if (e?.code !== 'storage/object-not-found') throw e;
+      });
+    }
+    if (!(await this.sync.removeEverything())) throw new Error(this.sync.error() ?? 'The cloud tome could not be deleted.');
+    const [db, sdk] = await Promise.all([firebaseFirestore(), import('firebase/firestore')]);
+    await sdk.deleteDoc(sdk.doc(db, USERS, user.uid));
+    this.profile.set({ avatarPath: null, avatarBytes: 0 });
   }
 
   async refreshBrowser(): Promise<void> {

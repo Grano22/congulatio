@@ -199,3 +199,9 @@
   font-size: 0.86rem;
   line-height: 1.45;
 }
+
+.acc__data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

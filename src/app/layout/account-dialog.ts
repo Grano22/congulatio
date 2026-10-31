@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { RpgModal } from '../ui/rpg-modal';
 import { RpgButton } from '../ui/rpg-button';
 import { ShellStore } from '../store/shellStore';
+import { TomeHistory } from '../store/tomeHistory';
 import { Session } from '../cloud/session';
 import { CloudSync, SyncStatus } from '../cloud/cloudSync';
 import { AccountStore } from '../cloud/account';
@@ -45,13 +46,18 @@ export class AccountDialog {
   protected readonly name = signal('');
   protected readonly linkEmail = signal('');
   protected readonly linkPassword = signal('');
+  private readonly history = inject(TomeHistory);
+  protected readonly confirmDelete = signal<'cloud' | 'account' | null>(null);
   protected readonly confirmSignOut = this.account.confirmSignOut;
   protected readonly signOutWarning = this.account.signOutWarning;
 
   constructor() {
     effect(() => {
       if (!this.open()) {
-        untracked(() => this.account.confirmSignOut.set(false));
+        untracked(() => {
+          this.account.confirmSignOut.set(false);
+          this.confirmDelete.set(null);
+        });
         return;
       }
       untracked(() => {
@@ -92,6 +98,32 @@ export class AccountDialog {
 
   protected async refreshLimits(): Promise<void> {
     if (await this.session.refreshQuota()) this.shell.notify('info', 'Storage limits refreshed.');
+  }
+
+  protected exportTome(): void {
+    this.history.exportTome(true);
+  }
+
+  protected openPrivacy(): void {
+    this.shell.open('privacy');
+  }
+
+  protected async deleteCloud(): Promise<void> {
+    if (this.confirmDelete() !== 'cloud') {
+      this.confirmDelete.set('cloud');
+      return;
+    }
+    this.confirmDelete.set(null);
+    await this.account.deleteCloudData();
+  }
+
+  protected async deleteAccount(): Promise<void> {
+    if (this.confirmDelete() !== 'account') {
+      this.confirmDelete.set('account');
+      return;
+    }
+    this.confirmDelete.set(null);
+    if (await this.account.deleteAccount()) this.shell.closeDialog();
   }
 
   protected signIn(): void {

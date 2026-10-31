@@ -53,7 +53,8 @@
   color: var(--color-ink-400);
 }
 .wel__release ul,
-.wel__perks ul {
+.wel__perks ul,
+.wel__privacy ul {
   list-style: disc;
   margin: 0.35rem 0 0;
   padding-left: 1.15rem;
@@ -81,4 +82,29 @@
   font-size: 0.8rem;
   font-style: italic;
   color: var(--color-ink-500);
+}
+
+.wel__privacy {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--color-ink-300);
+}
+.wel__privacy h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-800);
+}
+.wel__link {
+  margin-top: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--color-mana-600);
+  text-decoration: underline;
+  cursor: pointer;
 }

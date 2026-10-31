@@ -127,6 +127,40 @@
       </section>
     }
 
+    <section class="acc__block">
+      <h3>Your data</h3>
+      <p class="acc__row acc__row--muted">
+        Export keeps a full copy of your work with its history.
+        @if (session.cloud()) {
+          Deleting removes your tome, profile and portrait from the cloud.
+        }
+        <button type="button" class="acc__link" (click)="openPrivacy()">How we handle your data</button>
+      </p>
+      <div class="acc__data">
+        <app-rpg-button variant="wood" size="sm" (click)="exportTome()">Export my tome</app-rpg-button>
+        @if (session.cloud()) {
+          <app-rpg-button variant="danger" size="sm" [disabled]="account.busy()" (click)="deleteCloud()">
+            {{ confirmDelete() === 'cloud' ? 'Really delete cloud data?' : 'Delete cloud data' }}
+          </app-rpg-button>
+          <app-rpg-button variant="danger" size="sm" [disabled]="account.busy()" (click)="deleteAccount()">
+            {{ confirmDelete() === 'account' ? 'Really delete account?' : 'Delete account' }}
+          </app-rpg-button>
+        }
+      </div>
+      @if (confirmDelete() === 'cloud') {
+        <p class="acc__msg acc__msg--error" role="alert">
+          Your tome, profile and portrait will be removed from the cloud. The copy in this browser stays and uploads again on
+          your next save. Press the button again to confirm.
+        </p>
+      }
+      @if (confirmDelete() === 'account') {
+        <p class="acc__msg acc__msg--error" role="alert">
+          Your account, cloud tome, profile and portrait will be deleted for good, together with this account’s copy in this
+          browser. Export first if you want to keep your work. Press the button again to confirm.
+        </p>
+      }
+    </section>
+
     @if (confirmSignOut() && signOutWarning(); as warning) {
       <p class="acc__msg acc__msg--error" role="alert">{{ warning }} Press Sign out again to continue.</p>
     }
