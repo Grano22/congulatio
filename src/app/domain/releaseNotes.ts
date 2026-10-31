@@ -7,6 +7,17 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.5.0',
+    date: '2026-10-31',
+    title: 'Dress the forge your way',
+    highlights: [
+      'Themes are now their own choice and work with every view mode: Forge (the classic look), Ebony Tome (a dark wooden book with aged vellum pages) and Dragonfire (glowing embers on charred iron).',
+      'Pick a theme from the palette button above the stage, in View → Theme or in Settings, or cycle through them with Ctrl/⌘+Alt+T.',
+      'Switching to the D&D view no longer changes the theme.',
+      'Each view mode has its own icon in the view switch, the View menu and the status bar.',
+    ],
+  },
+  {
     version: '0.4.0',
     date: '2026-10-31',
     title: 'Roll for initiative',

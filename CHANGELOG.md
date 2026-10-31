@@ -7,6 +7,24 @@ All notable changes to Congulatio are written down here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-31
+
+### Added
+
+- Themes as a feature of their own (`domain/themes.ts`, `ThemeStore`, kept in `localStorage`): Forge, Ebony Tome and
+  Dragonfire. Pick one from the palette popover in the stage toolbar (with live previews), in View → Theme, in
+  Settings, or cycle with Ctrl/⌘+Alt+T. Switching crossfades with the View Transitions API unless reduced motion is
+  requested, and the browser `theme-color` follows the theme.
+- View-mode icons (Workflow for NPC Flow, dice for D&D) in the view switch, the View menu and the status bar.
+- Accessibility audits of the Character tab and the D&D sheet in every theme.
+
+### Changed
+
+- View modes no longer carry a theme; the D&D view keeps whatever theme is chosen. A theme saved by 0.4.0 is kept.
+- Accent glows, wood highlights, page, card and field colours are theme tokens instead of hard-coded values.
+- Dragonfire now pairs its ember accent with charred-iron frames and bone-white pages so the red stands out.
+- The view switch shows icons only when the stage is narrow.
+
 ## [0.4.0] - 2026-10-31
 
 ### Added
