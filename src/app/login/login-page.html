@@ -1,0 +1,115 @@
+<main class="login grain">
+  <section class="login__card rivets" aria-labelledby="login-title">
+    <header class="login__brand">
+      <span class="login__seal" aria-hidden="true">
+        <app-lucide-icon [icon]="shieldIcon" iconClass="ic-24" [strokeWidth]="1.8" />
+      </span>
+      <div>
+        <p class="rpg-title login__name">Congulatio</p>
+        <p class="login__tagline">Character &amp; Dialogue Forge</p>
+      </div>
+      @if (session.stage(); as stage) {
+        @if (stage !== 'production') {
+          <span class="login__stage" [attr.title]="session.emulated() ? 'Talking to local Firebase emulators' : 'Firebase project for ' + stage">{{ stage }}</span>
+        }
+      }
+    </header>
+
+    <h1 id="login-title" class="login__title">{{ title() }}</h1>
+
+    @if (!session.ready()) {
+      <p class="login__note" role="status">Opening the gates…</p>
+    } @else {
+      @if (!session.configured()) {
+        <p class="login__note login__note--warn" role="status">
+          The cloud is not set up for this build. You can still work in this browser; your tome stays on this device.
+        </p>
+      }
+
+      <form class="login__form" (submit)="submit($event)">
+        @if (mode() === 'register') {
+          <label class="field">
+            <span class="rpg-label">Name</span>
+            <input class="rpg-input" name="name" autocomplete="nickname" [value]="name()" (input)="name.set($any($event.target).value)" />
+          </label>
+        }
+        <label class="field">
+          <span class="rpg-label">E-mail</span>
+          <input class="rpg-input" name="email" type="email" autocomplete="email" required [value]="email()" (input)="email.set($any($event.target).value)" />
+        </label>
+        @if (mode() !== 'reset') {
+          <label class="field">
+            <span class="rpg-label">Password</span>
+            <input
+              class="rpg-input"
+              name="password"
+              type="password"
+              required
+              minlength="6"
+              [attr.autocomplete]="mode() === 'register' ? 'new-password' : 'current-password'"
+              [value]="password()"
+              (input)="password.set($any($event.target).value)"
+            />
+          </label>
+        }
+
+        @if (session.error(); as error) {
+          <p class="login__msg login__msg--error" role="alert">{{ error }}</p>
+        }
+        @if (info(); as message) {
+          <p class="login__msg login__msg--ok" role="status">{{ message }}</p>
+        }
+
+        <button type="submit" class="rbtn rbtn--gold rbtn--md login__submit" [disabled]="cloudDisabled()">
+          <app-lucide-icon [icon]="keyIcon" iconClass="ic-14" [strokeWidth]="2" />
+          {{ submitLabel() }}
+        </button>
+
+        <p class="login__switch">
+          @if (mode() === 'signin') {
+            <button type="button" (click)="switchTo('register')">Create an account</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" (click)="switchTo('reset')">Forgot password?</button>
+          } @else {
+            <button type="button" (click)="switchTo('signin')">Back to sign in</button>
+          }
+        </p>
+      </form>
+
+      <div class="ornament login__or">or</div>
+
+      <div class="login__alt">
+        <app-rpg-button variant="wood" size="md" [disabled]="cloudDisabled()" (click)="google()">
+          <app-lucide-icon [icon]="cloudIcon" iconClass="ic-14" [strokeWidth]="2" />
+          Continue with Google
+        </app-rpg-button>
+        <app-rpg-button variant="wood" size="md" [disabled]="cloudDisabled()" (click)="wander()">
+          <app-lucide-icon [icon]="wandererIcon" iconClass="ic-14" [strokeWidth]="2" />
+          Enter as a wanderer
+        </app-rpg-button>
+        <app-rpg-button variant="ghost" size="sm" [disabled]="session.busy()" (click)="offline()">
+          <app-lucide-icon [icon]="driveIcon" iconClass="ic-14" [strokeWidth]="2" />
+          Work offline on this device
+        </app-rpg-button>
+      </div>
+
+      <dl class="login__modes">
+        <div>
+          <dt>Account</dt>
+          <dd>Your tome syncs to the cloud and follows you to every device. {{ accountQuota }} of cloud storage.</dd>
+        </div>
+        <div>
+          <dt>Wanderer</dt>
+          <dd>
+            An anonymous cloud ledger tied to this browser, {{ anonymousQuota }}. Link an e-mail or Google later to keep it
+            — signing out of a wanderer loses the cloud copy.
+          </dd>
+        </div>
+        <div>
+          <dt>Offline</dt>
+          <dd>Nothing leaves this browser. The tome lives in its built-in database.</dd>
+        </div>
+      </dl>
+    }
+  </section>
+</main>

@@ -13,8 +13,9 @@ class MemoryVault {
   async get(store: string, owner: string): Promise<VaultTome | VaultSync | undefined> {
     return structuredClone(this.rows.get(`${store}/${owner}`));
   }
-  async put(store: string, value: VaultTome | VaultSync): Promise<void> {
-    this.rows.set(`${store}/${value.owner}`, structuredClone(value));
+  async put(store: string, value: object): Promise<void> {
+    const row = value as VaultTome | VaultSync;
+    this.rows.set(`${store}/${row.owner}`, structuredClone(row));
   }
   async remove(store: string, owner: string): Promise<void> {
     this.rows.delete(`${store}/${owner}`);

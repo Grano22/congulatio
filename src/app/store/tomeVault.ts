@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import type { ChangesetEntry, TomeSnapshot } from '../domain/tome';
 
 const DB_NAME = 'congulatio';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 export const TOMES = 'tomes';
 export const SYNC = 'sync';
+export const SETTINGS = 'settings';
 
 export type VaultTome = {
   owner: string;
@@ -19,7 +20,12 @@ export type VaultSync = {
   hashes: Record<string, string>;
 };
 
-type StoreName = typeof TOMES | typeof SYNC;
+export type VaultSetting<T = unknown> = {
+  key: string;
+  value: T;
+};
+
+type StoreName = typeof TOMES | typeof SYNC | typeof SETTINGS;
 
 const promised = <T>(request: IDBRequest<T>): Promise<T> =>
   new Promise((resolve, reject) => {
@@ -35,23 +41,40 @@ export class TomeVault {
     return typeof indexedDB !== 'undefined';
   }
 
-  async get<T extends VaultTome | VaultSync>(store: StoreName, owner: string): Promise<T | undefined> {
+  async get<T extends object>(store: StoreName, key: string): Promise<T | undefined> {
     const db = await this.open();
-    return promised<T | undefined>(db.transaction(store, 'readonly').objectStore(store).get(owner));
+    return promised<T | undefined>(db.transaction(store, 'readonly').objectStore(store).get(key));
   }
 
-  async put(store: StoreName, value: VaultTome | VaultSync): Promise<void> {
+  async put(store: StoreName, value: object): Promise<void> {
     const db = await this.open();
     const tx = db.transaction(store, 'readwrite');
     tx.objectStore(store).put(value);
     await this.done(tx);
   }
 
-  async remove(store: StoreName, owner: string): Promise<void> {
+  async remove(store: StoreName, key: string): Promise<void> {
     const db = await this.open();
     const tx = db.transaction(store, 'readwrite');
-    tx.objectStore(store).delete(owner);
+    tx.objectStore(store).delete(key);
     await this.done(tx);
+  }
+
+  async setting<T>(key: string): Promise<T | undefined> {
+    try {
+      return (await this.get<VaultSetting<T>>(SETTINGS, key))?.value;
+    } catch {
+      return undefined;
+    }
+  }
+
+  async remember<T>(key: string, value: T | undefined): Promise<void> {
+    try {
+      if (value === undefined) await this.remove(SETTINGS, key);
+      else await this.put(SETTINGS, { key, value } satisfies VaultSetting<T>);
+    } catch {
+      return;
+    }
   }
 
   async persist(): Promise<boolean> {
@@ -87,6 +110,7 @@ export class TomeVault {
         const db = request.result;
         if (!db.objectStoreNames.contains(TOMES)) db.createObjectStore(TOMES, { keyPath: 'owner' });
         if (!db.objectStoreNames.contains(SYNC)) db.createObjectStore(SYNC, { keyPath: 'owner' });
+        if (!db.objectStoreNames.contains(SETTINGS)) db.createObjectStore(SETTINGS, { keyPath: 'key' });
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
