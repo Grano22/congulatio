@@ -1,6 +1,6 @@
 {
   "name": "congulatio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Aplikacja do tworzenia postaci np: NPC oraz drzewek dialogowych i interakcji do gry komputerowej typu RPG.",
   "scripts": {
     "ng": "ng",

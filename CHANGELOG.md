@@ -7,6 +7,37 @@ All notable changes to Congulatio are written down here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-31
+
+### Added
+
+- Installable progressive web app: web manifest, app icons and an Angular service worker that caches the app shell
+  for offline use, keeps `firebase-config.json` network-first with a cached fallback, offers File → Install
+  Congulatio as an app, and shows an "Update ready · reload" button that saves before reloading.
+- Autosave from memory to IndexedDB on a timer (15 s – 5 min, default 30 s) and whenever the tab is hidden; Edit →
+  Settings… (Ctrl/⌘+Alt+P) and Edit → Autosave turn it on or off.
+- Warning before closing the page while edits are unsaved or saved but not yet synced to the cloud (can be turned off
+  in Settings).
+- Offline badge in the top bar and "No connection" in the status bar.
+- Banner for signed-in users when saved changes cannot reach the cloud (offline, sync failed or storage full), with
+  Retry sync and Export a copy.
+- Account menu on the account icon: who is signed in, sync status, Sign in, Account & storage, Save & sync now, Sign
+  out.
+- GDPR privacy notice (Help → Privacy & your data), a "How we handle your data" section in the welcome dialog, and a
+  Your data section in Account & storage with export, delete cloud data and delete account.
+
+### Changed
+
+- Default cloud storage limit for accounts raised from 20 MiB to 50 MiB.
+- An untouched sample tome no longer counts as unsaved.
+- Sign-out logic lives in one place and warns when changes have not reached the cloud yet.
+
+### Fixed
+
+- Starting the quick tour from the welcome dialog no longer closes the tour immediately: a modal closed by the app no
+  longer reports a user close.
+- Settings are stored the moment they change, so a quick reload keeps them.
+
 ## [0.1.0] - 2026-10-31
 
 ### Added
@@ -19,7 +50,7 @@ All notable changes to Congulatio are written down here. The format follows
 - A brand-new account or wanderer starts with the tome that is open in the browser.
 - Account & storage dialog: portrait upload to Firebase Storage (cropped and shrunk to 256 px), display name, cloud
   storage meter against a per-user limit (custom claim `storageQuota`, defaults 2 MiB for wanderers and 20 MiB for
-  accounts), browser storage estimate with a request for persistent storage, sync status and sign-out.
+  accounts, raised to 50 MiB in 0.2.0), browser storage estimate with a request for persistent storage, sync status and sign-out.
 - Sync status in the top bar and the status bar; File menu entries for the account dialog and syncing now.
 - Welcome dialog for new visitors and a "What's new" dialog after each update (Help → What's new).
 - Firebase settings are loaded at runtime from `firebase-config.json`, generated from `.env.local` locally or from
@@ -51,6 +82,7 @@ All notable changes to Congulatio are written down here. The format follows
 - Custom attributes, inspector with read-only mode, global search, menus, shortcuts and quick tour.
 - Tome history with undo, redo, save, import and export; GitHub Pages deployment.
 
-[Unreleased]: https://github.com/Grano22/congulatio/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Grano22/congulatio/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Grano22/congulatio/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Grano22/congulatio/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/Grano22/congulatio/releases/tag/v0.0.1

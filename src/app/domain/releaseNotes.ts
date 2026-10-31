@@ -7,6 +7,20 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.2.0',
+    date: '2026-10-31',
+    title: 'Install it, work offline, never lose a line',
+    highlights: [
+      'Install Congulatio as an app (File → Install) and open it without a connection; you are told when an update is ready.',
+      'Autosave writes your edits to this browser every 30 seconds and when you switch away; change or turn it off in Edit → Settings (Ctrl/⌘+Alt+P).',
+      'A clear Offline badge appears when the connection drops, and signed-in users see when changes are waiting to reach the cloud.',
+      'The page asks before closing while edits are unsaved or not yet synced.',
+      'Click your account icon to sign in, sign out or sync right away.',
+      'A privacy notice (Help → Privacy & your data) explains how your data is handled, and you can delete your cloud data or account at any time.',
+      'Accounts now get 50 MiB of cloud storage.',
+    ],
+  },
+  {
     version: '0.1.0',
     date: '2026-10-31',
     title: 'Your tome, kept safe and everywhere',
