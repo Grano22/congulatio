@@ -25,6 +25,9 @@
 - [x] Optional accounts (e-mail, Google, anonymous wanderer) with Firestore sync, portraits and storage limits (0.1.0)
 - [x] Welcome and What's new dialog, CHANGELOG and version bookkeeping (0.1.0)
 - [x] On-demand end-to-end tests on the Firebase emulators (0.1.0)
+- [x] Installable PWA with offline shell and update prompt (0.2.0)
+- [x] Autosave with settings, offline badge, unsaved/unsynced warnings, account menu (0.2.0)
+- [x] GDPR privacy notice, cloud data and account deletion (0.2.0)
 
 ## Next
 
@@ -33,7 +36,8 @@
 - [ ] World Atlas navigator section
 - [ ] Bring back the node-based dialogue editor (Dialogue Loom) or remove it
 - [ ] Use attribute tokens such as `[[Aldric Blackwood.STR=78]]` inside dialogue text
-- [ ] Enforce cloud storage limits on the server (Cloud Function keeping a per-user usage counter)
+- [ ] Enforce the per-user cloud limit (50 MiB for accounts) on the server: a Cloud Function keeping a usage counter
+      that the security rules check, instead of the client-side check only
 - [ ] Merge conflicting tomes per entity instead of newer-save-wins
 - [ ] Sync the changeset between devices
 - [ ] Run the e2e suite in a scheduled or manual GitHub Actions job

@@ -7,9 +7,9 @@ Congulatio to aplikacja webowa (Angular 22) dla projektantów gier fabularnych. 
 rutyny, interakcje i własne atrybuty — mieszka w jednym **Tomie**, który ma pełną historię zmian z cofaniem i
 ponawianiem, zapis we wbudowanej bazie przeglądarki (IndexedDB), opcjonalne konto z synchronizacją w chmurze
 (Firebase: logowanie, Firestore, Storage) oraz eksport i import do pliku JSON. Aplikacja działa **offline-first** —
-konto nie jest wymagane.
+konto nie jest wymagane. Można ją też **zainstalować jako aplikację (PWA)** i otwierać bez internetu.
 
-Aktualna wersja: **0.1.0** — zmiany opisuje [`CHANGELOG.md`](CHANGELOG.md).
+Aktualna wersja: **0.2.0** — zmiany opisuje [`CHANGELOG.md`](CHANGELOG.md).
 
 Projekt powstał jako praca uczelniana. Autor: **Adrian Blasiak**.
 
@@ -23,21 +23,23 @@ Pojęcia świata (Tom, dusza, rutyna, interakcja, scena…), zależności międz
 1. [Najważniejsze funkcje](#najważniejsze-funkcje)
 2. [Szybki start](#szybki-start)
 3. [Konto, chmura i Firebase](#konto-chmura-i-firebase)
-4. [Skrypty npm](#skrypty-npm)
-5. [Skróty klawiszowe](#skróty-klawiszowe)
-6. [Architektura](#architektura)
-7. [Model danych i plik Tomu](#model-danych-i-plik-tomu)
-8. [Story AI (Chrome Prompt API)](#story-ai-chrome-prompt-api)
-9. [Animacje z Mixamo](#animacje-z-mixamo)
-10. [Testy](#testy)
-11. [Wdrożenie na GitHub Pages](#wdrożenie-na-github-pages)
-12. [Wydajność i budżety](#wydajność-i-budżety)
-13. [Dostępność](#dostępność)
-14. [Wersjonowanie i lista zmian](#wersjonowanie-i-lista-zmian)
-15. [Konwencje projektu](#konwencje-projektu)
-16. [Znane ograniczenia](#znane-ograniczenia)
-17. [Wykorzystanie AI](#wykorzystanie-ai)
-18. [Autor i licencja](#autor-i-licencja)
+4. [Aplikacja PWA i praca offline](#aplikacja-pwa-i-praca-offline)
+5. [Prywatność (RODO)](#prywatność-rodo)
+6. [Skrypty npm](#skrypty-npm)
+7. [Skróty klawiszowe](#skróty-klawiszowe)
+8. [Architektura](#architektura)
+9. [Model danych i plik Tomu](#model-danych-i-plik-tomu)
+10. [Story AI (Chrome Prompt API)](#story-ai-chrome-prompt-api)
+11. [Animacje z Mixamo](#animacje-z-mixamo)
+12. [Testy](#testy)
+13. [Wdrożenie na GitHub Pages](#wdrożenie-na-github-pages)
+14. [Wydajność i budżety](#wydajność-i-budżety)
+15. [Dostępność](#dostępność)
+16. [Wersjonowanie i lista zmian](#wersjonowanie-i-lista-zmian)
+17. [Konwencje projektu](#konwencje-projektu)
+18. [Znane ograniczenia](#znane-ograniczenia)
+19. [Wykorzystanie AI](#wykorzystanie-ai)
+20. [Autor i licencja](#autor-i-licencja)
 
 ---
 
@@ -99,25 +101,33 @@ podążają za zmianą fokusu.
 ### Tom, historia i menu
 
 - **File:** zapis Tomu wraz z dziennikiem zmian w przeglądarce, otwarcie Tomu z pliku, eksport (z pełną historią lub
-  bez), **Account & storage…** (konto, portret, limity), **Sync with the cloud now**, reset do danych przykładowych (z
-  potwierdzeniem; reset da się cofnąć).
+  bez), **Account & storage…** (konto, portret, limity), **Sync with the cloud now**, **Install Congulatio as an app**,
+  **Reload to update**, reset do danych przykładowych (z potwierdzeniem; reset da się cofnąć).
 - **Edit:** cofnij i ponów dla wszystkich danych oraz okno **History & changeset** z osią czasu i powrotem do dowolnego
-  kroku. Szybkie serie edycji (pisanie, przeciąganie suwaka) są łączone w jeden krok.
+  kroku. Szybkie serie edycji (pisanie, przeciąganie suwaka) są łączone w jeden krok. **Autosave** (włącz/wyłącz) i
+  **Settings…** (Ctrl/⌘+Alt+P).
 - **View:** pokazywanie i ukrywanie paneli, tryb tylko do odczytu Inspektora, **presety układu** z dobranymi
   szerokościami paneli, maksymalizacja sceny, pełny ekran, przejście do zakładki.
 - **Tools:** przywołanie losowej duszy, rzeźbienie duszy w fokusie, symulacja, mapa.
 - **Help:** **Quick tour** (przewodnik krok po kroku oraz tabela skrótów budowana z tej samej listy poleceń, która
-  obsługuje klawiaturę), **What’s new** i **About**.
+  obsługuje klawiaturę), **What’s new**, **Privacy & your data (GDPR)** i **About**.
 - **Wyszukiwarka Tomu** w górnym pasku (⌘/Ctrl+K): postacie (`Imię Nazwisko (przydomek)`), linie, opcje, rutyny,
   więzi, interakcje i polecenia menu, każda kategoria z własnym kolorem etykiety. Wybór wyniku przenosi do właściwej
   sekcji.
-- **Pasek stanu:** stan zapisu, krok historii, aktualny fokus, liczności Tomu, stan synchronizacji z chmurą oraz
-  komunikaty.
-- **Konto** (okrągły portret w prawym górnym rogu, kropka pokazuje stan synchronizacji; bez konta obok jest przycisk
-  **Sign in**): okno **Account & storage** z portretem, nazwą, licznikiem miejsca w chmurze i w przeglądarce,
-  korzyściami z konta oraz wylogowaniem.
+- **Pasek stanu:** stan zapisu, krok historii, aktualny fokus, liczności Tomu, stan synchronizacji z chmurą, „No
+  connection” bez sieci oraz komunikaty.
+- **Plakietka Offline** w górnym pasku, gdy zniknie połączenie, oraz przycisk **Update ready · reload**, gdy czeka
+  nowa wersja aplikacji.
+- **Menu konta** (okrągły portret w prawym górnym rogu, kropka pokazuje stan synchronizacji): kto jest zalogowany,
+  stan synchronizacji, **Sign in or create an account** albo **Save & sync now** i **Sign out**, oraz **Account &
+  storage…** — okno z portretem, nazwą, licznikiem miejsca w chmurze i w przeglądarce, korzyściami z konta, sekcją
+  **Your data** (eksport, usunięcie danych z chmury, usunięcie konta) i wylogowaniem. Bez konta obok jest też przycisk
+  **Sign in**.
+- **Ustawienia** (Edit → Settings…): autozapis włączony/wyłączony i jego częstotliwość (15 s – 5 min), ostrzeżenie
+  przed zamknięciem strony. Ustawienia są zapisywane w przeglądarce.
 - **Okno powitalne:** przy pierwszej wizycie wita, wyjaśnia, że konto nie jest potrzebne, pokazuje nowości i korzyści
-  z konta. Po każdej aktualizacji pokazuje **What’s new** z nowościami od ostatnio widzianej wersji (raz na wersję;
+  z konta oraz krótko, jak przetwarzamy dane (z linkiem do pełnej informacji RODO). Po każdej aktualizacji pokazuje
+  **What’s new** z nowościami od ostatnio widzianej wersji (raz na wersję;
   zawsze dostępne w Help → What’s new).
 
 ### Konto jest opcjonalne (offline-first)
@@ -134,6 +144,23 @@ przycisku **Sign in**, okna powitalnego i okna konta:
 - **Nowe** konto lub wędrowiec zaczyna z Tomem, który jest właśnie otwarty. Logowanie do **istniejącego** konta
   nigdy nie nadpisuje jego Tomu w chmurze lokalną pracą — Tom bez konta zostaje w przeglądarce.
 - Wylogowanie wraca do Tomu bez konta zapisanego w tej przeglądarce.
+
+---
+
+### Zapis: pamięć → przeglądarka → chmura
+
+| Warstwa | Co tam jest | Kiedy trafia dalej |
+| --- | --- | --- |
+| **Pamięć** | Bieżące edycje i pełna historia cofania. | Ctrl/⌘+S, **autozapis** (domyślnie co 30 s, gdy są zmiany) i przy przełączeniu się z karty. |
+| **IndexedDB** | Zapisany Tom i dziennik zmian, osobno dla każdego konta (bez konta właściciel `local`). Przetrwa zamknięcie przeglądarki. | Po każdym zapisie, jeśli jesteś zalogowany i masz sieć. |
+| **Chmura** (po zalogowaniu) | Kopia zapisanego Tomu w Firestore i portret w Storage. | — |
+
+- Przy próbie zamknięcia strony z niezapisanymi zmianami albo z zapisem, który nie dotarł jeszcze do chmury,
+  przeglądarka pyta o potwierdzenie (można to wyłączyć w ustawieniach).
+- Gdy zalogowany użytkownik ma zmiany, których nie da się wysłać (brak sieci, błąd synchronizacji, przekroczony limit),
+  pod górnym paskiem pojawia się pasek z wyjaśnieniem: zmiany są bezpieczne w tej przeglądarce i wyślą się później,
+  ale do tego czasu istnieją tylko tutaj i można je stracić, czyszcząc dane przeglądarki. Pasek ma przyciski **Retry
+  sync** i **Export a copy**.
 
 ---
 
@@ -314,6 +341,41 @@ Użytkownik zobaczy nowy limit po kliknięciu **refresh** w oknie konta (lub po 
 
 ---
 
+## Aplikacja PWA i praca offline
+
+- Build produkcyjny zawiera service worker Angulara (`@angular/service-worker`, konfiguracja `ngsw-config.json`),
+  manifest `public/manifest.webmanifest` i ikony w `public/icons/` (źródło: `icon.svg`).
+- Po pierwszej wizycie powłoka aplikacji (HTML, JS, CSS, czcionki, ikony) jest w pamięci podręcznej, więc Congulatio
+  otwiera się bez internetu. `firebase-config.json` jest pobierany najpierw z sieci, a bez niej z pamięci podręcznej.
+- **Instalacja:** File → **Install Congulatio as an app** (gdy przeglądarka na to pozwala) albo ikona instalacji w
+  pasku adresu. Aplikacja działa w osobnym oknie.
+- **Aktualizacje:** gdy nowa wersja zostanie pobrana w tle, w górnym pasku pojawia się **Update ready · reload**;
+  przed przeładowaniem niezapisane zmiany są zapisywane.
+- W trybie deweloperskim (`npm start`) service worker jest wyłączony. Sprawdzenie lokalne: `npm run build:pages` i
+  serwowanie `dist/congulatio/browser` pod `/congulatio/` (np. dowolnym serwerem statycznym z fallbackiem na
+  `index.html`).
+- Gdy zmienisz zestaw plików w `public/`, sprawdź `ngsw-config.json` — pliki spoza wzorców nie będą dostępne offline.
+
+---
+
+## Prywatność (RODO)
+
+Pełna informacja o przetwarzaniu danych jest w aplikacji: **Help → Privacy & your data (GDPR)** (treść w
+`src/app/domain/privacyNotice.ts`). W skrócie:
+
+- **Bez konta** nic nie opuszcza urządzenia — Tom, ustawienia i portret są w IndexedDB, układ w `localStorage`. To
+  pamięć niezbędna do działania aplikacji, więc nie wymaga banera zgody.
+- **Z kontem** Firebase (Google) przechowuje identyfikator, e-mail, nazwę, portret i Tom wyłącznie po to, by logować i
+  synchronizować (art. 6 ust. 1 lit. b RODO); bezpieczeństwo — uzasadniony interes (lit. f). Bez reklam, analityki i
+  śledzących ciasteczek.
+- **Prawa:** eksport Tomu do pliku (dostęp, przenoszenie), zmiana nazwy i portretu (sprostowanie), **Delete cloud
+  data** i **Delete account** w oknie konta (usunięcie), skarga do Prezesa UODO.
+- Przed publicznym udostępnieniem uzupełnij kontakt administratora (`PRIVACY_CONTACT`) i lokalizację bazy Firestore, a
+  treść warto skonsultować prawnie — to szablon dla projektu uczelnianego, nie porada prawna.
+- Każda zmiana zakresu przetwarzanych danych wymaga aktualizacji `privacyNotice.ts` (z datą `PRIVACY_UPDATED`).
+
+---
+
 ## Skrypty npm
 
 | Skrypt | Działanie |
@@ -349,6 +411,7 @@ tour → Shortcuts** (F1).
 | Maksymalizuj scenę / Pełny ekran | Ctrl+Alt+M / Ctrl+Alt+F |
 | Zakładki 1–7 (Character … Simulation) | Alt+1 … Alt+7 |
 | Przywołaj losową duszę | Ctrl+Alt+N |
+| Ustawienia | Ctrl+Alt+P |
 | Szybki przewodnik | F1 lub ? |
 | Usuń krok dialogu (w drzewie) lub duszę (w Kodeksie) | Delete |
 
@@ -368,6 +431,7 @@ listach, zakładkach i polach z podpowiedziami działają strzałki, Home/End, E
 | 3D | three.js 0.180 (`OrbitControls`, `FBXLoader`) |
 | Chmura | Firebase 13 (Auth, Firestore, Storage), ładowany leniwie |
 | Dane lokalne | IndexedDB (własna, lekka nakładka `TomeVault`) |
+| PWA | `@angular/service-worker` (`ngsw-config.json`), web manifest |
 | Ikony | Lucide |
 | Style | CSS z tokenami motywu w `src/styles.css`, Tailwind CSS 4 (tylko warstwa bazowa) |
 | Testy | Vitest 5 + jsdom przez `@angular/build:unit-test`; e2e: puppeteer-core + emulatory Firebase |
@@ -439,6 +503,9 @@ flowchart LR
   lokalny skryba. **`tomeGuard`** otwiera Tom bieżącego użytkownika przed wejściem do warsztatu, a `signInGuard`
   odsyła zalogowanych ze strony `/login`.
 - **`WelcomeStore`** pamięta w IndexedDB ostatnio widzianą wersję i otwiera okno powitalne lub „What’s new”.
+- **`Persistence`** autozapisuje pamięć do IndexedDB (interwał i przy ukryciu karty) i ostrzega przed zamknięciem
+  strony; **`SettingsStore`** trzyma ustawienia w IndexedDB; **`NetworkStore`** śledzi połączenie; **`PwaStore`**
+  obsługuje instalację i aktualizacje service workera.
 - **`CloudSync`** porównuje zapis w IndexedDB z wierszem `meta` w Firestore i wysyła lub pobiera zmiany;
   **`AccountStore`** obsługuje profil, portrety i licznik miejsca.
 - **`WorkspaceStore`** trzyma aktywną zakładkę i obiekt w fokusie (dusza, rutyna, krok dialogu, interakcja).
@@ -549,6 +616,8 @@ Testy jednostkowe (Vitest, środowisko jsdom) obejmują:
 - planowanie usuwania dialogów i klasyfikację scen (połączone / samodzielne);
 - rutyny (pory dnia, walidacja), własne atrybuty (walidacja, wiersze, tokeny, wartości);
 - budowanie promptów i parsowanie odpowiedzi Story AI;
+- autozapis, ostrzeżenie przed zamknięciem i ustawienia;
+- okna modalne (zamknięcie przez aplikację nie jest traktowane jak zamknięcie przez użytkownika);
 - uruchomienie aplikacji i Kodeksu.
 
 ### Testy end-to-end (ciężkie, tylko na żądanie)
@@ -600,7 +669,7 @@ Klucze i baza aplikacji mają nazwę `congulatio`, żeby nie kolidowały z innym
 
 ## Wydajność i budżety
 
-- Budżet paczki startowej: ostrzeżenie powyżej 500 kB, błąd powyżej 1 MB (obecnie ok. 345 kB, ok. 99 kB po
+- Budżet paczki startowej: ostrzeżenie powyżej 500 kB, błąd powyżej 1 MB (obecnie ok. 352 kB, ok. 100 kB po
   kompresji).
 - Warsztat (ok. 155 kB) i strona logowania ładują się jako osobne trasy, a Firebase (Auth, Firestore, Storage)
   dopiero wtedy, gdy jest potrzebny.
