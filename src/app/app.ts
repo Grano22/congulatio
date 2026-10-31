@@ -16,7 +16,7 @@ import { Sculptor } from './sculptor/sculptor';
 import { CharacterRoutines } from './character-routines/character-routines';
 import { EditorTabId, WorkspaceStore } from './store/workspaceStore';
 import { ShellStore } from './store/shellStore';
-import { TomeHistory } from './store/tomeHistory';
+import { LOCAL_OWNER, TomeHistory } from './store/tomeHistory';
 import { CommandsService } from './layout/commands';
 import { ShellDialogs } from './layout/shell-dialogs';
 
@@ -65,6 +65,10 @@ export class App {
 
   protected readonly maxSectionIcon = computed(() => (this.shell.maximized() ? Minimize2 : Maximize2));
   protected readonly fullscreenIcon = computed(() => (this.shell.fullscreen() ? Shrink : Expand));
+
+  constructor() {
+    void this.history.open(LOCAL_OWNER);
+  }
 
   protected openTab(id: EditorTabId): void {
     this.workspace.open(id);

@@ -5,6 +5,7 @@ import { RelationsStore } from './relationsStore';
 import { InteractionsStore } from './interactionsStore';
 import { AttributesStore } from './attributesStore';
 import { ShellStore } from './shellStore';
+import { TOMES, TomeVault, VaultTome } from './tomeVault';
 import { SAMPLE_DIALOGUE_NODES } from '../domain/dialogue';
 import { SAMPLE_RELATIONS, SAMPLE_ROUTINES } from '../domain/relations';
 import { SAMPLE_INTERACTIONS } from '../domain/interactions';
@@ -24,7 +25,8 @@ import {
   validateSnapshot,
 } from '../domain/tome';
 
-const SAVE_KEY = 'congulatio.tome.v1';
+const LEGACY_SAVE_KEY = 'congulatio.tome.v1';
+export const LOCAL_OWNER = 'local';
 const RECORD_DELAY_MS = 450;
 const HISTORY_LIMIT = 200;
 
@@ -37,7 +39,7 @@ export const INITIAL_TOME: TomeSnapshot = {
   attributeDefs: SAMPLE_CUSTOM_ATTRIBUTES,
 };
 
-type SavedTome = { format: typeof TOME_FORMAT; version: number; savedAt: string; tome: TomeSnapshot; changeset: ChangesetEntry[] };
+type LegacySavedTome = { format: typeof TOME_FORMAT; version: number; savedAt: string; tome: TomeSnapshot; changeset: ChangesetEntry[] };
 
 const now = (): string => new Date().toISOString();
 
@@ -49,6 +51,7 @@ export class TomeHistory {
   private readonly interactions = inject(InteractionsStore);
   private readonly attributes = inject(AttributesStore);
   private readonly shell = inject(ShellStore);
+  private readonly vault = inject(TomeVault);
 
   readonly current = computed<TomeSnapshot>(() => ({
     characters: this.characters.characters(),
@@ -63,6 +66,8 @@ export class TomeHistory {
   readonly index = signal(0);
   readonly archived = signal<ChangesetEntry[]>([]);
   readonly savedAt = signal<string | null>(null);
+  readonly owner = signal<string | null>(null);
+  private opening?: { owner: string; done: Promise<void> };
   private readonly savedSnapshot = signal<TomeSnapshot | null>(null);
   private readonly pending = signal(false);
   private nextId = 1;
@@ -78,8 +83,7 @@ export class TomeHistory {
   });
 
   constructor() {
-    this.loadSaved();
-    this.entries.set([{ id: this.nextId++, label: this.savedAt() ? 'Opened saved tome' : 'Opened tome', details: [], at: now(), snapshot: this.current() }]);
+    this.entries.set([{ id: this.nextId++, label: 'Opened tome', details: [], at: now(), snapshot: this.current() }]);
     effect(() => {
       const snapshot = this.current();
       untracked(() => this.schedule(snapshot));
@@ -117,25 +121,51 @@ export class TomeHistory {
     this.shell.notify('success', 'The tome was reset. Undo brings your work back.');
   }
 
+  open(owner: string): Promise<void> {
+    if (this.owner() === owner) return Promise.resolve();
+    if (this.opening?.owner === owner) return this.opening.done;
+    const done = this.read(owner).finally(() => {
+      if (this.opening?.done === done) this.opening = undefined;
+    });
+    this.opening = { owner, done };
+    return done;
+  }
+
+  close(): void {
+    this.opening = undefined;
+    this.owner.set(null);
+    this.load(INITIAL_TOME, null, [], 'Opened tome');
+  }
+
   save(): void {
+    void this.persist().then((ok) => ok && this.shell.notify('success', 'The tome and its changeset were saved in this browser.'));
+  }
+
+  async persist(): Promise<boolean> {
     this.flush();
     const savedAt = now();
-    const data: SavedTome = {
-      format: TOME_FORMAT,
-      version: TOME_VERSION,
-      savedAt,
-      tome: this.current(),
-      changeset: this.changeset(),
-    };
+    const tome = this.current();
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      await this.vault.put(TOMES, { owner: this.owner() ?? LOCAL_OWNER, savedAt, tome, changeset: this.changeset() });
     } catch {
-      this.shell.notify('error', 'The tome is too large for browser storage. Export it to a file instead.');
-      return;
+      this.shell.notify('error', 'The browser database refused the tome. Export it to a file instead.');
+      return false;
     }
     this.savedAt.set(savedAt);
-    this.savedSnapshot.set(this.current());
-    this.shell.notify('success', 'The tome and its changeset were saved.');
+    this.savedSnapshot.set(tome);
+    return true;
+  }
+
+  async adopt(snapshot: TomeSnapshot, savedAt: string, label: string): Promise<void> {
+    this.apply(snapshot, label);
+    const tome = this.current();
+    this.savedAt.set(savedAt);
+    this.savedSnapshot.set(tome);
+    try {
+      await this.vault.put(TOMES, { owner: this.owner() ?? LOCAL_OWNER, savedAt, tome, changeset: this.changeset() });
+    } catch {
+      this.shell.notify('error', 'The browser database refused the tome. Export it to a file instead.');
+    }
   }
 
   exportTome(withHistory: boolean): void {
@@ -240,24 +270,61 @@ export class TomeHistory {
     this.attributes.replaceAll(snapshot.attributeDefs);
   }
 
-  private loadSaved(): void {
-    let raw: string | null = null;
+  private async read(owner: string): Promise<void> {
+    let record: VaultTome | undefined;
     try {
-      raw = localStorage.getItem(SAVE_KEY);
+      record = (await this.vault.get<VaultTome>(TOMES, owner)) ?? (await this.migrateLegacy(owner));
     } catch {
+      this.shell.notify('error', 'The browser database could not be opened, so the tome lives only until this tab closes.');
+    }
+    this.flush();
+    this.owner.set(owner);
+    if (!record) {
+      this.load(INITIAL_TOME, null, [], 'Opened tome');
       return;
     }
-    if (!raw) return;
     try {
-      const data = JSON.parse(raw) as Partial<SavedTome>;
-      if (data.format !== TOME_FORMAT) return;
-      const tome = validateSnapshot(data.tome);
-      this.restore(tome);
-      this.savedAt.set(String(data.savedAt ?? ''));
-      this.savedSnapshot.set(this.current());
-      this.archived.set(Array.isArray(data.changeset) ? data.changeset : []);
+      this.load(validateSnapshot(record.tome), record.savedAt, Array.isArray(record.changeset) ? record.changeset : [], 'Opened saved tome');
     } catch {
+      this.load(INITIAL_TOME, null, [], 'Opened tome');
       this.shell.notify('error', 'The saved tome was damaged and could not be opened.');
+    }
+    void this.vault.persist();
+  }
+
+  private load(snapshot: TomeSnapshot, savedAt: string | null, changeset: ChangesetEntry[], label: string): void {
+    clearTimeout(this.timer);
+    this.pending.set(false);
+    this.restore(snapshot);
+    this.savedAt.set(savedAt);
+    this.savedSnapshot.set(savedAt ? this.current() : null);
+    this.archived.set(changeset);
+    this.entries.set([{ id: this.nextId++, label, details: [], at: now(), snapshot: this.current() }]);
+    this.index.set(0);
+  }
+
+  private async migrateLegacy(owner: string): Promise<VaultTome | undefined> {
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem(LEGACY_SAVE_KEY);
+    } catch {
+      return undefined;
+    }
+    if (!raw) return undefined;
+    try {
+      const data = JSON.parse(raw) as Partial<LegacySavedTome>;
+      if (data.format !== TOME_FORMAT) return undefined;
+      const record: VaultTome = {
+        owner,
+        savedAt: String(data.savedAt ?? now()),
+        tome: validateSnapshot(data.tome),
+        changeset: Array.isArray(data.changeset) ? data.changeset : [],
+      };
+      await this.vault.put(TOMES, record);
+      localStorage.removeItem(LEGACY_SAVE_KEY);
+      return record;
+    } catch {
+      return undefined;
     }
   }
 }
