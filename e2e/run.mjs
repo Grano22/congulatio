@@ -39,13 +39,21 @@ async function reachable(url) {
 
 const start = (command, args) => spawn(command, args, { cwd: root, stdio: 'ignore', detached: process.platform !== 'win32' });
 
-function stop(child) {
-  if (!child?.pid) return;
+function signal(child, name) {
   try {
-    process.kill(process.platform === 'win32' ? child.pid : -child.pid);
+    if (process.platform === 'win32') child.kill(name);
+    else process.kill(-child.pid, name);
   } catch {
-    child.kill();
+    return;
   }
+}
+
+async function stop(child) {
+  if (!child?.pid || child.exitCode !== null) return;
+  const exited = new Promise((resolve) => child.once('exit', resolve));
+  signal(child, 'SIGINT');
+  const done = await Promise.race([exited.then(() => true), wait(15_000).then(() => false)]);
+  if (!done) signal(child, 'SIGKILL');
 }
 
 const previousConfig = existsSync(configFile) ? readFileSync(configFile, 'utf8') : null;
@@ -85,8 +93,7 @@ try {
   console.error(`\nEnd-to-end run stopped: ${e.message}`);
   process.exitCode = 1;
 } finally {
-  stop(server);
-  stop(emulators);
+  await Promise.all([stop(server), stop(emulators)]);
   if (!attachedUrl) {
     if (previousConfig === null) rmSync(configFile, { force: true });
     else writeFileSync(configFile, previousConfig);

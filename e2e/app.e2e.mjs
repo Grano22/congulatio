@@ -50,7 +50,7 @@ async function press(page, ...keys) {
 async function clickText(page, text, selector = 'button') {
   const clicked = await page.evaluate(
     (text, selector) => {
-      const el = [...document.querySelectorAll(selector)].find((b) => b.textContent.trim().includes(text) && !b.disabled);
+      const el = [...document.querySelectorAll(selector)].find((b) => b.textContent.trim().includes(text) && !b.disabled && b.getClientRects().length > 0);
       el?.click();
       return Boolean(el);
     },
@@ -58,6 +58,17 @@ async function clickText(page, text, selector = 'button') {
     selector,
   );
   if (!clicked) throw new Error(`No enabled ${selector} reads "${text}"`);
+}
+
+async function dismissWelcome(page) {
+  const shown = await page
+    .waitForFunction(() => [...document.querySelectorAll('dialog[open] .rmodal__title')].some((t) => /welcome|what.s new/i.test(t.textContent)), { timeout: 4000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!shown) return false;
+  await clickText(page, 'Start forging').catch(() => clickText(page, 'Back to the forge'));
+  await page.waitForFunction(() => !document.querySelector('dialog[open]'), { timeout: 4000 });
+  return true;
 }
 
 const statusText = (page) => page.$eval('.statusbar', (e) => e.innerText.replace(/\s+/g, ' '));
@@ -91,19 +102,45 @@ export async function appSuite(baseUrl) {
   try {
     const a = await openPage(browser, baseUrl, errors, 'device A');
 
-    await step('a visitor is sent to the login page', async () => {
-      await a.waitForSelector('.login__card', { timeout: 15000 });
-      if (path(a) !== '/login') throw new Error(`landed on ${path(a)}`);
+    await step('a visitor lands in the workbench without signing in', async () => {
+      await a.waitForSelector('.topbar__account', { timeout: 15000 });
+      if (path(a) !== '/') throw new Error(`landed on ${path(a)}`);
+      if (!/this device only/i.test(await statusText(a))) throw new Error('the status bar does not say offline');
     });
 
-    await step('a wanderer enters anonymously', async () => {
-      await clickText(a, 'Enter as a wanderer');
+    await step('a first visit shows the welcome dialog with account benefits', async () => {
+      await a.waitForSelector('dialog[open] .wel__perks', { timeout: 5000 });
+      await dismissWelcome(a);
+    });
+
+    let carried = 0;
+    await step('offline work is saved in the browser and survives a reload', async () => {
+      await press(a, MOD, 'Alt', 'KeyN');
+      await wait(600);
+      carried = await soulCount(a);
+      await press(a, MOD, 'KeyS');
+      await wait(800);
+      await a.reload({ waitUntil: 'domcontentloaded' });
       await a.waitForSelector('.topbar__account', { timeout: 15000 });
+      if (await dismissWelcome(a)) throw new Error('the welcome dialog came back after it was dismissed');
+      const after = await soulCount(a);
+      if (after !== carried) throw new Error(`expected ${carried} souls after reload, saw ${after}`);
+      return `${carried} souls`;
+    });
+
+    await step('a visitor opens sign-in from the top bar and enters as a wanderer', async () => {
+      await clickText(a, 'Sign in');
+      await a.waitForSelector('.login__card', { timeout: 15000 });
+      await clickText(a, 'Enter as a wanderer');
+      await a.waitForFunction(() => location.pathname === '/' && document.querySelector('.topbar__account'), { timeout: 15000 });
+    });
+
+    await step('the new wanderer starts with the tome that was open', async () => {
+      await a.waitForFunction((n) => new RegExp(`${n} souls`, 'i').test(document.querySelector('.statusbar')?.innerText ?? ''), { timeout: 10000 }, carried);
     });
 
     let uid = '';
-    await step('saving pushes the tome to Firestore under the wanderer', async () => {
-      await press(a, MOD, 'KeyS');
+    await step('the carried tome is pushed to Firestore under the wanderer', async () => {
       const syncedOwner = () =>
         a.evaluate(
           () =>
@@ -146,6 +183,7 @@ export async function appSuite(baseUrl) {
       await a.waitForSelector('.topbar__account', { timeout: 15000 });
       if (path(a) !== '/') throw new Error(`reloaded into ${path(a)}`);
       if (/unsaved/i.test(await statusText(a))) throw new Error('the reloaded tome looks unsaved');
+      if (/this device only/i.test(await statusText(a))) throw new Error('the reload signed the wanderer out');
     });
 
     await step('a wanderer links an e-mail and becomes an account', async () => {
@@ -172,6 +210,9 @@ export async function appSuite(baseUrl) {
 
     const b = await openPage(browser, baseUrl, errors, 'device B');
     await step('a second device signs in and pulls the same tome', async () => {
+      await b.waitForSelector('.topbar__account', { timeout: 15000 });
+      await dismissWelcome(b);
+      await clickText(b, 'Sign in');
       await b.waitForSelector('.login__card', { timeout: 15000 });
       await b.type('input[name=email]', email);
       await b.type('input[name=password]', 'secret123');
@@ -181,18 +222,17 @@ export async function appSuite(baseUrl) {
       if (/unsaved/i.test(await statusText(b))) throw new Error('the pulled tome looks unsaved');
     });
 
-    await step('signing out returns to the login page', async () => {
+    await step('signing out returns to the tome kept in this browser', async () => {
       await b.click('.topbar__account');
       await b.waitForSelector('.acc__who');
       await clickText(b, 'Sign out');
       await wait(400);
-      if (!(await b.$('.login__card'))) await clickText(b, 'Sign out anyway');
-      await b.waitForSelector('.login__card', { timeout: 10000 });
+      if (await b.$('dialog[open] .acc__who')) await clickText(b, 'Sign out anyway');
+      await b.waitForFunction(() => /this device only/i.test(document.querySelector('.statusbar')?.innerText ?? ''), { timeout: 10000 });
+      if (path(b) !== '/') throw new Error(`signed out into ${path(b)}`);
     });
 
-    await step('offline mode works and survives a reload', async () => {
-      await clickText(b, 'Work offline on this device');
-      await b.waitForSelector('.topbar__account', { timeout: 10000 });
+    await step('the signed-out browser stays offline after a reload', async () => {
       await b.reload({ waitUntil: 'domcontentloaded' });
       await b.waitForSelector('.topbar__account', { timeout: 10000 });
       if (!/this device only/i.test(await statusText(b))) throw new Error('the status bar does not say offline');
