@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function ownsStored() {
+      return signedIn() && resource.data.owner == request.auth.uid;
+    }
+
+    function claimsIncoming() {
+      return signedIn() && request.resource.data.owner == request.auth.uid;
+    }
+
+    function idBelongsToCaller(documentId) {
+      return documentId.matches(request.auth.uid + '~.+');
+    }
+
+    function validTableRow() {
+      let row = request.resource.data;
+      return row.keys().hasOnly(['owner', 'kind', 'entityId', 'position', 'json', 'hash', 'bytes', 'updatedAt'])
+        && row.keys().hasAll(['owner', 'kind', 'json', 'bytes', 'updatedAt'])
+        && row.kind is string && row.kind.size() <= 32
+        && row.json is string && row.json.size() <= 900000
+        && row.bytes is int && row.bytes >= 0
+        && row.updatedAt is string;
+    }
+
+    function validProfile() {
+      let profile = request.resource.data;
+      return profile.keys().hasOnly(['displayName', 'photoURL', 'avatarPath', 'avatarBytes', 'kind', 'updatedAt'])
+        && (!('avatarBytes' in profile) || (profile.avatarBytes is int && profile.avatarBytes <= 524288));
+    }
+
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create, update: if isSelf(userId) && validProfile();
+      allow delete: if isSelf(userId);
+    }
+
+    match /app_tables/{documentId} {
+      allow read: if ownsStored() || isAdmin();
+      allow create: if claimsIncoming() && idBelongsToCaller(documentId) && validTableRow();
+      allow update: if ownsStored() && claimsIncoming() && validTableRow();
+      allow delete: if ownsStored();
+    }
+
+    match /admin_tables/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
