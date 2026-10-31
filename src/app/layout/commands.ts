@@ -8,8 +8,12 @@ import { WelcomeStore } from '../store/welcomeStore';
 import { SettingsStore } from '../store/settingsStore';
 import { PwaStore } from '../store/pwaStore';
 import { generateRandomCharacter } from '../domain/randomCharacter';
-import { THEMES, VIEW_MODES } from '../domain/viewModes';
+import { VIEW_MODES } from '../domain/viewModes';
+import { THEMES } from '../domain/themes';
 import { ViewStore } from '../store/viewStore';
+import { ThemeStore } from '../store/themeStore';
+import { VIEW_MODE_ICONS } from './view-mode-icons';
+import type { IconNode } from 'lucide';
 
 export type KeyChord = {
   code: string;
@@ -25,6 +29,7 @@ export type Command = {
   group: string;
   keys?: KeyChord[];
   badge?: string;
+  icon?: IconNode;
   enabled?: () => boolean;
   checked?: () => boolean;
   hidden?: () => boolean;
@@ -79,6 +84,7 @@ export class CommandsService {
   private readonly settings = inject(SettingsStore);
   private readonly pwa = inject(PwaStore);
   private readonly view = inject(ViewStore);
+  private readonly themes = inject(ThemeStore);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -153,23 +159,27 @@ export class CommandsService {
       group: 'View mode',
       label: m.label,
       badge: m.beta ? 'Beta' : undefined,
+      icon: VIEW_MODE_ICONS[m.id],
       checked: () => this.view.modeId() === m.id,
       run: () => this.view.setMode(m.id),
     })),
-    {
-      id: 'view.theme.auto',
-      group: 'Theme',
-      label: 'Match the view mode',
-      checked: () => this.view.themeChoice() === 'auto',
-      run: () => this.view.setTheme('auto'),
-    },
     ...THEMES.map<Command>((t) => ({
       id: `view.theme.${t.id}`,
       group: 'Theme',
       label: `${t.label} theme`,
-      checked: () => this.view.themeChoice() === t.id,
-      run: () => this.view.setTheme(t.id),
+      checked: () => this.themes.id() === t.id,
+      run: () => this.themes.set(t.id),
     })),
+    {
+      id: 'view.theme.next',
+      group: 'Theme',
+      label: 'Next theme',
+      keys: [{ code: 'KeyT', mod: true, alt: true, inText: true }],
+      run: () => {
+        this.themes.next();
+        this.shell.notify('info', `${this.themes.current().label} theme`);
+      },
+    },
     {
       id: 'view.maximize',
       group: 'View',

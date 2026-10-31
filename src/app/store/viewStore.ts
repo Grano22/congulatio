@@ -1,31 +1,16 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
-import {
-  DEFAULT_VIEW_MODE,
-  EditorTabId,
-  NavigatorId,
-  ThemeChoice,
-  ViewModeId,
-  allowsTab,
-  fallbackTab,
-  isThemeChoice,
-  isViewModeId,
-  modeForTab,
-  resolveTheme,
-  viewMode,
-} from '../domain/viewModes';
+import { DEFAULT_VIEW_MODE, EditorTabId, NavigatorId, ViewModeId, allowsTab, fallbackTab, isViewModeId, modeForTab, viewMode } from '../domain/viewModes';
 import { WorkspaceStore } from './workspaceStore';
 import { ShellStore } from './shellStore';
 
 const VIEW_KEY = 'congulatio.view.v1';
 
-type StoredView = { mode: ViewModeId; theme: ThemeChoice };
-
-function readView(): StoredView {
+function readMode(): ViewModeId {
   try {
-    const v = JSON.parse(localStorage.getItem(VIEW_KEY) ?? '{}') as Partial<StoredView>;
-    return { mode: isViewModeId(v.mode) ? v.mode : DEFAULT_VIEW_MODE, theme: isThemeChoice(v.theme) ? v.theme : 'auto' };
+    const mode = (JSON.parse(localStorage.getItem(VIEW_KEY) ?? '{}') as { mode?: unknown }).mode;
+    return isViewModeId(mode) ? mode : DEFAULT_VIEW_MODE;
   } catch {
-    return { mode: DEFAULT_VIEW_MODE, theme: 'auto' };
+    return DEFAULT_VIEW_MODE;
   }
 }
 
@@ -33,25 +18,19 @@ function readView(): StoredView {
 export class ViewStore {
   private readonly workspace = inject(WorkspaceStore);
   private readonly shell = inject(ShellStore);
-  private readonly stored = readView();
 
-  readonly modeId = signal<ViewModeId>(this.stored.mode);
-  readonly themeChoice = signal<ThemeChoice>(this.stored.theme);
+  readonly modeId = signal<ViewModeId>(readMode());
   readonly mode = computed(() => viewMode(this.modeId()));
-  readonly theme = computed(() => resolveTheme(this.themeChoice(), this.mode()));
 
   constructor() {
     this.workspace.open(fallbackTab(this.mode(), this.workspace.tab()));
     effect(() => {
-      const view: StoredView = { mode: this.modeId(), theme: this.themeChoice() };
+      const mode = this.modeId();
       try {
-        localStorage.setItem(VIEW_KEY, JSON.stringify(view));
+        localStorage.setItem(VIEW_KEY, JSON.stringify({ mode }));
       } catch {
         return;
       }
-    });
-    effect(() => {
-      document.documentElement.dataset['theme'] = this.theme();
     });
     effect(() => {
       const tab = this.workspace.tab();
@@ -69,10 +48,6 @@ export class ViewStore {
     const mode = viewMode(id);
     this.workspace.open(fallbackTab(mode, this.workspace.tab()));
     this.modeId.set(mode.id);
-  }
-
-  setTheme(choice: ThemeChoice): void {
-    this.themeChoice.set(choice);
   }
 
   allowsTab(tab: EditorTabId): boolean {

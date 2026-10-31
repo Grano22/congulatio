@@ -55,3 +55,55 @@
   font-style: italic;
   color: var(--color-ink-500);
 }
+.set__block--spaced {
+  margin-top: 1.2rem;
+}
+.set__themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.6rem;
+}
+.set__theme {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 2px solid var(--color-parchment-400);
+  border-radius: 10px;
+  background: rgb(var(--card-rgb) / 0.45);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.set__theme:hover {
+  transform: translateY(-1px);
+}
+.set__theme--on {
+  border-color: var(--color-wood-700);
+  box-shadow: 0 0 0 2px var(--color-gold-400);
+}
+.set__theme:has(:focus-visible) {
+  outline: 3px solid var(--color-mana-500);
+  outline-offset: 2px;
+}
+.set__theme b {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-ink-900);
+}
+.set__theme small {
+  font-size: 0.74rem;
+  line-height: 1.3;
+  color: var(--color-ink-600);
+}
+.set__theme-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.set__hint--tight {
+  margin-top: 0;
+}

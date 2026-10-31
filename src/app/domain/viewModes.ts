@@ -4,22 +4,15 @@ export type NavigatorId = 'codex' | 'routines' | 'attributes' | 'dialogues' | 'q
 
 export type ViewModeId = 'npc-flow' | 'dnd';
 
-export type ThemeId = 'forge' | 'dragonfire';
-
-export type ThemeChoice = ThemeId | 'auto';
-
 export type ViewMode = {
   id: ViewModeId;
   label: string;
   short: string;
   description: string;
   beta: boolean;
-  theme: ThemeId;
   tabs: EditorTabId[];
   navigators: NavigatorId[];
 };
-
-export type Theme = { id: ThemeId; label: string; description: string };
 
 export const DEFAULT_VIEW_MODE: ViewModeId = 'npc-flow';
 
@@ -30,7 +23,6 @@ export const VIEW_MODES: ViewMode[] = [
     short: 'NPC Flow',
     description: 'Characters, dialogues, routines, interactions and simulations for game NPCs.',
     beta: false,
-    theme: 'forge',
     tabs: ['character', 'sculptor', 'dialogue', 'routines', 'interactions', 'relations', 'simulation'],
     navigators: ['codex', 'routines', 'attributes', 'dialogues', 'quests', 'world'],
   },
@@ -40,24 +32,14 @@ export const VIEW_MODES: ViewMode[] = [
     short: 'D&D',
     description: 'Tabletop characters with 5e-style sheets, printable as a PDF or a card. Dialogues stay in the NPC Flow view.',
     beta: true,
-    theme: 'dragonfire',
     tabs: ['character', 'sheet', 'sculptor', 'relations'],
     navigators: ['codex', 'attributes', 'quests', 'world'],
   },
 ];
 
-export const THEMES: Theme[] = [
-  { id: 'forge', label: 'Forge', description: 'Carved oak and gilded brass' },
-  { id: 'dragonfire', label: 'Dragonfire', description: 'Ember red on dark stone' },
-];
-
 export const isViewModeId = (value: unknown): value is ViewModeId => VIEW_MODES.some((m) => m.id === value);
 
-export const isThemeChoice = (value: unknown): value is ThemeChoice => value === 'auto' || THEMES.some((t) => t.id === value);
-
 export const viewMode = (id: ViewModeId): ViewMode => VIEW_MODES.find((m) => m.id === id) ?? VIEW_MODES[0];
-
-export const resolveTheme = (choice: ThemeChoice, mode: ViewMode): ThemeId => (choice === 'auto' ? mode.theme : choice);
 
 export const allowsTab = (mode: ViewMode, tab: EditorTabId): boolean => mode.tabs.includes(tab);
 

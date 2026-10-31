@@ -1,9 +1,12 @@
 import { Component, ElementRef, inject } from '@angular/core';
 import { VIEW_MODES, ViewModeId } from '../domain/viewModes';
 import { ViewStore } from '../store/viewStore';
+import { LucideIcon } from '../ui/lucide-icon';
+import { VIEW_MODE_ICONS } from './view-mode-icons';
 
 @Component({
   selector: 'app-view-mode-switch',
+  imports: [LucideIcon],
   styles: [
     `
       :host {
@@ -44,8 +47,15 @@ import { ViewStore } from '../store/viewStore';
         color: var(--color-gold-200);
         background: linear-gradient(180deg, var(--color-wood-500), var(--color-wood-700));
         box-shadow:
-          inset 0 1px 0 rgba(255, 235, 180, 0.3),
+          inset 0 1px 0 rgb(var(--sheen-rgb) / 0.3),
           0 0 0 1px var(--color-gold-600);
+      }
+      .vms__icon {
+        color: var(--color-gold-400);
+      }
+      .vms__opt--on .vms__icon {
+        color: var(--color-gold-200);
+        filter: drop-shadow(0 0 4px rgb(var(--accent-rgb) / 0.6));
       }
       .vms__beta {
         padding: 0 0.3rem;
@@ -54,8 +64,8 @@ import { ViewStore } from '../store/viewStore';
         font-size: 0.52rem;
         line-height: 1.3;
       }
-      @media (max-width: 1100px) {
-        .vms__long {
+      @container stage (max-width: 820px) {
+        .vms__label {
           display: none;
         }
       }
@@ -71,11 +81,13 @@ import { ViewStore } from '../store/viewStore';
           [class.vms__opt--on]="view.modeId() === mode.id"
           [attr.aria-checked]="view.modeId() === mode.id"
           [attr.tabindex]="view.modeId() === mode.id ? 0 : -1"
+          [attr.aria-label]="mode.label + (mode.beta ? ' (beta)' : '')"
           [attr.title]="mode.label + (mode.beta ? ' (beta)' : '') + ': ' + mode.description"
           [attr.data-mode]="mode.id"
           (click)="view.setMode(mode.id)"
         >
-          {{ mode.short }}<span class="vms__long">&nbsp;view</span>
+          <app-lucide-icon class="vms__icon" [icon]="icons[mode.id]" iconClass="ic-14" [strokeWidth]="2" />
+          <span class="vms__label">{{ mode.short }}</span>
           @if (mode.beta) {
             <span class="vms__beta">Beta</span>
           }
@@ -87,6 +99,7 @@ import { ViewStore } from '../store/viewStore';
 export class ViewModeSwitch {
   protected readonly view = inject(ViewStore);
   protected readonly modes = VIEW_MODES;
+  protected readonly icons = VIEW_MODE_ICONS;
   private readonly host = inject(ElementRef<HTMLElement>);
 
   protected onKey(event: KeyboardEvent): void {

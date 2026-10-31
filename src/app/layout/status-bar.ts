@@ -11,15 +11,22 @@ import { CloudSync } from '../cloud/cloudSync';
 import { Session } from '../cloud/session';
 import { NetworkStore } from '../store/networkStore';
 import { ErrorLog } from '../store/errorLog';
+import { ViewStore } from '../store/viewStore';
+import { ThemeStore } from '../store/themeStore';
+import { LucideIcon } from '../ui/lucide-icon';
+import { VIEW_MODE_ICONS } from './view-mode-icons';
 
 @Component({
   selector: 'app-status-bar',
-  imports: [DatePipe],
+  imports: [DatePipe, LucideIcon],
   styleUrl: './status-bar.css',
   templateUrl: './status-bar.html',
 })
 export class StatusBar {
   protected readonly shell = inject(ShellStore);
+  protected readonly view = inject(ViewStore);
+  protected readonly theme = inject(ThemeStore);
+  protected readonly modeIcon = computed(() => VIEW_MODE_ICONS[this.view.modeId()]);
   protected readonly history = inject(TomeHistory);
   private readonly workspace = inject(WorkspaceStore);
   private readonly characters = inject(CharactersStore);

@@ -5,6 +5,7 @@ import { Session } from './cloud/session';
 import { CloudSync } from './cloud/cloudSync';
 import { TomeHistory } from './store/tomeHistory';
 import { Seo } from './layout/seo';
+import { ThemeStore } from './store/themeStore';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ export class App {
   private readonly history = inject(TomeHistory);
   protected readonly sync = inject(CloudSync);
   private readonly seo = inject(Seo);
+  protected readonly theme = inject(ThemeStore);
 
   constructor() {
     this.seo.start();

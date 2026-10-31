@@ -26,7 +26,7 @@
     ),
     linear-gradient(180deg, var(--color-wood-800), var(--color-wood-900));
   border-top: 2px solid var(--color-wood-950);
-  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.12);
+  box-shadow: inset 0 1px 0 rgb(var(--sheen-rgb) / 0.12);
 }
 
 .statusbar__group {
@@ -67,7 +67,7 @@
 }
 .statusbar__dot--warn {
   background: radial-gradient(circle at 35% 30%, var(--color-gold-200), var(--color-gold-600) 70%);
-  box-shadow: 0 0 6px rgba(226, 194, 92, 0.7);
+  box-shadow: 0 0 6px rgb(var(--accent-rgb) / 0.7);
 }
 
 .statusbar__dot--error {
@@ -108,4 +108,10 @@
 .statusbar__problems:hover,
 .statusbar__problems:focus-visible {
   background: rgba(168, 74, 53, 0.18);
+}
+.statusbar__mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-gold-300);
 }

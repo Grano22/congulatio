@@ -1,6 +1,7 @@
 import { Component, ElementRef, Injector, afterNextRender, inject, signal } from '@angular/core';
 import { Command, CommandsService } from './commands';
 import { TomeHistory } from '../store/tomeHistory';
+import { LucideIcon } from '../ui/lucide-icon';
 
 type MenuItem = { kind: 'command'; id: string } | { kind: 'separator' } | { kind: 'header'; label: string };
 
@@ -28,9 +29,10 @@ const MENUS: MenuDef[] = [
       cmd('view.mode.dnd'),
       SEP,
       header('Theme'),
-      cmd('view.theme.auto'),
       cmd('view.theme.forge'),
+      cmd('view.theme.ebony'),
       cmd('view.theme.dragonfire'),
+      cmd('view.theme.next'),
       SEP,
       header('Layout presets'),
       cmd('view.preset.balanced'),
@@ -59,6 +61,7 @@ const MENUS: MenuDef[] = [
 
 @Component({
   selector: 'app-main-menu',
+  imports: [LucideIcon],
   styleUrl: './main-menu.css',
   host: { '(document:pointerdown)': 'onOutside($event)' },
   template: `
@@ -105,7 +108,12 @@ const MENUS: MenuDef[] = [
                         (pointerenter)="focusItem(m, i)"
                       >
                         <span class="mm__check" aria-hidden="true">{{ command.checked && command.checked() ? '✓' : '' }}</span>
-                        <span class="mm__label">{{ labelFor(command) }}</span>
+                        <span class="mm__label">
+                          @if (command.icon) {
+                            <app-lucide-icon [icon]="command.icon" iconClass="ic-14 mm__icon" [strokeWidth]="2" />
+                          }
+                          {{ labelFor(command) }}
+                        </span>
                         @if (command.badge) {
                           <span class="mm__badge">{{ command.badge }}</span>
                         }

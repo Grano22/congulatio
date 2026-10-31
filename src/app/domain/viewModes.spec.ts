@@ -1,4 +1,4 @@
-import { VIEW_MODES, fallbackTab, isThemeChoice, isViewModeId, modeForTab, resolveTheme, viewMode } from './viewModes';
+import { VIEW_MODES, fallbackTab, isViewModeId, modeForTab, viewMode } from './viewModes';
 
 describe('viewModes', () => {
   const npc = viewMode('npc-flow');
@@ -26,16 +26,9 @@ describe('viewModes', () => {
     expect(modeForTab(dnd, 'character').id).toBe('dnd');
   });
 
-  it('follows the view theme unless a theme is chosen', () => {
-    expect(resolveTheme('auto', dnd)).toBe('dragonfire');
-    expect(resolveTheme('forge', dnd)).toBe('forge');
-  });
-
   it('validates stored values', () => {
     expect(isViewModeId('dnd')).toBe(true);
     expect(isViewModeId('pathfinder')).toBe(false);
-    expect(isThemeChoice('auto')).toBe(true);
-    expect(isThemeChoice('neon')).toBe(false);
     expect(viewMode('nope' as never).id).toBe('npc-flow');
   });
 });

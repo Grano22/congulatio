@@ -1,4 +1,4 @@
-<app-rpg-modal title="Settings" width="32rem" [open]="open()" (closed)="shell.closeDialog()">
+<app-rpg-modal title="Settings" width="36rem" [open]="open()" (closed)="shell.closeDialog()">
   <section class="set__block">
     <h3>Saving</h3>
     <p class="set__layers">
@@ -35,6 +35,21 @@
         </small>
       </span>
     </label>
+  </section>
+
+  <section class="set__block set__block--spaced" aria-labelledby="set-theme">
+    <h3 id="set-theme">Theme</h3>
+    <div class="set__themes" role="radiogroup" aria-labelledby="set-theme">
+      @for (t of themes; track t.id) {
+        <label class="set__theme" [class.set__theme--on]="theme.id() === t.id">
+          <input type="radio" name="set-theme" class="set__theme-input" [value]="t.id" [checked]="theme.id() === t.id" (change)="theme.set(t.id)" />
+          <app-theme-preview [theme]="t.id" />
+          <b>{{ t.label }}</b>
+          <small>{{ t.description }}</small>
+        </label>
+      }
+    </div>
+    <p class="set__hint set__hint--tight">Themes only change the look and work with every view mode. Cycle them with {{ nextThemeKeys }}.</p>
   </section>
 
   <p class="set__hint">Settings are kept in this browser.</p>

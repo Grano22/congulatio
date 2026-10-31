@@ -25,6 +25,7 @@ import { WelcomeStore } from '../store/welcomeStore';
 import { Persistence } from '../store/persistence';
 import { ViewStore } from '../store/viewStore';
 import { ViewModeSwitch } from '../layout/view-mode-switch';
+import { ThemePicker } from '../layout/theme-picker';
 import { DndSheet } from '../dnd-sheet/dnd-sheet';
 import { CharacterPrint } from '../print/character-print';
 import { PrintJob } from '../print/printJob';
@@ -52,6 +53,7 @@ export type { EditorTabId };
     SyncBanner,
     LoadFailed,
     ViewModeSwitch,
+    ThemePicker,
     DndSheet,
     CharacterPrint,
   ],

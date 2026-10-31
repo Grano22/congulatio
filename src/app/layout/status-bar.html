@@ -45,6 +45,11 @@
       <span>{{ cloud }}</span>
     }
     <span class="statusbar__sep" aria-hidden="true">·</span>
+    <span class="statusbar__mode" [attr.title]="view.mode().label + ' view · ' + theme.current().label + ' theme'">
+      <app-lucide-icon [icon]="modeIcon()" iconClass="ic-12" [strokeWidth]="2.2" />
+      {{ view.mode().short }}
+    </span>
+    <span class="statusbar__sep" aria-hidden="true">·</span>
     <span>Congulatio v{{ version }}</span>
   </div>
 </footer>

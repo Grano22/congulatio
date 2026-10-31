@@ -27,7 +27,7 @@
 .mm__top:focus-visible,
 .mm__top--open {
   border-color: var(--color-wood-500);
-  background: rgba(255, 220, 150, 0.08);
+  background: rgb(var(--sheen-rgb) / 0.08);
   outline: none;
 }
 .mm__top--open {
@@ -85,6 +85,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.mm__label .mm__icon {
+  margin-right: 0.35rem;
+  vertical-align: -2px;
+  color: var(--color-gold-300);
 }
 .mm__badge {
   padding: 0.05rem 0.4rem;

@@ -6,10 +6,14 @@ import { ShellStore } from '../store/shellStore';
 import { AUTOSAVE_INTERVALS, AutosaveInterval, SettingsStore } from '../store/settingsStore';
 import { Persistence } from '../store/persistence';
 import { Session } from '../cloud/session';
+import { ThemePreview } from '../ui/theme-preview';
+import { ThemeStore } from '../store/themeStore';
+import { THEMES } from '../domain/themes';
+import { CommandsService } from './commands';
 
 @Component({
   selector: 'app-settings-dialog',
-  imports: [RpgModal, RpgButton, DatePipe],
+  imports: [RpgModal, RpgButton, DatePipe, ThemePreview],
   styleUrl: './settings-dialog.css',
   templateUrl: './settings-dialog.html',
 })
@@ -18,6 +22,10 @@ export class SettingsDialog {
   protected readonly store = inject(SettingsStore);
   protected readonly persistence = inject(Persistence);
   protected readonly session = inject(Session);
+  protected readonly theme = inject(ThemeStore);
+  protected readonly themes = THEMES;
+  private readonly commands = inject(CommandsService);
+  protected readonly nextThemeKeys = this.commands.shortcut(this.commands.get('view.theme.next')!);
 
   protected readonly open = computed(() => this.shell.dialog() === 'settings');
   protected readonly settings = this.store.settings;
