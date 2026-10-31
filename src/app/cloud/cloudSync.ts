@@ -5,6 +5,7 @@ import { firebaseFirestore } from './firebase';
 import { cloudErrorMessage } from './authErrors';
 import { TomeHistory } from '../store/tomeHistory';
 import { ShellStore } from '../store/shellStore';
+import { NetworkStore } from '../store/networkStore';
 import { SYNC, TOMES, TomeVault, VaultSync, VaultTome } from '../store/tomeVault';
 import {
   CloudRow,
@@ -32,6 +33,7 @@ export class CloudSync {
   private readonly history = inject(TomeHistory);
   private readonly vault = inject(TomeVault);
   private readonly shell = inject(ShellStore);
+  private readonly network = inject(NetworkStore);
 
   readonly status = signal<SyncStatus>('off');
   readonly error = signal<string | null>(null);
@@ -41,6 +43,12 @@ export class CloudSync {
   readonly active = computed(() => {
     const user = this.session.user();
     return Boolean(user && this.session.cloud() && this.history.owner() === user.uid);
+  });
+  readonly pending = computed(() => {
+    if (!this.active()) return false;
+    const saved = this.history.savedAt();
+    const synced = this.syncedAt();
+    return Boolean(saved && (!synced || saved > synced));
   });
 
   private running?: Promise<void>;
@@ -67,19 +75,15 @@ export class CloudSync {
         if (this.active()) this.schedule();
       });
     });
-    const online = (): void => {
-      if (this.active()) void this.sync();
-    };
-    const offline = (): void => {
-      if (this.active()) this.status.set('offline');
-    };
-    window.addEventListener('online', online);
-    window.addEventListener('offline', offline);
-    inject(DestroyRef).onDestroy(() => {
-      clearTimeout(this.timer);
-      window.removeEventListener('online', online);
-      window.removeEventListener('offline', offline);
+    effect(() => {
+      const online = this.network.online();
+      untracked(() => {
+        if (!this.active()) return;
+        if (online) void this.sync();
+        else this.status.set('offline');
+      });
     });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));
   }
 
   sync(): Promise<void> {
@@ -127,7 +131,7 @@ export class CloudSync {
   private async run(): Promise<void> {
     const owner = this.history.owner();
     if (!owner || !this.active()) return;
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    if (!this.network.online()) {
       this.status.set('offline');
       return;
     }
@@ -231,8 +235,7 @@ export class CloudSync {
   }
 
   private fail(e: unknown): void {
-    const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
-    this.status.set(offline ? 'offline' : 'error');
+    this.status.set(this.network.online() ? 'error' : 'offline');
     this.error.set(cloudErrorMessage(e, 'The cloud sync failed. Your work stays in this browser.'));
   }
 }

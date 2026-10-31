@@ -89,3 +89,8 @@
     display: none;
   }
 }
+
+.statusbar__offline {
+  color: var(--color-blood-400);
+  font-weight: 700;
+}

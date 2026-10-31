@@ -131,3 +131,21 @@
 .topbar__sync--over-quota {
   background: var(--color-blood-400);
 }
+
+.topbar__offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-parchment-50);
+  background: var(--color-blood-500);
+  border: 1px solid var(--color-blood-400);
+  box-shadow: 0 0 8px rgba(168, 74, 53, 0.55);
+  white-space: nowrap;
+}

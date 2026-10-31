@@ -9,6 +9,7 @@ import { WorkspaceStore } from '../store/workspaceStore';
 import { APP_VERSION } from './app-version';
 import { CloudSync } from '../cloud/cloudSync';
 import { Session } from '../cloud/session';
+import { NetworkStore } from '../store/networkStore';
 
 @Component({
   selector: 'app-status-bar',
@@ -26,6 +27,7 @@ export class StatusBar {
 
   private readonly session = inject(Session);
   private readonly sync = inject(CloudSync);
+  protected readonly network = inject(NetworkStore);
   protected readonly version = APP_VERSION;
   protected readonly cloudLabel = computed(() => {
     if (this.session.user().kind === 'offline') return 'This device only';

@@ -25,6 +25,12 @@
 
   <!-- Tools -->
   <div class="topbar__tools">
+    @if (!network.online()) {
+      <span class="topbar__offline" role="status" [attr.title]="offlineTitle()">
+        <app-lucide-icon [icon]="offlineIcon" iconClass="ic-14" [strokeWidth]="2.2" />
+        Offline
+      </span>
+    }
     <app-global-search />
     <app-rpg-button variant="wood" size="sm" [attr.title]="'Export tome (' + exportKeys + ')'" (click)="commands.run('tome.export')">
       <app-lucide-icon [icon]="downloadIcon" iconClass="ic-14" [strokeWidth]="1.9" />
