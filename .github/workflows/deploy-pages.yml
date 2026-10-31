@@ -35,6 +35,21 @@ jobs:
       - name: Run unit tests
         run: npm run test:ci
 
+      - name: Write Firebase settings from GitHub secrets
+        env:
+          FIREBASE_STAGE: ${{ secrets.FIREBASE_STAGE || vars.FIREBASE_STAGE || 'production' }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY || vars.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN || vars.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET || vars.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID || vars.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID || vars.FIREBASE_APP_ID }}
+          FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID || vars.FIREBASE_MEASUREMENT_ID }}
+          FIREBASE_EMULATORS: 'false'
+          FIREBASE_ENV_FILE: .env.ci-none
+          FIREBASE_KEEP_EXISTING: 'false'
+        run: node scripts/firebase-config.mjs
+
       - name: Build for GitHub Pages
         run: |
           REPO="${{ github.event.repository.name }}"

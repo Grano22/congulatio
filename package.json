@@ -4,12 +4,14 @@
   "description": "Aplikacja do tworzenia postaci np: NPC oraz drzewek dialogowych i interakcji do gry komputerowej typu RPG.",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "node scripts/firebase-config.mjs && ng serve",
+    "build": "node scripts/firebase-config.mjs && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false",
-    "build:pages": "ng build --base-href /congulatio/"
+    "build:pages": "node scripts/firebase-config.mjs && ng build --base-href /congulatio/",
+    "config:firebase": "node scripts/firebase-config.mjs",
+    "emulators": "firebase emulators:start --project demo-congulatio"
   },
   "private": true,
   "packageManager": "npm@12.2.0",
