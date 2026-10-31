@@ -1,13 +1,14 @@
 import { Component, effect, inject, untracked } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CrashScreen } from './layout/crash-screen';
 import { Session } from './cloud/session';
 import { CloudSync } from './cloud/cloudSync';
 import { TomeHistory } from './store/tomeHistory';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: '<router-outlet />',
+  imports: [RouterOutlet, CrashScreen],
+  template: '<router-outlet /><app-crash-screen />',
   styles: [':host { display: block; min-height: 100dvh; }'],
 })
 export class App {

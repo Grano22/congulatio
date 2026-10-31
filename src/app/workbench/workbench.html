@@ -47,31 +47,43 @@
             <!-- <app-dialogue-editor animate.enter="stage-enter" animate.leave="stage-leave" /> -->
             @defer {
               <app-dialogue-workbench animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The dialogue tab" />
             }
           }
           @case ('routines') {
             @defer {
               <app-character-routines animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The routines tab" />
             }
           }
           @case ('interactions') {
             @defer {
               <app-interactions-editor animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The interactions tab" />
             }
           }
           @case ('relations') {
             @defer {
               <app-relation-graph animate.enter="stage-enter" animate.leave="stage-leave" (focusCharacter)="openTab('character')" />
+            } @error {
+              <app-load-failed what="The relations map" />
             }
           }
           @case ('simulation') {
             @defer {
               <app-scenario-simulator animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The simulation tab" />
             }
           }
           @case ('sculptor') {
             @defer {
               <app-sculptor animate.enter="stage-enter" animate.leave="stage-leave" />
+            } @error {
+              <app-load-failed what="The sculptor" />
             }
           }
         }
@@ -93,4 +105,6 @@
 
 @defer (when shell.dialog()) {
   <app-shell-dialogs />
+} @error {
+  <app-load-failed what="This dialog" />
 }

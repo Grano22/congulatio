@@ -1,6 +1,6 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 
-export type ShellDialog = 'about' | 'tour' | 'history' | 'reset' | 'remove-dialogue' | 'remove-soul' | 'account' | 'welcome' | 'settings' | 'privacy';
+export type ShellDialog = 'about' | 'tour' | 'history' | 'reset' | 'remove-dialogue' | 'remove-soul' | 'account' | 'welcome' | 'settings' | 'privacy' | 'problems';
 
 export type ShellNotice = { kind: 'success' | 'error' | 'info'; text: string };
 

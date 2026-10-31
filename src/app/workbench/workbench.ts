@@ -20,6 +20,7 @@ import { TomeHistory } from '../store/tomeHistory';
 import { CommandsService } from '../layout/commands';
 import { ShellDialogs } from '../layout/shell-dialogs';
 import { SyncBanner } from '../layout/sync-banner';
+import { LoadFailed } from '../ui/load-failed';
 import { WelcomeStore } from '../store/welcomeStore';
 import { Persistence } from '../store/persistence';
 
@@ -44,6 +45,7 @@ export type { EditorTabId };
     CharacterRoutines,
     ShellDialogs,
     SyncBanner,
+    LoadFailed,
   ],
   styleUrl: './workbench.css',
   templateUrl: './workbench.html',

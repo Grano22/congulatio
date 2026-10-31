@@ -10,6 +10,7 @@ import { APP_VERSION } from './app-version';
 import { CloudSync } from '../cloud/cloudSync';
 import { Session } from '../cloud/session';
 import { NetworkStore } from '../store/networkStore';
+import { ErrorLog } from '../store/errorLog';
 
 @Component({
   selector: 'app-status-bar',
@@ -28,6 +29,7 @@ export class StatusBar {
   private readonly session = inject(Session);
   private readonly sync = inject(CloudSync);
   protected readonly network = inject(NetworkStore);
+  protected readonly errors = inject(ErrorLog);
   protected readonly version = APP_VERSION;
   protected readonly cloudLabel = computed(() => {
     if (this.session.user().kind === 'offline') return 'This device only';

@@ -12,6 +12,7 @@ export const PRIVACY_SUMMARY: string[] = [
   'Without an account nothing leaves your device: the tome, settings and portrait stay in this browser’s built-in storage.',
   'With an account, your e-mail, name, portrait and tome are stored with Google Firebase only to sign you in and sync your work.',
   'No ads, no analytics, no tracking cookies, and your data is never sold or shared for marketing.',
+  'Errors are noted only in this browser; a technical error report is sent only if you tick the consent box and press Send.',
   'You can export everything to a file and delete your cloud data or your whole account at any time in Account & storage.',
 ];
 
@@ -44,10 +45,21 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
     ],
   },
   {
+    heading: 'Error reports',
+    items: [
+      'When something breaks, Congulatio keeps a short list of distinct errors (message, technical trace, count, times, app version) in this browser so you can review it in Help → Problems & error reports. Clear it there at any time.',
+      'Nothing is sent automatically. A report leaves your device only when you tick the consent box and press Send, or when you copy it or open a GitHub issue yourself.',
+      'A sent report holds the error details, the app screen, a coarse browser and system name, whether you were online, and your optional note. Web addresses, e-mail addresses and tokens are removed from it, and it carries no tome content, name, e-mail or account id.',
+      'Sent reports are stored in Cloud Firestore, readable only by the administrator, and deleted after 12 months.',
+      'Legal basis: your consent (GDPR Art. 6(1)(a)), which you can withdraw at any time by asking us to delete a report.',
+    ],
+  },
+  {
     heading: 'Why and on what legal basis',
     items: [
       'To sign you in, keep your tome in sync across devices and show your storage limit — necessary to provide the service you asked for (GDPR Art. 6(1)(b)).',
       'To keep the service secure and prevent abuse — our legitimate interest (Art. 6(1)(f)).',
+      'To fix problems you choose to report — your consent (Art. 6(1)(a)).',
       'We do not use your data for advertising, profiling or automated decisions, and we do not sell it.',
     ],
   },
