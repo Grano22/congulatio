@@ -11,6 +11,7 @@ import { TomeHistory } from '../store/tomeHistory';
 import { ShellStore } from '../store/shellStore';
 import { Session } from '../cloud/session';
 import { NetworkStore } from '../store/networkStore';
+import { PwaStore } from '../store/pwaStore';
 
 @Component({
   selector: 'app-top-bar',
@@ -28,6 +29,7 @@ export class TopBar {
   protected readonly session = inject(Session);
   private readonly router = inject(Router);
   protected readonly network = inject(NetworkStore);
+  protected readonly pwa = inject(PwaStore);
   protected readonly offlineIcon = WifiOff;
   protected readonly offlineTitle = computed(() =>
     this.session.cloud()

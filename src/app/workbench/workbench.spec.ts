@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { provideServiceWorker } from '@angular/service-worker';
 import { Workbench } from './workbench';
 
 describe('Workbench', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Workbench],
+      providers: [provideServiceWorker('ngsw-worker.js', { enabled: false })],
     }).compileComponents();
   });
 

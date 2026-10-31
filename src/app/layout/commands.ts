@@ -6,6 +6,7 @@ import { TomeHistory } from '../store/tomeHistory';
 import { CloudSync } from '../cloud/cloudSync';
 import { WelcomeStore } from '../store/welcomeStore';
 import { SettingsStore } from '../store/settingsStore';
+import { PwaStore } from '../store/pwaStore';
 import { generateRandomCharacter } from '../domain/randomCharacter';
 
 export type KeyChord = {
@@ -71,6 +72,7 @@ export class CommandsService {
   private readonly sync = inject(CloudSync);
   private readonly welcome = inject(WelcomeStore);
   private readonly settings = inject(SettingsStore);
+  private readonly pwa = inject(PwaStore);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -78,6 +80,8 @@ export class CommandsService {
     { id: 'tome.export', group: 'File', label: 'Export tome', keys: [{ code: 'KeyE', mod: true, shift: true, inText: true }], run: () => this.history.exportTome(false) },
     { id: 'tome.exportHistory', group: 'File', label: 'Export tome with history', run: () => this.history.exportTome(true) },
     { id: 'tome.reset', group: 'File', label: 'Reset tome…', run: () => this.shell.open('reset') },
+    { id: 'app.install', group: 'File', label: 'Install Congulatio as an app', enabled: () => this.pwa.canInstall(), run: () => void this.pwa.install() },
+    { id: 'app.update', group: 'File', label: 'Reload to update', enabled: () => this.pwa.updateReady(), run: () => void this.pwa.applyUpdate() },
     { id: 'account.open', group: 'File', label: 'Account & storage…', run: () => this.shell.open('account') },
     { id: 'account.sync', group: 'File', label: 'Sync with the cloud now', enabled: () => this.sync.active(), run: () => void this.history.persist().then(() => this.sync.sync()) },
 
