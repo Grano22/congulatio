@@ -23,10 +23,18 @@
             <app-characters-galery closable (close)="closeNavigator('codex')" (focusCharacter)="focusCharacter.emit()" />
           }
           @case ('routines') {
-            <app-routines-almanac closable (close)="closeNavigator('routines')" />
+            @defer (on immediate) {
+              <app-routines-almanac closable (close)="closeNavigator('routines')" />
+            } @error {
+              <app-load-failed what="The routine almanac" />
+            }
           }
           @case ('attributes') {
-            <app-attribute-ledger closable (close)="closeNavigator('attributes')" />
+            @defer (on immediate) {
+              <app-attribute-ledger closable (close)="closeNavigator('attributes')" />
+            } @error {
+              <app-load-failed what="The attribute ledger" />
+            }
           }
           @case ('dialogues') {
             <app-navigator-page

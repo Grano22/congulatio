@@ -6,6 +6,7 @@ import { NavigatorPage } from './navigator-page';
 import { CharactersGalery } from '../characters-galery/characters-galery';
 import { RoutinesAlmanac } from '../routines-almanac/routines-almanac';
 import { AttributeLedger } from '../attribute-ledger/attribute-ledger';
+import { LoadFailed } from '../ui/load-failed';
 import { ShellStore } from '../store/shellStore';
 import { ViewStore } from '../store/viewStore';
 import { PairDrag, equalWeights, equalizePair, resizePair } from '../domain/paneSplit';
@@ -32,7 +33,7 @@ const MIN_ROW_PX = 120;
 
 @Component({
   selector: 'app-navigator',
-  imports: [LucideIcon, NavigatorPage, CharactersGalery, RoutinesAlmanac, AttributeLedger],
+  imports: [LucideIcon, NavigatorPage, CharactersGalery, RoutinesAlmanac, AttributeLedger, LoadFailed],
   styleUrl: './navigator.css',
   templateUrl: './navigator.html',
 })
