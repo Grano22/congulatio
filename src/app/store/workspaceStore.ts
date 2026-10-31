@@ -1,8 +1,9 @@
 import { effect, inject, untracked } from '@angular/core';
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 import { CharactersStore } from './charactersStore';
+import type { EditorTabId } from '../domain/viewModes';
 
-export type EditorTabId = 'character' | 'sculptor' | 'dialogue' | 'routines' | 'interactions' | 'relations' | 'simulation';
+export type { EditorTabId };
 
 export type FocusKind = 'soul' | 'routine' | 'dialogue' | 'interaction';
 

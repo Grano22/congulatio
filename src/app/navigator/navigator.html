@@ -1,6 +1,6 @@
 <div class="nav" [style.width.px]="width()">
   <nav class="nav__rail" aria-label="Navigators">
-    @for (def of navigators; track def.id) {
+    @for (def of navigators(); track def.id) {
       <button
         type="button"
         class="nav__rail-btn"

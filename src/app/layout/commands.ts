@@ -8,6 +8,8 @@ import { WelcomeStore } from '../store/welcomeStore';
 import { SettingsStore } from '../store/settingsStore';
 import { PwaStore } from '../store/pwaStore';
 import { generateRandomCharacter } from '../domain/randomCharacter';
+import { THEMES, VIEW_MODES } from '../domain/viewModes';
+import { ViewStore } from '../store/viewStore';
 
 export type KeyChord = {
   code: string;
@@ -22,8 +24,10 @@ export type Command = {
   label: string;
   group: string;
   keys?: KeyChord[];
+  badge?: string;
   enabled?: () => boolean;
   checked?: () => boolean;
+  hidden?: () => boolean;
   run: () => void;
 };
 
@@ -35,6 +39,7 @@ export const TAB_ORDER: { id: EditorTabId; label: string }[] = [
   { id: 'interactions', label: 'Interactions' },
   { id: 'relations', label: 'Relations map' },
   { id: 'simulation', label: 'Simulation' },
+  { id: 'sheet', label: 'D&D character sheet' },
 ];
 
 const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
@@ -73,6 +78,7 @@ export class CommandsService {
   private readonly welcome = inject(WelcomeStore);
   private readonly settings = inject(SettingsStore);
   private readonly pwa = inject(PwaStore);
+  private readonly view = inject(ViewStore);
 
   readonly all: Command[] = [
     { id: 'tome.save', group: 'File', label: 'Save tome', keys: [{ code: 'KeyS', mod: true, inText: true }], run: () => this.history.save() },
@@ -142,6 +148,28 @@ export class CommandsService {
       checked: () => this.shell.activePreset() === p.id,
       run: () => this.shell.applyPreset(p.id),
     })),
+    ...VIEW_MODES.map<Command>((m) => ({
+      id: `view.mode.${m.id}`,
+      group: 'View mode',
+      label: m.label,
+      badge: m.beta ? 'Beta' : undefined,
+      checked: () => this.view.modeId() === m.id,
+      run: () => this.view.setMode(m.id),
+    })),
+    {
+      id: 'view.theme.auto',
+      group: 'Theme',
+      label: 'Match the view mode',
+      checked: () => this.view.themeChoice() === 'auto',
+      run: () => this.view.setTheme('auto'),
+    },
+    ...THEMES.map<Command>((t) => ({
+      id: `view.theme.${t.id}`,
+      group: 'Theme',
+      label: `${t.label} theme`,
+      checked: () => this.view.themeChoice() === t.id,
+      run: () => this.view.setTheme(t.id),
+    })),
     {
       id: 'view.maximize',
       group: 'View',
@@ -171,6 +199,7 @@ export class CommandsService {
       label: t.label,
       keys: [{ code: `Digit${i + 1}`, alt: true, inText: true }],
       checked: () => this.workspace.tab() === t.id,
+      hidden: () => !this.view.allowsTab(t.id),
       run: () => this.workspace.open(t.id),
     })),
 
@@ -182,7 +211,7 @@ export class CommandsService {
       enabled: () => this.workspace.focus()?.kind === 'soul',
       run: () => this.openForFocusedSoul('sculptor'),
     },
-    { id: 'tools.simulate', group: 'Tools', label: 'Simulate a scenario', run: () => this.workspace.open('simulation') },
+    { id: 'tools.simulate', group: 'Tools', label: 'Simulate a scenario', hidden: () => !this.view.allowsTab('simulation'), run: () => this.workspace.open('simulation') },
     { id: 'tools.map', group: 'Tools', label: 'Show focus on the relations map', run: () => this.workspace.open('relations') },
 
     { id: 'help.tour', group: 'Help', label: 'Quick tour & shortcuts', keys: [{ code: 'F1', inText: true }, { code: 'Slash', shift: true }], run: () => this.shell.open('tour') },
@@ -200,6 +229,10 @@ export class CommandsService {
 
   isEnabled(command: Command): boolean {
     return command.enabled ? command.enabled() : true;
+  }
+
+  isHidden(command: Command): boolean {
+    return command.hidden ? command.hidden() : false;
   }
 
   run(id: string): void {

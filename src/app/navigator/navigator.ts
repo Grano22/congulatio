@@ -7,6 +7,7 @@ import { CharactersGalery } from '../characters-galery/characters-galery';
 import { RoutinesAlmanac } from '../routines-almanac/routines-almanac';
 import { AttributeLedger } from '../attribute-ledger/attribute-ledger';
 import { ShellStore } from '../store/shellStore';
+import { ViewStore } from '../store/viewStore';
 import { PairDrag, equalWeights, equalizePair, resizePair } from '../domain/paneSplit';
 import type { NavigatorId } from '../domain/viewModes';
 
@@ -37,16 +38,21 @@ const MIN_ROW_PX = 120;
 })
 export class Navigator {
   private readonly shell = inject(ShellStore);
+  private readonly view = inject(ViewStore);
   readonly width = this.shell.leftWidth;
   readonly dragging = signal<number>(-1);
   readonly focusCharacter = output<void>();
 
-  protected readonly navigators = NAVIGATORS;
+  protected readonly navigators = computed(() => NAVIGATORS.filter((def) => this.view.allowsNavigator(def.id)));
   protected readonly compassIcon = Compass;
   protected readonly open = signal<NavigatorId[]>(['codex']);
 
-  protected readonly isEmpty = computed(() => this.open().length === 0);
-  protected readonly openDefs = computed(() => this.open().map((id) => NAVIGATORS.find((def) => def.id === id)!));
+  protected readonly openDefs = computed(() =>
+    this.open()
+      .filter((id) => this.view.allowsNavigator(id))
+      .map((id) => NAVIGATORS.find((def) => def.id === id)!),
+  );
+  protected readonly isEmpty = computed(() => this.openDefs().length === 0);
   private readonly openKey = computed(() => this.openDefs().map((d) => d.id).join('|'));
   protected readonly weights = linkedSignal({
     source: this.openKey,

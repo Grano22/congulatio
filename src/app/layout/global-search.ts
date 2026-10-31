@@ -55,7 +55,7 @@ export class GlobalSearch {
       routines: this.relations.routines(),
       relations: this.relations.relations(),
       interactions: this.interactions.interactions(),
-      actions: this.commands.all.filter((c) => c.id !== OWN_COMMAND).map((c) => ({ id: c.id, label: c.label, group: c.group })),
+      actions: this.commands.all.filter((c) => c.id !== OWN_COMMAND && !this.commands.isHidden(c)).map((c) => ({ id: c.id, label: c.label, group: c.group })),
     }),
   );
   protected readonly hits = computed(() => searchIndex(this.index(), this.query()));

@@ -23,6 +23,15 @@ const MENUS: MenuDef[] = [
       cmd('view.inspector'),
       cmd('view.inspectorReadonly'),
       SEP,
+      header('View mode'),
+      cmd('view.mode.npc-flow'),
+      cmd('view.mode.dnd'),
+      SEP,
+      header('Theme'),
+      cmd('view.theme.auto'),
+      cmd('view.theme.forge'),
+      cmd('view.theme.dragonfire'),
+      SEP,
       header('Layout presets'),
       cmd('view.preset.balanced'),
       cmd('view.preset.writer'),
@@ -41,6 +50,7 @@ const MENUS: MenuDef[] = [
       cmd('tab.interactions'),
       cmd('tab.relations'),
       cmd('tab.simulation'),
+      cmd('tab.sheet'),
     ],
   },
   { label: 'Tools', items: [cmd('tools.summon'), cmd('tools.sculpt'), cmd('tools.simulate'), cmd('tools.map')] },
@@ -81,7 +91,7 @@ const MENUS: MenuDef[] = [
                   }
                   @case ('command') {
                     @let command = commandFor(item);
-                    @if (command) {
+                    @if (command && !commands.isHidden(command)) {
                       <button
                         type="button"
                         class="mm__item"
@@ -96,6 +106,9 @@ const MENUS: MenuDef[] = [
                       >
                         <span class="mm__check" aria-hidden="true">{{ command.checked && command.checked() ? '✓' : '' }}</span>
                         <span class="mm__label">{{ labelFor(command) }}</span>
+                        @if (command.badge) {
+                          <span class="mm__badge">{{ command.badge }}</span>
+                        }
                         <span class="mm__keys">{{ commands.shortcut(command) }}</span>
                       </button>
                     }
