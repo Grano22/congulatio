@@ -10,11 +10,11 @@
   display: flex;
   flex: 1;
   min-height: 0;
-  min-width: 0;
+  min-width: 240px;
+  max-width: max(240px, 50vw);
   background: var(--color-wood-900);
 }
 
-/* ---- rail ---- */
 .nav__rail {
   width: 50px;
   flex: none;
@@ -80,9 +80,6 @@
   margin-top: auto;
 }
 
-/* ---- split view: sections stacked vertically, side by side (below) ----
-   The parent is a normal flex column; it scrolls (themed scrollbar) when
-   the sections together are taller than the available space. */
 .nav__split {
   flex: 1;
   min-width: 0;
@@ -90,34 +87,24 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  /* a permanent carved scroll groove: the track is always visible
-     (styled in the global stylesheet), the gilded rope appears in it
-     whenever the sections overflow */
-  overflow-y: scroll;
+    overflow-y: auto;
   overflow-x: hidden;
   background: var(--color-wood-900);
 }
 
-/* each section keeps its own fixed px height (inline from paneStyle());
-   a lone section stretches to fill the sidebar. When the sections are
-   taller than the sidebar the split scrolls (themed scrollbar).
-   Enter/leave + smooth transitions live in the global styles.css
-   (`.nav*` selectors, kept out of this file for the 4kB style budget). */
 .nav__pane {
   display: flex;
-  flex: none;
+  flex: 1 1 0px;
   min-width: 0;
-  min-height: 0;
+  min-height: 120px;
+  overflow: hidden;
 }
 
-/* stacked frames sit flush against the dividers — a small, even radius and
-   a light shadow so the spacing between sections reads as perfectly aligned */
 .nav__pane ::ng-deep .rpanel {
   border-radius: 6px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
 }
 
-/* draggable horizontal divider between rows */
 .nav__divider {
   flex: none;
   height: 10px;
@@ -155,17 +142,12 @@
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
-
-/* right-edge width handle for the whole sidebar — a normal flex column,
-   not an absolutely positioned element */
 .nav__resizer {
   width: 7px;
   flex: none;
   align-self: stretch;
   cursor: col-resize;
-  /* sits to the right of the carved scroll groove — a gold hairline keeps
-     the two elements visually distinct */
-  border-left: 1px solid rgba(226, 194, 92, 0.22);
+    border-left: 1px solid rgba(226, 194, 92, 0.22);
   background: linear-gradient(90deg, transparent, rgba(226, 194, 92, 0));
   touch-action: none;
 }
@@ -174,7 +156,6 @@
   background: linear-gradient(90deg, transparent, rgba(226, 194, 92, 0.45));
 }
 
-/* no panes open */
 .nav__empty {
   flex: 1;
   display: flex;

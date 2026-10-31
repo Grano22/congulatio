@@ -16,7 +16,7 @@ export type LayoutPreset = {
   inspectorWidth: number;
 };
 
-export const LEFT_MIN = 320;
+export const LEFT_MIN = 260;
 export const LEFT_MAX = 680;
 export const INSPECTOR_MIN = 260;
 export const INSPECTOR_MAX = 420;

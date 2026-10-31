@@ -127,6 +127,14 @@ body {
 
 /* Sidebar scrollbars — a wider, gilded rope so overflow is unmistakable:
    applies to the split view itself and to every section body inside it */
+.nav__pane .rpanel__footer app-rpg-button {
+  max-width: 100%;
+}
+.nav__pane .rpanel__footer .rbtn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
 .nav__split,
 .nav__pane .rpanel__body {
   scrollbar-width: auto;
@@ -136,9 +144,6 @@ body {
 .nav__pane .rpanel__body::-webkit-scrollbar {
   width: 14px;
 }
-/* the split's track is a carved groove (always visible — the split uses
-   overflow-y: scroll), sunken into the frame just left of the width
-   resizer bar */
 .nav__split::-webkit-scrollbar-track {
   background: linear-gradient(90deg, var(--color-wood-900), var(--color-wood-950));
   border-left: 1px solid var(--color-wood-800);
@@ -488,6 +493,7 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  min-width: 0;
   border: 1px solid var(--color-wood-950);
   border-radius: 10px;
   overflow: hidden;
@@ -515,6 +521,10 @@ body {
     inset 0 1px 0 rgba(255, 220, 150, 0.16),
     0 2px 5px rgba(0, 0, 0, 0.35);
   flex: none;
+  min-width: 0;
+}
+.rpanel__header > .gem {
+  flex: none;
 }
 .rpanel__title {
   font-family: var(--font-display);
@@ -526,8 +536,13 @@ body {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
   margin: 0;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rpanel__subtitle {
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 0.74rem;
   font-style: italic;
   color: var(--color-parchment-300);
@@ -536,6 +551,7 @@ body {
   text-overflow: ellipsis;
 }
 .rpanel__header-actions {
+  flex: none;
   margin-left: auto;
   display: flex;
   align-items: center;

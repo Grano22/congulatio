@@ -1,5 +1,4 @@
 <div class="nav" [style.width.px]="width()">
-  <!-- carved rail -->
   <nav class="nav__rail" aria-label="Navigators">
     @for (def of navigators; track def.id) {
       <button
@@ -16,9 +15,7 @@
     <span class="nav__rail-ornament" aria-hidden="true"></span>
     <span class="gem nav__rail-gem" aria-hidden="true"></span>
   </nav>
-
-  <!-- split view of the open panes, always in canonical order -->
-  <div class="nav__split" #split [class.nav__split--dragging]="dragging() !== -1">
+  <div class="nav__split" [class.nav__split--dragging]="dragging() !== -1">
     @for (def of openDefs(); track def.id; let idx = $index) {
       <div class="nav__pane" [style]="paneStyle(def)" animate.enter="nav-enter" animate.leave="nav-leave">
         @switch (def.id) {
@@ -66,7 +63,7 @@
           class="nav__divider"
           role="separator"
           aria-orientation="horizontal"
-          title="Drag to resize · double-click to fill the remaining space equally"
+          title="Drag to resize · double-click to even out the two panes"
           [class.nav__divider--dragging]="dragging() === idx"
           animate.enter="nav-fade"
           animate.leave="nav-leave"
@@ -74,7 +71,7 @@
           (pointermove)="onPaneDragMove($event)"
           (pointerup)="endPaneDrag()"
           (pointercancel)="endPaneDrag()"
-          (dblclick)="equalizePair(idx, split)"
+          (dblclick)="equalizePair(idx)"
         >
           <span class="nav__divider-grip" aria-hidden="true"></span>
         </div>
@@ -88,8 +85,6 @@
       </div>
     }
   </div>
-
-  <!-- right-edge width handle -->
   <div
     class="nav__resizer"
     role="separator"
