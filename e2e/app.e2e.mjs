@@ -71,6 +71,15 @@ async function dismissWelcome(page) {
   return true;
 }
 
+const MENU = 'app-account-menu .amenu__trigger';
+
+async function openAccountDialog(page) {
+  await page.click(MENU);
+  await page.waitForSelector('.amenu__panel');
+  await clickText(page, 'Account & storage', '[role=menuitem]');
+  await page.waitForSelector('dialog[open] .acc__who');
+}
+
 const statusText = (page) => page.$eval('.statusbar', (e) => e.innerText.replace(/\s+/g, ' '));
 const soulCount = async (page) => Number((await statusText(page)).match(/(\d+) souls/i)?.[1] ?? NaN);
 const path = (page) => new URL(page.url()).pathname;
@@ -103,14 +112,60 @@ export async function appSuite(baseUrl) {
     const a = await openPage(browser, baseUrl, errors, 'device A');
 
     await step('a visitor lands in the workbench without signing in', async () => {
-      await a.waitForSelector('.topbar__account', { timeout: 15000 });
+      await a.waitForSelector(MENU, { timeout: 15000 });
       if (path(a) !== '/') throw new Error(`landed on ${path(a)}`);
       if (!/this device only/i.test(await statusText(a))) throw new Error('the status bar does not say offline');
     });
 
-    await step('a first visit shows the welcome dialog with account benefits', async () => {
+    await step('a first visit shows the welcome dialog with account benefits and data handling', async () => {
       await a.waitForSelector('dialog[open] .wel__perks', { timeout: 5000 });
-      await dismissWelcome(a);
+      await a.waitForSelector('dialog[open] .wel__privacy');
+    });
+
+    await step('the quick tour stays open when started from the welcome dialog', async () => {
+      await clickText(a, 'Take the quick tour');
+      await wait(500);
+      const titles = await a.$$eval('dialog[open] .rmodal__title', (t) => t.map((x) => x.textContent.trim()));
+      if (!titles.includes('Quick tour')) throw new Error(`open dialogs: ${titles.join(', ') || 'none'}`);
+      await a.keyboard.press('Escape');
+      await a.waitForFunction(() => !document.querySelector('dialog[open]'), { timeout: 4000 });
+    });
+
+    await step('the privacy notice opens from the Help menu', async () => {
+      await clickText(a, 'Help');
+      await clickText(a, 'Privacy', '[role=menuitem]');
+      await a.waitForFunction(() => [...document.querySelectorAll('dialog[open] .rmodal__title')].some((t) => /privacy/i.test(t.textContent)), { timeout: 4000 });
+      if (!(await a.$eval('dialog[open]', (d) => /GDPR/.test(d.textContent)))) throw new Error('no GDPR wording');
+      await a.keyboard.press('Escape');
+      await a.waitForFunction(() => !document.querySelector('dialog[open]'), { timeout: 4000 });
+    });
+
+    await step('settings turn autosave off and remember it', async () => {
+      await wait(300);
+      await press(a, MOD, 'Alt', 'KeyP');
+      await a.waitForSelector('dialog[open] .set__toggle input');
+      const toggle = await a.$('dialog[open] .set__toggle input');
+      if (!(await toggle.evaluate((i) => i.checked))) throw new Error('autosave should start on');
+      await toggle.click();
+      await a.keyboard.press('Escape');
+      await wait(300);
+      await a.reload({ waitUntil: 'domcontentloaded' });
+      await a.waitForSelector(MENU, { timeout: 15000 });
+      await press(a, MOD, 'Alt', 'KeyP');
+      await a.waitForSelector('dialog[open] .set__toggle input');
+      const after = await a.$eval('dialog[open] .set__toggle input', (i) => i.checked);
+      if (after) throw new Error('autosave came back on after a reload');
+      await a.click('dialog[open] .set__toggle input');
+      await a.keyboard.press('Escape');
+      await a.waitForFunction(() => !document.querySelector('dialog[open]'), { timeout: 4000 });
+    });
+
+    await step('the account menu offers sign in without an account', async () => {
+      await a.click(MENU);
+      await a.waitForSelector('.amenu__panel');
+      const items = await a.$$eval('.amenu__panel [role=menuitem]', (b) => b.map((x) => x.textContent.trim()));
+      if (!items.some((t) => /sign in/i.test(t)) || items.some((t) => /sign out/i.test(t))) throw new Error(items.join(' | '));
+      await a.keyboard.press('Escape');
     });
 
     let carried = 0;
@@ -121,7 +176,7 @@ export async function appSuite(baseUrl) {
       await press(a, MOD, 'KeyS');
       await wait(800);
       await a.reload({ waitUntil: 'domcontentloaded' });
-      await a.waitForSelector('.topbar__account', { timeout: 15000 });
+      await a.waitForSelector(MENU, { timeout: 15000 });
       if (await dismissWelcome(a)) throw new Error('the welcome dialog came back after it was dismissed');
       const after = await soulCount(a);
       if (after !== carried) throw new Error(`expected ${carried} souls after reload, saw ${after}`);
@@ -132,7 +187,7 @@ export async function appSuite(baseUrl) {
       await clickText(a, 'Sign in');
       await a.waitForSelector('.login__card', { timeout: 15000 });
       await clickText(a, 'Enter as a wanderer');
-      await a.waitForFunction(() => location.pathname === '/' && document.querySelector('.topbar__account'), { timeout: 15000 });
+      await a.waitForFunction(() => location.pathname === '/' && document.querySelector('app-account-menu .amenu__trigger'), { timeout: 15000 });
     });
 
     await step('the new wanderer starts with the tome that was open', async () => {
@@ -165,7 +220,7 @@ export async function appSuite(baseUrl) {
     });
 
     await step('the account dialog shows the storage limit', async () => {
-      await a.click('.topbar__account');
+      await openAccountDialog(a);
       await a.waitForSelector('.acc__meter');
       return (await a.$eval('.acc__block .acc__row', (e) => e.textContent.trim())).replace(/\s+/g, ' ');
     });
@@ -180,14 +235,14 @@ export async function appSuite(baseUrl) {
     await step('the session and tome survive a reload', async () => {
       await clickText(a, 'Close');
       await a.reload({ waitUntil: 'domcontentloaded' });
-      await a.waitForSelector('.topbar__account', { timeout: 15000 });
+      await a.waitForSelector(MENU, { timeout: 15000 });
       if (path(a) !== '/') throw new Error(`reloaded into ${path(a)}`);
       if (/unsaved/i.test(await statusText(a))) throw new Error('the reloaded tome looks unsaved');
       if (/this device only/i.test(await statusText(a))) throw new Error('the reload signed the wanderer out');
     });
 
     await step('a wanderer links an e-mail and becomes an account', async () => {
-      await a.click('.topbar__account');
+      await openAccountDialog(a);
       await a.waitForSelector('.acc__link-form');
       await a.type('.acc__link-form input[type=email]', email);
       await a.type('.acc__link-form input[type=password]', 'secret123');
@@ -210,23 +265,23 @@ export async function appSuite(baseUrl) {
 
     const b = await openPage(browser, baseUrl, errors, 'device B');
     await step('a second device signs in and pulls the same tome', async () => {
-      await b.waitForSelector('.topbar__account', { timeout: 15000 });
+      await b.waitForSelector(MENU, { timeout: 15000 });
       await dismissWelcome(b);
       await clickText(b, 'Sign in');
       await b.waitForSelector('.login__card', { timeout: 15000 });
       await b.type('input[name=email]', email);
       await b.type('input[name=password]', 'secret123');
       await clickText(b, 'Sign in');
-      await b.waitForSelector('.topbar__account', { timeout: 15000 });
+      await b.waitForSelector(MENU, { timeout: 15000 });
       await b.waitForFunction((n) => new RegExp(`${n} souls`, 'i').test(document.querySelector('.statusbar')?.innerText ?? ''), { timeout: 15000 }, souls);
       if (/unsaved/i.test(await statusText(b))) throw new Error('the pulled tome looks unsaved');
     });
 
-    await step('signing out returns to the tome kept in this browser', async () => {
-      await b.click('.topbar__account');
-      await b.waitForSelector('.acc__who');
-      await clickText(b, 'Sign out');
-      await wait(400);
+    await step('signing out from the account menu returns to the tome kept in this browser', async () => {
+      await b.click(MENU);
+      await b.waitForSelector('.amenu__panel');
+      await clickText(b, 'Sign out', '[role=menuitem]');
+      await wait(600);
       if (await b.$('dialog[open] .acc__who')) await clickText(b, 'Sign out anyway');
       await b.waitForFunction(() => /this device only/i.test(document.querySelector('.statusbar')?.innerText ?? ''), { timeout: 10000 });
       if (path(b) !== '/') throw new Error(`signed out into ${path(b)}`);
@@ -234,8 +289,18 @@ export async function appSuite(baseUrl) {
 
     await step('the signed-out browser stays offline after a reload', async () => {
       await b.reload({ waitUntil: 'domcontentloaded' });
-      await b.waitForSelector('.topbar__account', { timeout: 10000 });
+      await b.waitForSelector(MENU, { timeout: 10000 });
       if (!/this device only/i.test(await statusText(b))) throw new Error('the status bar does not say offline');
+    });
+
+    await step('deleting the account removes its cloud data', async () => {
+      if (!(await listRows(uid)).length) throw new Error('expected rows before deleting');
+      await openAccountDialog(a);
+      await clickText(a, 'Delete account');
+      await clickText(a, 'Really delete account?');
+      await a.waitForFunction(() => /this device only/i.test(document.querySelector('.statusbar')?.innerText ?? ''), { timeout: 15000 });
+      const left = await listRows(uid);
+      if (left.length) throw new Error(`${left.length} rows left`);
     });
   } catch {
     return suite;
