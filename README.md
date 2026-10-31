@@ -9,7 +9,7 @@ ponawianiem, zapis we wbudowanej bazie przeglądarki (IndexedDB), opcjonalne kon
 (Firebase: logowanie, Firestore, Storage) oraz eksport i import do pliku JSON. Aplikacja działa **offline-first** —
 konto nie jest wymagane. Można ją też **zainstalować jako aplikację (PWA)** i otwierać bez internetu.
 
-Aktualna wersja: **0.2.0** — zmiany opisuje [`CHANGELOG.md`](CHANGELOG.md).
+Aktualna wersja: **0.3.0** — zmiany opisuje [`CHANGELOG.md`](CHANGELOG.md).
 
 Projekt powstał jako praca uczelniana. Autor: **Adrian Blasiak**.
 
@@ -25,21 +25,24 @@ Pojęcia świata (Tom, dusza, rutyna, interakcja, scena…), zależności międz
 3. [Konto, chmura i Firebase](#konto-chmura-i-firebase)
 4. [Aplikacja PWA i praca offline](#aplikacja-pwa-i-praca-offline)
 5. [Prywatność (RODO)](#prywatność-rodo)
-6. [Skrypty npm](#skrypty-npm)
-7. [Skróty klawiszowe](#skróty-klawiszowe)
-8. [Architektura](#architektura)
-9. [Model danych i plik Tomu](#model-danych-i-plik-tomu)
-10. [Story AI (Chrome Prompt API)](#story-ai-chrome-prompt-api)
-11. [Animacje z Mixamo](#animacje-z-mixamo)
-12. [Testy](#testy)
-13. [Wdrożenie na GitHub Pages](#wdrożenie-na-github-pages)
-14. [Wydajność i budżety](#wydajność-i-budżety)
-15. [Dostępność](#dostępność)
-16. [Wersjonowanie i lista zmian](#wersjonowanie-i-lista-zmian)
-17. [Konwencje projektu](#konwencje-projektu)
-18. [Znane ograniczenia](#znane-ograniczenia)
-19. [Wykorzystanie AI](#wykorzystanie-ai)
-20. [Autor i licencja](#autor-i-licencja)
+6. [Błędy i zgłoszenia](#błędy-i-zgłoszenia)
+7. [SEO i pliki pomocnicze](#seo-i-pliki-pomocnicze)
+8. [Bezpieczeństwo](#bezpieczeństwo)
+9. [Skrypty npm](#skrypty-npm)
+10. [Skróty klawiszowe](#skróty-klawiszowe)
+11. [Architektura](#architektura)
+12. [Model danych i plik Tomu](#model-danych-i-plik-tomu)
+13. [Story AI (Chrome Prompt API)](#story-ai-chrome-prompt-api)
+14. [Animacje z Mixamo](#animacje-z-mixamo)
+15. [Testy](#testy)
+16. [Wdrożenie na GitHub Pages](#wdrożenie-na-github-pages)
+17. [Wydajność i budżety](#wydajność-i-budżety)
+18. [Dostępność](#dostępność)
+19. [Wersjonowanie i lista zmian](#wersjonowanie-i-lista-zmian)
+20. [Konwencje projektu](#konwencje-projektu)
+21. [Znane ograniczenia](#znane-ograniczenia)
+22. [Wykorzystanie AI](#wykorzystanie-ai)
+23. [Autor i licencja](#autor-i-licencja)
 
 ---
 
@@ -110,7 +113,7 @@ podążają za zmianą fokusu.
   szerokościami paneli, maksymalizacja sceny, pełny ekran, przejście do zakładki.
 - **Tools:** przywołanie losowej duszy, rzeźbienie duszy w fokusie, symulacja, mapa.
 - **Help:** **Quick tour** (przewodnik krok po kroku oraz tabela skrótów budowana z tej samej listy poleceń, która
-  obsługuje klawiaturę), **What’s new**, **Privacy & your data (GDPR)** i **About**.
+  obsługuje klawiaturę), **What’s new**, **Problems & error reports…**, **Privacy & your data (GDPR)** i **About**.
 - **Wyszukiwarka Tomu** w górnym pasku (⌘/Ctrl+K): postacie (`Imię Nazwisko (przydomek)`), linie, opcje, rutyny,
   więzi, interakcje i polecenia menu, każda kategoria z własnym kolorem etykiety. Wybór wyniku przenosi do właściwej
   sekcji.
@@ -369,11 +372,65 @@ Pełna informacja o przetwarzaniu danych jest w aplikacji: **Help → Privacy & 
 - **Z kontem** Firebase (Google) przechowuje identyfikator, e-mail, nazwę, portret i Tom wyłącznie po to, by logować i
   synchronizować (art. 6 ust. 1 lit. b RODO); bezpieczeństwo — uzasadniony interes (lit. f). Bez reklam, analityki i
   śledzących ciasteczek.
+- **Zgłoszenia błędów** wysyłane są tylko po zaznaczeniu zgody (art. 6 ust. 1 lit. a), bez identyfikatora konta,
+  i wygasają po 12 miesiącach (zob. [Błędy i zgłoszenia](#błędy-i-zgłoszenia)).
 - **Prawa:** eksport Tomu do pliku (dostęp, przenoszenie), zmiana nazwy i portretu (sprostowanie), **Delete cloud
   data** i **Delete account** w oknie konta (usunięcie), skarga do Prezesa UODO.
 - Przed publicznym udostępnieniem uzupełnij kontakt administratora (`PRIVACY_CONTACT`) i lokalizację bazy Firestore, a
   treść warto skonsultować prawnie — to szablon dla projektu uczelnianego, nie porada prawna.
 - Każda zmiana zakresu przetwarzanych danych wymaga aktualizacji `privacyNotice.ts` (z datą `PRIVACY_UPDATED`).
+
+---
+
+## Błędy i zgłoszenia
+
+- **Globalny `ErrorHandler`** (`store/appErrorHandler.ts`) przyjmuje błędy Angulara oraz zdarzenia `error` i
+  `unhandledrejection` z okna. `ErrorLog` zapisuje w IndexedDB do 30 **unikalnych** błędów (odcisk z nazwy,
+  znormalizowanego komunikatu i ramek stosu) z liczbą wystąpień i czasami; adresy, e-maile i tokeny są usuwane.
+  Szum przeglądarki („Script error.”, pętle `ResizeObserver`) jest pomijany.
+- **Ekran awaryjny** (odpowiednik error boundary) pojawia się przy błędach krytycznych — nieudane wczytanie
+  fragmentu aplikacji albo seria błędów — i proponuje **Save my work & reload**, **Reload**, **Keep working** oraz
+  opcjonalne zgłoszenie. Leniwie ładowane zakładki i okna mają własne bloki `@error` z przyciskiem Reload, a gdy
+  aplikacja w ogóle nie wystartuje, `main.ts` pokazuje statyczny komunikat.
+- **Help → Problems & error reports** pokazuje listę problemów; licznik w pasku stanu prowadzi do tego samego okna.
+- **Zgłoszenie** wymaga zaznaczenia zgody i pokazuje dokładnie, co zostanie wysłane. Zalogowani wysyłają je do
+  kolekcji `error_reports` (tylko tworzenie, z czasem serwera i polem `expireAt` za rok, bez identyfikatora
+  użytkownika); każdy może też skopiować raport albo otworzyć gotowe zgłoszenie na GitHubie.
+- **Retencja:** włącz w Google Cloud zasadę TTL dla kolekcji `error_reports` na polu `expireAt`
+  (`gcloud firestore fields ttls update expireAt --collection-group=error_reports --enable-ttl`), żeby raporty
+  znikały po roku. Raporty czyta tylko administrator (custom claim `admin`).
+- Brak analityki zachowań — wymagałaby zgody i banera. Jeśli kiedyś będzie potrzebna, wybierz narzędzie bez ciasteczek
+  (np. samodzielnie hostowane Umami lub Plausible) i opisz je w informacji o prywatności.
+
+---
+
+## SEO i pliki pomocnicze
+
+- `src/index.html`: opis, słowa kluczowe, `canonical`, Open Graph i Twitter Card z obrazem `public/og-image.png`
+  (1200×630), dane strukturalne JSON-LD (`WebApplication`) i czytelny dla robotów `<noscript>`.
+- Tytuły, opisy i `robots` dla każdej trasy ustawia `layout/seo.ts` (strona `/login` ma `noindex`).
+- `public/robots.txt`, `public/sitemap.xml`, `public/humans.txt`, `public/.well-known/security.txt` (RFC 9116) oraz
+  `SECURITY.md` w repozytorium.
+- Adres strony to `https://grano22.github.io/congulatio/`; workflow podmienia go automatycznie, gdy repozytorium ma
+  innego właściciela lub nazwę, i regeneruje `ngsw.json`.
+- Na GitHub Pages projektu roboty czytają tylko `robots.txt` z katalogu głównego domeny użytkownika, więc dla pełnej
+  kontroli rozważ własną domenę; mapę witryny zgłoś w Google Search Console.
+
+---
+
+## Bezpieczeństwo
+
+- **Content-Security-Policy** w `index.html` (GitHub Pages nie pozwala na nagłówki): skrypty tylko z aplikacji i
+  Google, połączenia tylko do Firebase, brak `object`, `base-uri` i `form-action` ograniczone do aplikacji. Dodając
+  nową usługę zewnętrzną, rozszerz politykę świadomie.
+- **Reguły Firestore i Storage** sprawdzają właściciela, identyfikatory, typy, rozmiary, listy pól, adresy portretów i
+  nazwy plików; pilnuje tego zestaw `npm run e2e -- rules`.
+- **Zależności:** `npm audit` bez podatności (nadpisania w `overrides`), CI blokuje wdrożenie przy wysokich
+  podatnościach produkcyjnych, Dependabot co tydzień z 14-dniowym opóźnieniem nowych wersji, CodeQL skanuje kod.
+- **Sekrety:** ustawienia Firebase nie trafiają do repozytorium; `.claude/settings.json` i hak
+  `.claude/hooks/protect-secrets.sh` blokują asystentom AI odczyt, zapis i regenerowanie plików z ustawieniami i
+  kluczy.
+- Zgłaszanie podatności: [`SECURITY.md`](SECURITY.md).
 
 ---
 
@@ -627,13 +684,15 @@ Testy jednostkowe (Vitest, środowisko jsdom) obejmują:
 npm run e2e            # oba zestawy
 npm run e2e -- rules   # tylko reguły bezpieczeństwa
 npm run e2e -- app     # tylko scenariusze w przeglądarce
+npm run e2e -- a11y    # audyt dostępności axe-core (WCAG 2.2 AA)
 ```
 
 Skrypt sam uruchamia emulatory Firebase, serwer deweloperski na porcie 4300 i headless Chrome, a na końcu wszystko
 zatrzymuje (ok. 10–60 s, pierwsze uruchomienie pobiera firebase-tools). Sprawdza m.in., że drugi użytkownik nie
 przeczyta, nie nadpisze, nie zajmie ani nie usunie cudzych wierszy, oraz pełny przebieg: logowanie, zapis i
 synchronizację, portret i limit, przeładowanie, połączenie wędrowca z e-mailem, drugie urządzenie, wylogowanie i
-tryb offline, a także start bez konta, okno powitalne i przeniesienie otwartego Tomu do nowego wędrowca. Testy działają **wyłącznie** na emulatorach projektu `demo-*` i odmawiają uruchomienia w innym
+tryb offline, a także start bez konta, okno powitalne, przeniesienie otwartego Tomu do nowego wędrowca, ekran
+awaryjny i zgłoszenie błędu za zgodą. Audyt dostępności sprawdza wszystkie zakładki, okna i stronę logowania. Testy działają **wyłącznie** na emulatorach projektu `demo-*` i odmawiają uruchomienia w innym
 przypadku, więc nie dotkną prawdziwych danych. Szczegóły: [`e2e/README.md`](e2e/README.md). Nie są częścią
 `test:ci` ani workflow wdrożenia.
 
@@ -670,7 +729,7 @@ Klucze i baza aplikacji mają nazwę `congulatio`, żeby nie kolidowały z innym
 
 ## Wydajność i budżety
 
-- Budżet paczki startowej: ostrzeżenie powyżej 500 kB, błąd powyżej 1 MB (obecnie ok. 352 kB, ok. 100 kB po
+- Budżet paczki startowej: ostrzeżenie powyżej 500 kB, błąd powyżej 1 MB (obecnie ok. 374 kB, ok. 108 kB po
   kompresji).
 - Warsztat (ok. 155 kB) i strona logowania ładują się jako osobne trasy, a Firebase (Auth, Firestore, Storage)
   dopiero wtedy, gdy jest potrzebny.
@@ -686,6 +745,11 @@ Klucze i baza aplikacji mają nazwę `congulatio`, żeby nie kolidowały z innym
   z listami (`combobox` / `listbox`, `aria-activedescendant`), modale na natywnym `<dialog>` z pułapką fokusu i Esc.
 - Komunikaty o sukcesie i błędach trafiają do regionów `aria-live`.
 - Zwinięte zakładki mają etykiety dostępne dla czytników ekranu i podpowiedzi.
+- Link **Skip to the workspace** (pierwszy element po naciśnięciu Tab), poprawna hierarchia nagłówków, nazwy
+  przycisków z samą ikoną (wejście `label` w `RpgButton`), cele dotykowe co najmniej 24 px i przewijane okna dostępne z
+  klawiatury.
+- Zgodność sprawdza audyt axe-core z regułami WCAG 2.2 AA (`npm run e2e -- a11y`); poważne i krytyczne naruszenia
+  zatrzymują test.
 
 ---
 

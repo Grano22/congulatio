@@ -28,6 +28,10 @@
 - [x] Installable PWA with offline shell and update prompt (0.2.0)
 - [x] Autosave with settings, offline badge, unsaved/unsynced warnings, account menu (0.2.0)
 - [x] GDPR privacy notice, cloud data and account deletion (0.2.0)
+- [x] Crash screen, local problem log and consent-based error reports (0.3.0)
+- [x] SEO metadata, social preview, robots.txt, sitemap and security.txt (0.3.0)
+- [x] WCAG 2.2 AA audit with axe-core and fixes (0.3.0)
+- [x] CSP, tighter rules, dependency overrides, CodeQL and Dependabot (0.3.0)
 
 ## Next
 
@@ -41,5 +45,9 @@
 - [ ] Merge conflicting tomes per entity instead of newer-save-wins
 - [ ] Sync the changeset between devices
 - [ ] Run the e2e suite in a scheduled or manual GitHub Actions job
+- [ ] Firebase App Check (reCAPTCHA Enterprise) to stop scripted abuse of Auth, Firestore and Storage
+- [ ] Custom domain behind a CDN to send real security headers (CSP, frame-ancestors, HSTS, Permissions-Policy)
+- [ ] Trusted Types once the Firebase sign-in popup works with them
+- [ ] Pin GitHub Actions to commit SHAs
 - [ ] Choose a license
 - [ ] Remove the unused `primeng` and `@primeuix/themes` dependencies, or start using them

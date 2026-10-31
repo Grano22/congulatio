@@ -23,6 +23,16 @@
   do not add localStorage for user data
 * Never pick a shortcut the browser keeps for itself (for example Cmd+, Cmd+T, Cmd+W, Cmd+N, Cmd+Q on macOS Chrome);
   check it reaches the page
+* Never read, write, copy or regenerate secret or generated settings files (any non-example env file,
+  `public/firebase-config.json`, key files), not even through `npm start`, `npm run build`, `config:firebase` or
+  `start:emulators`. Use `npx ng build` and `npx ng serve --configuration emulators`. `.claude/settings.json` and
+  `.claude/hooks/protect-secrets.sh` enforce this; never weaken them
+* Never send data off the device without the user's explicit action and consent: no analytics, no automatic error
+  uploads, no third-party scripts
+* Never loosen the Content-Security-Policy in `src/index.html` with `'unsafe-inline'` or `'unsafe-eval'` for scripts
+  or with wildcard hosts; add the exact host a new service needs and say why in the commit
+* Never swallow unexpected errors silently: let them reach the `ErrorHandler`, or call `ErrorLog.capture(error)` when
+  you catch one you cannot handle
 
 ## Project facts
 
@@ -52,13 +62,24 @@
   `PRIVACY_UPDATED`) in the same change whenever the app starts storing, sending or keeping personal data differently
 * Dialogs opened from another dialog: just call `shell.open(...)`; `RpgModal` only reports user-initiated closes, so
   never close a dialog from a native `close` event yourself
+* Errors: `store/appErrorHandler.ts` feeds `store/errorLog.ts` (unique, redacted, kept in IndexedDB); critical errors
+  open `layout/crash-screen.ts`; every lazy `@defer` block needs an `@error` block with `<app-load-failed>`; reports go
+  through `cloud/errorReporter.ts` only after the consent checkbox in `ui/error-report-form.ts`. Pure logic lives in
+  `domain/errorReport.ts`
+* Accessibility target is WCAG 2.2 AA: icon-only `<app-rpg-button>` needs `label="…"` (never `aria-label` on the
+  host), keep heading levels in order (panels are h2, sections h3), targets at least 24 px, and run
+  `npm run e2e -- a11y` after UI changes
+* SEO: `src/index.html` holds the canonical, Open Graph and JSON-LD data, `layout/seo.ts` applies route `title` and
+  `data.description` / `data.robots`; `public/robots.txt`, `public/sitemap.xml` and `public/.well-known/security.txt`
+  use `https://grano22.github.io/congulatio/`, which CI rewrites for forks
 
 ## Commands
 
 * `npm start` runs the dev server on http://localhost:4200
 * `npm run test:ci` runs the unit tests once
 * `npm run e2e` runs the heavy end-to-end suites (Firebase emulators + headless Chrome, `demo-*` project only); run it
-  on demand after touching auth, sync, rules or the account UI, never in CI
+  on demand after touching auth, sync, rules or the account UI, never in CI. `npm run e2e -- rules`, `-- app` and
+  `-- a11y` run one suite
 * `npm run emulators` and `npm run start:emulators` run the app against local Firebase emulators
 * `npm run build` builds into `dist/congulatio/browser`
 * `npm run build:pages` builds with the GitHub Pages base href
@@ -134,6 +155,13 @@ When you rename a soul's first name, the dialogue steps that use the old name as
 
 Removing a feature or UI section: also remove its tab or navigator entry, commands and menu items, quick tour step,
 search kind, focus handling, README and glossary sections, and its specs.
+
+### Checklist: new route or external service
+
+- New route: give it a `title`, add `data.description` (and `data.robots: 'noindex, follow'` if it should not be
+  indexed), add indexable routes to `public/sitemap.xml`, and add a page to the a11y audit in `e2e/a11y.e2e.mjs`.
+- New external service: add its exact hosts to the CSP in `src/index.html`, describe the data it receives in
+  `domain/privacyNotice.ts` (bump `PRIVACY_UPDATED`), and check the production build has no CSP errors in the console.
 
 ### Checklist: UI wiring
 
