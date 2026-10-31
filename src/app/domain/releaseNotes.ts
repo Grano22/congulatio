@@ -7,6 +7,18 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    version: '0.4.0',
+    date: '2026-10-31',
+    title: 'Roll for initiative',
+    highlights: [
+      'New view modes in View → View mode or the switch above the stage: Game NPC Flow Design (the default) and Dungeons & Dragons (beta).',
+      'The D&D view shows only tabletop parts: characters, a new 5e-style character sheet, the sculptor and the relations map. Dialogues stay in the NPC Flow view.',
+      'Print a character sheet on A4 or save it as a PDF, or print a two-sided playing card for the table.',
+      'Themes: each view brings its own look (Forge or Dragonfire), or pick one yourself in View → Theme.',
+      'Sidebar panes now share the height equally when you open another one, and narrow sidebars keep every pane and close button in view.',
+    ],
+  },
+  {
     version: '0.3.0',
     date: '2026-10-31',
     title: 'Sturdier, safer and easier to use',

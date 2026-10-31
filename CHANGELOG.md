@@ -7,6 +7,32 @@ All notable changes to Congulatio are written down here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-31
+
+### Added
+
+- View-mode framework (`domain/viewModes.ts`, `ViewStore`): each mode lists its tabs, sidebar navigators and default
+  theme; the choice is kept in `localStorage`. Switch in View → View mode or with the switch in the stage toolbar.
+- Dungeons & Dragons view mode (beta): Character, Sheet, Sculptor and Relations tabs plus the Codex, Attribute
+  Ledger, Quest Board and World Atlas navigators. Dialogues, routines, interactions and simulations stay in the Game
+  NPC Flow Design view; opening one of them switches back to that view with a notice.
+- 5e-style character sheet derived from a soul's attributes (1–100 mapped to 3–20), with class, hit points, armor
+  class, saving throws, skills and passive perception, based on the SRD 5.2 (CC BY 4.0).
+- Printing: an A4 character sheet (print or save as PDF) and a 63 × 88 mm two-sided card, using named CSS pages.
+- Themes: Forge and Dragonfire, following the view mode or chosen in View → Theme.
+- Menu items can carry a badge (used for Beta).
+
+### Changed
+
+- The sheet, the print layouts, the Routine Almanac and the Attribute Ledger load lazily.
+- The Go to menu and the search only list tabs of the current view mode.
+
+### Fixed
+
+- Sidebar panes split the height equally when one is opened or closed; dragging a divider only moves height between
+  the two panes beside it.
+- Narrow sidebars (now down to 260 px) shrink pane titles instead of pushing panes and their close buttons out of view.
+
 ## [0.3.0] - 2026-10-31
 
 ### Added
