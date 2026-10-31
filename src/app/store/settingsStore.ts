@@ -1,4 +1,4 @@
-import { Injectable, effect, inject, signal, untracked } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { TomeVault } from './tomeVault';
 
 export const AUTOSAVE_INTERVALS = [15, 30, 60, 300] as const;
@@ -33,16 +33,15 @@ export class SettingsStore {
 
   constructor() {
     void this.vault.setting<unknown>(SETTINGS_KEY).then((stored) => {
-      this.settings.set(readSettings(stored));
+      if (!this.loaded()) this.settings.set(readSettings(stored));
       this.loaded.set(true);
-    });
-    effect(() => {
-      const settings = this.settings();
-      if (untracked(this.loaded)) void this.vault.remember(SETTINGS_KEY, settings);
     });
   }
 
-  update(changes: Partial<AppSettings>): void {
-    this.settings.update((s) => readSettings({ ...s, ...changes }));
+  update(changes: Partial<AppSettings>): Promise<void> {
+    const next = readSettings({ ...this.settings(), ...changes });
+    this.settings.set(next);
+    this.loaded.set(true);
+    return this.vault.remember(SETTINGS_KEY, next);
   }
 }
