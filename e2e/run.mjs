@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { AUTH_URL, PROJECT_ID, assertSafeTarget, wait } from './support.mjs';
 import { rulesSuite } from './rules.e2e.mjs';
 import { appSuite } from './app.e2e.mjs';
+import { a11ySuite } from './a11y.e2e.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const port = Number(process.env.E2E_PORT ?? 4300);
@@ -65,7 +66,7 @@ try {
     await waitForUrl('http://127.0.0.1:8080', 60_000);
     await waitForUrl('http://127.0.0.1:9199', 60_000);
   }
-  if (!attachedUrl && wants('app')) {
+  if (!attachedUrl && (wants('app') || wants('a11y'))) {
     console.log(`Starting the dev server on ${baseUrl} with the emulator settings from e2e/fixtures…`);
     server = start('npx', ['ng', 'serve', '--configuration', 'emulators', '--port', String(port)]);
     await waitForUrl(baseUrl, 180_000);
@@ -74,6 +75,7 @@ try {
   const suites = [];
   if (wants('rules')) suites.push(await rulesSuite());
   if (wants('app')) suites.push(await appSuite(baseUrl));
+  if (wants('a11y')) suites.push(await a11ySuite(baseUrl));
   for (const suite of suites) suite.print();
   const failed = suites.reduce((n, s) => n + s.failed, 0);
   const total = suites.reduce((n, s) => n + s.results.length, 0);

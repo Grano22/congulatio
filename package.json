@@ -44,6 +44,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^26.6.6",
     "@types/three": "^0.180.0",
+    "axe-core": "^4.11.0",
     "jsdom": "^30.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",
