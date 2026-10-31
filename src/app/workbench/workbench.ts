@@ -19,6 +19,7 @@ import { ShellStore } from '../store/shellStore';
 import { TomeHistory } from '../store/tomeHistory';
 import { CommandsService } from '../layout/commands';
 import { ShellDialogs } from '../layout/shell-dialogs';
+import { SyncBanner } from '../layout/sync-banner';
 import { WelcomeStore } from '../store/welcomeStore';
 import { Persistence } from '../store/persistence';
 
@@ -42,6 +43,7 @@ export type { EditorTabId };
     Sculptor,
     CharacterRoutines,
     ShellDialogs,
+    SyncBanner,
   ],
   styleUrl: './workbench.css',
   templateUrl: './workbench.html',
