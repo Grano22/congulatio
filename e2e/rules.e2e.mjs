@@ -77,7 +77,46 @@ export async function rulesSuite() {
   denied('a regular user cannot read admin tables', await request(a, 'GET', 'admin_tables/any'));
   denied('a user cannot write outside the known collections', await request(a, 'PATCH', 'secrets/any', { fields: { x: { stringValue: 'y' } } }));
 
+  denied('a row with an unknown kind is refused', await create(a, `${a.uid}~secrets~x`, row(a.uid, { kind: { stringValue: 'secrets' } })));
+  denied('a profile portrait link must be https', await request(a, 'PATCH', `users/${a.uid}`, { fields: { photoURL: { stringValue: 'javascript:alert(1)' } } }));
+  denied('a profile cannot point at another user’s portrait', await request(a, 'PATCH', `users/${a.uid}`, { fields: { avatarPath: { stringValue: `avatars/${b.uid}/avatar.webp` } } }));
+  denied('a display name longer than 100 characters is refused', await request(a, 'PATCH', `users/${a.uid}`, { fields: { displayName: { stringValue: 'x'.repeat(101) } } }));
+
+  const report = (extra = {}) => ({
+    fingerprint: { stringValue: '0123456789abcdef' },
+    name: { stringValue: 'TypeError' },
+    message: { stringValue: 'x is undefined' },
+    appVersion: { stringValue: '0.3.0' },
+    count: { integerValue: '1' },
+    expireAt: { timestampValue: new Date(Date.now() + 365 * 86_400_000).toISOString() },
+    ...extra,
+  });
+  const sendReport = async (who, fields, serverTime = true) =>
+    (
+      await fetch(`${FIRESTORE_URL.replace(/\/documents$/, '/documents:commit')}`, {
+        method: 'POST',
+        headers: { ...(who ? { Authorization: `Bearer ${who.token}` } : {}), 'content-type': 'application/json' },
+        body: JSON.stringify({
+          writes: [
+            {
+              update: { name: `${FIRESTORE_URL.replace(/^.*\/v1\//, '')}/error_reports/r${Date.now()}${Math.random().toString(36).slice(2, 8)}`, fields },
+              ...(serverTime ? { updateTransforms: [{ fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' }] } : {}),
+            },
+          ],
+        }),
+      })
+    ).status;
+  allowed('a signed-in user sends a valid error report', await sendReport(a, report()));
+  denied('an error report cannot carry a user id', await sendReport(a, report({ uid: { stringValue: a.uid } })));
+  denied('an error report must use the server time', await sendReport(a, report({ createdAt: { timestampValue: '2020-01-01T00:00:00Z' } }), false));
+  denied('an error report must expire within about a year', await sendReport(a, report({ expireAt: { timestampValue: new Date(Date.now() + 3650 * 86_400_000).toISOString() } })));
+  denied('an error report message is capped', await sendReport(a, report({ message: { stringValue: 'x'.repeat(501) } })));
+  denied('signed-out visitors cannot send error reports', await sendReport(null, report()));
+  denied('users cannot read error reports', await request(a, 'GET', 'error_reports'));
+
   allowed('a user uploads their own avatar', await upload(a, `avatars/${a.uid}/avatar.webp`, 'image/webp', 1000));
+  denied('an avatar must be named avatar.webp or avatar.jpg', await upload(a, `avatars/${a.uid}/page.html`, 'image/webp', 100));
+  denied('an SVG or other image type is refused', await upload(a, `avatars/${a.uid}/avatar.webp`, 'image/svg+xml', 100));
   denied('another user cannot upload into that avatar folder', await upload(b, `avatars/${a.uid}/avatar.webp`, 'image/webp', 1000));
   denied('an avatar above 512 KiB is refused', await upload(a, `avatars/${a.uid}/avatar.webp`, 'image/webp', 600 * 1024));
   denied('a non-image avatar is refused', await upload(a, `avatars/${a.uid}/avatar.webp`, 'text/html', 100));

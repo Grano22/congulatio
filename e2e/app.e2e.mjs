@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { deflateSync } from 'node:zlib';
 import { createRequire } from 'node:module';
-import { Suite, chromePath, listRows, wait } from './support.mjs';
+import { FIRESTORE_URL, Suite, chromePath, listRows, wait } from './support.mjs';
 
 const require = createRequire(import.meta.url);
 const puppeteer = require('puppeteer-core');
@@ -88,8 +88,8 @@ async function openPage(browser, baseUrl, errors, tag) {
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
   await page.setViewport({ width: 1440, height: 900 });
-  page.on('pageerror', (e) => errors.push(`${tag}: ${e.message}`));
-  page.on('console', (m) => m.type() === 'error' && errors.push(`${tag}: ${m.text()}`));
+  page.on('pageerror', (e) => !e.message.includes('E2E burst') && errors.push(`${tag}: ${e.message}`));
+  page.on('console', (m) => m.type() === 'error' && !m.text().includes('E2E burst') && errors.push(`${tag}: ${m.text()}`));
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   return page;
 }
@@ -249,6 +249,38 @@ export async function appSuite(baseUrl) {
       await clickText(a, 'Link e-mail');
       await a.waitForFunction(() => document.querySelector('.acc__badge')?.textContent.includes('Account'), { timeout: 15000 });
       await clickText(a, 'Close');
+    });
+
+    await step('a burst of errors opens the crash screen with reload and report options', async () => {
+      await a.evaluate(() => {
+        for (let i = 0; i < 6; i++) window.dispatchEvent(new ErrorEvent('error', { error: new Error('E2E burst of failures'), message: 'E2E burst of failures' }));
+      });
+      await a.waitForSelector('[role=alertdialog]', { timeout: 5000 });
+      const buttons = await a.$$eval('[role=alertdialog] button', (b) => b.map((x) => x.textContent.trim()));
+      for (const label of ['Save my work & reload', 'Reload', 'Keep working']) if (!buttons.includes(label)) throw new Error(`missing ${label}: ${buttons.join(' | ')}`);
+    });
+
+    await step('a signed-in user reports it only after consenting, without any user id', async () => {
+      await clickText(a, 'Report this problem', 'summary');
+      const sendDisabled = () => a.evaluate(() => [...document.querySelectorAll('[role=alertdialog] button')].find((b) => b.textContent.trim() === 'Send report')?.disabled);
+      if ((await sendDisabled()) !== true) throw new Error('Send report should wait for consent');
+      await a.click('[role=alertdialog] .erf__consent input');
+      await a.waitForFunction(() => [...document.querySelectorAll('[role=alertdialog] button')].find((b) => b.textContent.trim() === 'Send report')?.disabled === false, { timeout: 3000 }).catch(() => undefined);
+      if ((await sendDisabled()) !== false) throw new Error('Send report should be enabled after consent');
+      await clickText(a, 'Send report');
+      await a.waitForFunction(() => /Thank you/.test(document.querySelector('[role=alertdialog]')?.textContent ?? ''), { timeout: 15000 });
+      const res = await fetch(`${FIRESTORE_URL}/error_reports?pageSize=300`, { headers: { Authorization: 'Bearer owner' } });
+      const docs = ((await res.json()).documents ?? []).filter((d) => d.fields?.message?.stringValue === 'E2E burst of failures');
+      if (!docs.length) throw new Error('no report stored');
+      const keys = Object.keys(docs.at(-1).fields);
+      for (const forbidden of ['uid', 'owner', 'email', 'userId']) if (keys.includes(forbidden)) throw new Error(`report contains ${forbidden}`);
+      return `${keys.length} fields`;
+    });
+
+    await step('keep working closes the crash screen and the problem stays listed', async () => {
+      await clickText(a, 'Keep working');
+      await a.waitForFunction(() => !document.querySelector('[role=alertdialog]'), { timeout: 4000 });
+      if (!/problem/i.test(await statusText(a))) throw new Error('status bar does not list the problem');
     });
 
     let souls = 0;
