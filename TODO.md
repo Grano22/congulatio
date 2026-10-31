@@ -21,6 +21,10 @@
 - [x] Custom attributes, click-to-copy tokens and a read-only inspector
 - [x] Story AI in the composer (Chrome Prompt API)
 - [x] GitHub Pages deployment
+- [x] Tome saved in IndexedDB, one per owner (0.1.0)
+- [x] Optional accounts (e-mail, Google, anonymous wanderer) with Firestore sync, portraits and storage limits (0.1.0)
+- [x] Welcome and What's new dialog, CHANGELOG and version bookkeeping (0.1.0)
+- [x] On-demand end-to-end tests on the Firebase emulators (0.1.0)
 
 ## Next
 
@@ -29,6 +33,9 @@
 - [ ] World Atlas navigator section
 - [ ] Bring back the node-based dialogue editor (Dialogue Loom) or remove it
 - [ ] Use attribute tokens such as `[[Aldric Blackwood.STR=78]]` inside dialogue text
-- [ ] End-to-end tests
+- [ ] Enforce cloud storage limits on the server (Cloud Function keeping a per-user usage counter)
+- [ ] Merge conflicting tomes per entity instead of newer-save-wins
+- [ ] Sync the changeset between devices
+- [ ] Run the e2e suite in a scheduled or manual GitHub Actions job
 - [ ] Choose a license
 - [ ] Remove the unused `primeng` and `@primeuix/themes` dependencies, or start using them
