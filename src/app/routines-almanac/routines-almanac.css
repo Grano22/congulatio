@@ -25,7 +25,7 @@
   padding: 0.7rem;
   border-radius: 8px;
   border: 1px solid var(--color-gold-600);
-  background: rgba(255, 250, 232, 0.6);
+  background: rgb(var(--card-rgb) / 0.6);
 }
 .ra__pair {
   display: grid;
@@ -72,7 +72,7 @@
   padding: 0.45rem 0.55rem;
   border-radius: 8px;
   border: 1px solid var(--color-wood-700);
-  background: linear-gradient(180deg, rgba(255, 250, 232, 0.8), rgba(222, 198, 146, 0.6));
+  background: linear-gradient(180deg, rgb(var(--card-rgb) / 0.8), rgba(222, 198, 146, 0.6));
   color: var(--color-ink-800);
   font-family: var(--font-body);
   text-align: left;

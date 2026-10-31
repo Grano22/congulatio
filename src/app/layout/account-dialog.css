@@ -107,7 +107,7 @@
   padding: 0.8rem;
   border: 1px solid var(--color-gold-600);
   border-radius: 8px;
-  background: rgba(180, 146, 42, 0.12);
+  background: rgb(var(--accent-deep-rgb) / 0.12);
 }
 
 .acc__meter {

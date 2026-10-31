@@ -118,7 +118,7 @@
 .dl__hit {
   padding: 0 1px;
   border-radius: 2px;
-  background: rgba(226, 194, 92, 0.6);
+  background: rgb(var(--accent-rgb) / 0.6);
   color: inherit;
 }
 .dl__level-head {
@@ -254,7 +254,7 @@
   border-radius: 7px;
   border: 1px solid var(--color-wood-800);
   border-left: 5px solid var(--level-color);
-  background: linear-gradient(168deg, #f4e8c8, #dcc48f);
+  background: linear-gradient(168deg, var(--page-a), var(--page-c));
   color: var(--color-ink-800);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
   cursor: pointer;
@@ -276,7 +276,7 @@
 }
 .dl__entry:focus-visible,
 .dl__entry:hover {
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(226, 194, 92, 0.5);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6), 0 0 0 2px rgb(var(--accent-rgb) / 0.5);
 }
 .dl__entry--selected {
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--color-gold-400);
@@ -287,7 +287,7 @@
 @keyframes dl-flash {
   0%,
   30% {
-    box-shadow: 0 0 0 4px var(--color-gold-300), 0 0 22px rgba(226, 194, 92, 0.8);
+    box-shadow: 0 0 0 4px var(--color-gold-300), 0 0 22px rgb(var(--accent-rgb) / 0.8);
   }
 }
 
@@ -435,7 +435,7 @@
   padding: 0.25rem 0.4rem;
   border-radius: 5px;
   border: 1px solid transparent;
-  background: rgba(255, 250, 232, 0.55);
+  background: rgb(var(--card-rgb) / 0.55);
   color: var(--color-ink-800);
   font-family: var(--font-body);
   font-size: 0.82rem;

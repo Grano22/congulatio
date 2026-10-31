@@ -27,7 +27,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   border: 1px solid var(--color-wood-500);
-  background: rgba(255, 250, 232, 0.6);
+  background: rgb(var(--card-rgb) / 0.6);
   color: var(--color-ink-700);
   font-family: var(--font-body);
   font-size: 0.8rem;
@@ -57,7 +57,7 @@
   padding: 0.8rem 0.9rem;
   border-radius: 8px;
   border: 1px solid var(--color-gold-600);
-  background: rgba(255, 250, 232, 0.65);
+  background: rgb(var(--card-rgb) / 0.65);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 .acts__editor-title {
@@ -132,14 +132,14 @@
   padding: 0.45rem 0.6rem;
   border-radius: 8px;
   border: 1px solid var(--color-wood-700);
-  background: linear-gradient(180deg, rgba(255, 250, 232, 0.8), rgba(222, 198, 146, 0.6));
+  background: linear-gradient(180deg, rgb(var(--card-rgb) / 0.8), rgba(222, 198, 146, 0.6));
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   outline: none;
 }
 .acts__row:hover,
 .acts__row:focus-visible {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(226, 194, 92, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 0 2px rgb(var(--accent-rgb) / 0.5);
 }
 .acts__row--focused {
   border-color: var(--color-gold-600);
@@ -218,7 +218,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   border: 1px solid var(--color-parchment-400);
-  background: rgba(255, 250, 232, 0.85);
+  background: rgb(var(--card-rgb) / 0.85);
   font-size: 0.76rem;
   font-style: italic;
   color: var(--color-ink-600);

@@ -16,7 +16,7 @@
   padding: 0.25rem 1.8rem 0.25rem 0.45rem;
   border-radius: 6px;
   border: 1px solid var(--color-wood-500);
-  background: linear-gradient(180deg, #f7eed6, #efe0bb);
+  background: linear-gradient(180deg, var(--field-a), var(--field-b));
   color: var(--color-ink-900);
   cursor: pointer;
   outline: none;
@@ -24,7 +24,7 @@
 .sms__field:focus-visible,
 .sms--open .sms__field {
   border-color: var(--color-gold-500);
-  box-shadow: 0 0 0 2px rgba(208, 172, 60, 0.35);
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.35);
 }
 .sms__placeholder {
   font-style: italic;

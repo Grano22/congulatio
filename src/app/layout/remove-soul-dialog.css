@@ -9,7 +9,7 @@
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
   border: 1px solid var(--color-blood-400);
-  background: rgba(255, 250, 232, 0.6);
+  background: rgb(var(--card-rgb) / 0.6);
 }
 .rs__portrait {
   width: 52px;
@@ -55,7 +55,7 @@
 .rs__section {
   border-radius: 7px;
   border: 1px solid var(--color-parchment-400);
-  background: rgba(255, 250, 232, 0.5);
+  background: rgb(var(--card-rgb) / 0.5);
 }
 .rs__section--gone {
   border-color: var(--color-blood-400);

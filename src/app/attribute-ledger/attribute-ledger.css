@@ -27,7 +27,7 @@
   padding: 0.7rem;
   border-radius: 8px;
   border: 1px solid var(--color-gold-600);
-  background: rgba(255, 250, 232, 0.6);
+  background: rgb(var(--card-rgb) / 0.6);
 }
 .al__pair {
   display: grid;
@@ -73,7 +73,7 @@
   padding: 0.4rem 0.5rem;
   border-radius: 8px;
   border: 1px solid var(--color-wood-700);
-  background: linear-gradient(180deg, rgba(255, 250, 232, 0.8), rgba(222, 198, 146, 0.6));
+  background: linear-gradient(180deg, rgb(var(--card-rgb) / 0.8), rgba(222, 198, 146, 0.6));
 }
 .al__badge {
   flex: none;

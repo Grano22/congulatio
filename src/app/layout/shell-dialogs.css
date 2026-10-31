@@ -43,7 +43,7 @@
   padding: 0.7rem 0.9rem;
   border-radius: 8px;
   border: 1px solid var(--color-wood-500);
-  background: rgba(255, 250, 232, 0.5);
+  background: rgb(var(--card-rgb) / 0.5);
 }
 .dlg-about__ai h3,
 .dlg-hist__older,
@@ -73,7 +73,7 @@
 .dlg-tour__mode {
   padding: 0.3rem 1rem;
   border: none;
-  background: rgba(255, 250, 232, 0.4);
+  background: rgb(var(--card-rgb) / 0.4);
   color: var(--color-ink-700);
   font-family: var(--font-display);
   font-size: 0.72rem;
@@ -153,7 +153,7 @@
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
   border: 1px solid var(--color-wood-500);
-  background: rgba(255, 250, 232, 0.7);
+  background: rgb(var(--card-rgb) / 0.7);
   font-family: ui-monospace, monospace;
   font-size: 0.78rem;
 }
@@ -176,11 +176,11 @@
   padding: 0.45rem 0.6rem;
   border-radius: 6px;
   border: 1px solid var(--color-parchment-400);
-  background: rgba(255, 250, 232, 0.5);
+  background: rgb(var(--card-rgb) / 0.5);
 }
 .dlg-hist__entry--current {
   border-color: var(--color-gold-600);
-  box-shadow: 0 0 0 2px rgba(208, 172, 60, 0.35);
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.35);
 }
 .dlg-hist__entry--undone {
   opacity: 0.6;

@@ -84,6 +84,156 @@
   --color-moss-400: #6f9a4a;
 }
 
+:root {
+  --accent-rgb: 226 194 92;
+  --accent-deep-rgb: 180 146 42;
+  --sheen-rgb: 255 220 150;
+  --page-a: #f4e8c8;
+  --page-b: #ebd9ad;
+  --page-c: #dec692;
+  --page-shade-rgb: 140 100 45;
+  --card-rgb: 255 250 232;
+  --field-a: #f7eed6;
+  --field-b: #efe0bb;
+}
+
+:root[data-theme='forge'],
+[data-theme-preview='forge'] {
+  --color-wood-950: #150c04;
+  --color-wood-900: #221406;
+  --color-wood-800: #31200d;
+  --color-wood-700: #432c14;
+  --color-wood-600: #553a1d;
+  --color-wood-500: #694a26;
+  --color-wood-400: #816133;
+  --color-wood-300: #9b7947;
+  --color-wood-200: #b89763;
+  --color-wood-100: #d3b78a;
+  --color-gold-700: #7a5c12;
+  --color-gold-600: #96761b;
+  --color-gold-500: #b4922a;
+  --color-gold-400: #d0ac3c;
+  --color-gold-300: #e2c25c;
+  --color-gold-200: #efd784;
+  --color-gold-100: #f6e7ab;
+  --color-stone-950: #131110;
+  --color-stone-900: #1c1915;
+  --color-stone-800: #26221c;
+  --color-stone-700: #322d24;
+  --color-stone-600: #423b2f;
+  --color-stone-500: #574e3f;
+  --color-parchment-50: #faf3de;
+  --color-parchment-100: #f2e6c4;
+  --color-parchment-200: #e7d5a7;
+  --color-parchment-300: #d8c088;
+  --color-parchment-400: #c4a76a;
+  --color-parchment-500: #aa8b50;
+  --color-ink-700: #41301a;
+  --color-ink-600: #524025;
+  --color-ink-500: #665231;
+  --color-ink-400: #846e47;
+  --accent-rgb: 226 194 92;
+  --accent-deep-rgb: 180 146 42;
+  --sheen-rgb: 255 220 150;
+  --page-a: #f4e8c8;
+  --page-b: #ebd9ad;
+  --page-c: #dec692;
+  --page-shade-rgb: 140 100 45;
+  --card-rgb: 255 250 232;
+  --field-a: #f7eed6;
+  --field-b: #efe0bb;
+}
+
+:root[data-theme='ebony'],
+[data-theme-preview='ebony'] {
+  --color-wood-950: #070403;
+  --color-wood-900: #0f0806;
+  --color-wood-800: #180e0a;
+  --color-wood-700: #23140e;
+  --color-wood-600: #301c14;
+  --color-wood-500: #42271b;
+  --color-wood-400: #5b3826;
+  --color-wood-300: #7a5039;
+  --color-wood-200: #9e735a;
+  --color-wood-100: #c29b82;
+  --color-gold-700: #80601c;
+  --color-gold-600: #a37b2b;
+  --color-gold-500: #c3963d;
+  --color-gold-400: #dcb253;
+  --color-gold-300: #eecd74;
+  --color-gold-200: #f6e09b;
+  --color-gold-100: #fbeec4;
+  --color-stone-950: #070505;
+  --color-stone-900: #0d0a09;
+  --color-stone-800: #15100e;
+  --color-stone-700: #1e1714;
+  --color-stone-600: #2b211c;
+  --color-stone-500: #3b2e27;
+  --color-parchment-50: #f8eedb;
+  --color-parchment-100: #efe0c0;
+  --color-parchment-200: #e3cd9f;
+  --color-parchment-300: #d6b984;
+  --color-parchment-400: #bf9d68;
+  --color-parchment-500: #a2804d;
+  --color-ink-700: #36240f;
+  --color-ink-600: #432f17;
+  --color-ink-500: #4c381f;
+  --color-ink-400: #5f492b;
+  --accent-rgb: 238 205 116;
+  --accent-deep-rgb: 195 150 61;
+  --sheen-rgb: 255 206 150;
+  --page-a: #ecd8a8;
+  --page-b: #dfc38e;
+  --page-c: #cdaa72;
+  --page-shade-rgb: 74 40 14;
+  --card-rgb: 250 236 204;
+  --field-a: #f2e2bd;
+  --field-b: #e5cd9b;
+}
+
+:root[data-theme='dragonfire'],
+[data-theme-preview='dragonfire'] {
+  --color-wood-950: #0b0a0a;
+  --color-wood-900: #141213;
+  --color-wood-800: #1d1a1a;
+  --color-wood-700: #292525;
+  --color-wood-600: #373131;
+  --color-wood-500: #484040;
+  --color-wood-400: #615656;
+  --color-wood-300: #7e7272;
+  --color-wood-200: #a19494;
+  --color-wood-100: #c5b8b5;
+  --color-gold-700: #8c1f0d;
+  --color-gold-600: #b42e14;
+  --color-gold-500: #da441e;
+  --color-gold-400: #f25c2d;
+  --color-gold-300: #ff7e50;
+  --color-gold-200: #ffa680;
+  --color-gold-100: #ffd2be;
+  --color-stone-950: #0c0a0a;
+  --color-stone-900: #131010;
+  --color-stone-800: #1b1717;
+  --color-stone-700: #251f1f;
+  --color-stone-600: #322a29;
+  --color-stone-500: #453a38;
+  --color-parchment-50: #faf6f0;
+  --color-parchment-100: #f1e9de;
+  --color-parchment-200: #e5d9c8;
+  --color-parchment-300: #d5c5ae;
+  --color-parchment-400: #bda98f;
+  --color-parchment-500: #a08b70;
+  --accent-rgb: 255 126 80;
+  --accent-deep-rgb: 218 68 30;
+  --sheen-rgb: 255 205 185;
+  --page-a: #f4ede3;
+  --page-b: #e8dece;
+  --page-c: #d9cbb6;
+  --page-shade-rgb: 112 58 38;
+  --card-rgb: 255 251 246;
+  --field-a: #faf5ee;
+  --field-b: #ede4d6;
+}
+
 /* --------------------------------------------------------------------------
    Base
    -------------------------------------------------------------------------- */
@@ -198,9 +348,9 @@ body {
 .tx-parchment {
   background:
     radial-gradient(130% 100% at 15% 0%, rgba(255, 252, 238, 0.8), transparent 55%),
-    radial-gradient(120% 90% at 90% 100%, rgba(140, 100, 45, 0.38), transparent 60%),
+    radial-gradient(120% 90% at 90% 100%, rgb(var(--page-shade-rgb) / 0.38), transparent 60%),
     radial-gradient(50% 35% at 75% 25%, rgba(120, 84, 32, 0.14), transparent 65%),
-    linear-gradient(168deg, #f4e8c8 0%, #ebd9ad 52%, #dec692 100%);
+    linear-gradient(168deg, var(--page-a) 0%, var(--page-b) 52%, var(--page-c) 100%);
 }
 
 /* candle-lit dungeon stone */
@@ -214,8 +364,8 @@ body {
 /* stone with a faint gilded survey grid (editor canvas ground) */
 .tx-stone-grid {
   background:
-    linear-gradient(rgba(226, 194, 92, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 194, 92, 0.05) 1px, transparent 1px),
+    linear-gradient(rgb(var(--accent-rgb) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--accent-rgb) / 0.05) 1px, transparent 1px),
     radial-gradient(90% 70% at 30% 12%, rgba(255, 244, 214, 0.06), transparent 60%),
     radial-gradient(70% 60% at 82% 92%, rgba(0, 0, 0, 0.45), transparent 65%),
     linear-gradient(180deg, var(--color-stone-700), var(--color-stone-800) 55%, var(--color-stone-900));
@@ -249,7 +399,7 @@ body {
 .bevel-out {
   border: 1px solid rgba(0, 0, 0, 0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255, 224, 160, 0.22),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.22),
     inset 0 -2px 3px rgba(0, 0, 0, 0.35),
     inset 2px 0 3px rgba(0, 0, 0, 0.12),
     inset -2px 0 3px rgba(0, 0, 0, 0.12),
@@ -261,7 +411,7 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.5);
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.45),
-    inset 0 -1px 0 rgba(255, 230, 170, 0.12);
+    inset 0 -1px 0 rgb(var(--sheen-rgb) / 0.12);
 }
 
 /* four brass rivets in the corners */
@@ -321,7 +471,7 @@ body {
   transform: rotate(45deg);
   flex: none;
   background: linear-gradient(135deg, var(--color-gold-200), var(--color-gold-600));
-  box-shadow: 0 0 6px rgba(226, 194, 92, 0.7);
+  box-shadow: 0 0 6px rgb(var(--accent-rgb) / 0.7);
 }
 
 /* --------------------------------------------------------------------------
@@ -343,7 +493,7 @@ body {
   font-family: var(--font-body);
   font-size: 0.95rem;
   color: var(--color-ink-900);
-  background: linear-gradient(180deg, #f7eed6, #efe0bb);
+  background: linear-gradient(180deg, var(--field-a), var(--field-b));
   border: 1px solid var(--color-wood-700);
   border-radius: 4px;
   padding: 0.45rem 0.65rem;
@@ -361,7 +511,7 @@ body {
   border-color: var(--color-gold-500);
   box-shadow:
     inset 0 2px 3px rgba(0, 0, 0, 0.14),
-    0 0 0 2px rgba(208, 172, 60, 0.35);
+    0 0 0 2px rgb(var(--accent-rgb) / 0.35);
 }
 .rpg-input::placeholder,
 .rpg-textarea::placeholder {
@@ -452,7 +602,7 @@ body {
   background: linear-gradient(180deg, var(--color-wood-500) 0%, var(--color-wood-700) 55%, var(--color-wood-800) 100%);
   border: 1px solid var(--color-wood-950);
   box-shadow:
-    inset 0 1px 0 rgba(255, 220, 150, 0.28),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.28),
     inset 0 -2px 3px rgba(0, 0, 0, 0.5),
     0 2px 4px rgba(0, 0, 0, 0.5);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
@@ -465,10 +615,10 @@ body {
   color: var(--color-parchment-200);
   background: transparent;
   border: 1px solid var(--color-wood-500);
-  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.12);
+  box-shadow: inset 0 1px 0 rgb(var(--sheen-rgb) / 0.12);
 }
 .rbtn--ghost:hover:not(:disabled) {
-  background: rgba(255, 220, 150, 0.08);
+  background: rgb(var(--sheen-rgb) / 0.08);
 }
 
 .rbtn--danger {
@@ -518,7 +668,7 @@ body {
     linear-gradient(180deg, var(--color-wood-700), var(--color-wood-800) 55%, var(--color-wood-900));
   border-bottom: 1px solid var(--color-wood-950);
   box-shadow:
-    inset 0 1px 0 rgba(255, 220, 150, 0.16),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.16),
     0 2px 5px rgba(0, 0, 0, 0.35);
   flex: none;
   min-width: 0;
@@ -567,8 +717,8 @@ body {
 .rpanel--parchment .rpanel__body {
   background:
     radial-gradient(130% 100% at 15% 0%, rgba(255, 252, 238, 0.8), transparent 55%),
-    radial-gradient(120% 90% at 90% 100%, rgba(140, 100, 45, 0.38), transparent 60%),
-    linear-gradient(168deg, #f4e8c8 0%, #ebd9ad 52%, #dec692 100%);
+    radial-gradient(120% 90% at 90% 100%, rgb(var(--page-shade-rgb) / 0.38), transparent 60%),
+    linear-gradient(168deg, var(--page-a) 0%, var(--page-b) 52%, var(--page-c) 100%);
 }
 .rpanel--stone .rpanel__body {
   background:
@@ -603,7 +753,7 @@ body {
     ),
     linear-gradient(180deg, var(--color-wood-800), var(--color-wood-900));
   border-top: 1px solid var(--color-wood-950);
-  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.1);
+  box-shadow: inset 0 1px 0 rgb(var(--sheen-rgb) / 0.1);
   flex: none;
 }
 
@@ -681,7 +831,7 @@ body {
   border-radius: 8px 8px 0 0;
   padding: 0.55rem 1.1rem 0.5rem;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.15);
+  box-shadow: inset 0 1px 0 rgb(var(--sheen-rgb) / 0.15);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
   transition: filter 0.12s ease;
   flex: none;
@@ -709,7 +859,7 @@ body {
   background: linear-gradient(180deg, var(--color-wood-400), var(--color-wood-500) 60%, var(--color-wood-600));
   color: var(--color-gold-200);
   box-shadow:
-    inset 0 1px 0 rgba(255, 235, 180, 0.4),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.4),
     0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 .rtab--active::after {
@@ -827,7 +977,7 @@ body {
   border: 1px solid var(--color-stone-950);
   box-shadow:
     0 2px 5px rgba(0, 0, 0, 0.5),
-    0 0 8px rgba(226, 194, 92, 0.25),
+    0 0 8px rgb(var(--accent-rgb) / 0.25),
     inset 0 1px 2px rgba(255, 255, 255, 0.15);
   animation: rune-float 3s ease-in-out infinite;
 }
@@ -880,7 +1030,7 @@ body {
   color: var(--color-parchment-300);
   background: linear-gradient(180deg, var(--color-wood-600), var(--color-wood-800));
   box-shadow:
-    inset 0 1px 0 rgba(255, 220, 150, 0.18),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.18),
     0 2px 3px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: filter 0.12s, box-shadow 0.12s, color 0.12s;
@@ -892,9 +1042,9 @@ body {
   color: var(--color-gold-200);
   background: linear-gradient(180deg, var(--color-wood-400), var(--color-wood-600));
   box-shadow:
-    inset 0 1px 0 rgba(255, 235, 180, 0.4),
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.4),
     0 0 0 1px var(--color-gold-600),
-    0 0 10px rgba(226, 194, 92, 0.35);
+    0 0 10px rgb(var(--accent-rgb) / 0.35);
 }
 
 
@@ -999,18 +1149,31 @@ body {
   }
 }
 
-:root[data-theme='dragonfire'] {
-  --color-gold-700: #6e1a12;
-  --color-gold-600: #8f2618;
-  --color-gold-500: #b5381f;
-  --color-gold-400: #d4522f;
-  --color-gold-300: #ec7a55;
-  --color-gold-200: #f5a585;
-  --color-gold-100: #fbd2bf;
-  --color-stone-950: #120d0d;
-  --color-stone-900: #1b1414;
-  --color-stone-800: #261b1a;
-  --color-stone-700: #332422;
-  --color-stone-600: #45302c;
-  --color-stone-500: #5b3f39;
+:root[data-theme='ebony'] .rpanel {
+  border-color: var(--color-gold-700);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.6),
+    0 0 0 3px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgb(var(--accent-rgb) / 0.18);
+}
+:root[data-theme='ebony'] .rpanel__header {
+  border-bottom-color: var(--color-gold-700);
+  box-shadow:
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.12),
+    0 1px 0 rgb(var(--accent-rgb) / 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+}
+:root[data-theme='dragonfire'] .rpanel__header {
+  box-shadow:
+    inset 0 1px 0 rgb(var(--sheen-rgb) / 0.08),
+    0 1px 0 rgb(var(--accent-rgb) / 0.45),
+    0 3px 10px rgb(var(--accent-deep-rgb) / 0.18);
+}
+:root[data-theme='dragonfire'] .gem {
+  filter: drop-shadow(0 0 4px rgb(var(--accent-rgb) / 0.75));
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
 }

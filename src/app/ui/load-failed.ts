@@ -30,7 +30,7 @@ import { NetworkStore } from '../store/networkStore';
         padding: 1.2rem;
         border-radius: 10px;
         border: 1px solid var(--color-blood-400);
-        background: linear-gradient(168deg, #f4e8c8, #dcc48f);
+        background: linear-gradient(168deg, var(--page-a), var(--page-c));
         color: var(--color-ink-900);
       }
       .lf__title {

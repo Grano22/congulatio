@@ -65,7 +65,7 @@ import { isChunkFailure } from '../domain/errorReport';
         padding: 1.4rem;
         border: 2px solid var(--color-wood-950);
         border-radius: 12px;
-        background: linear-gradient(168deg, #f4e8c8, #dcc48f);
+        background: linear-gradient(168deg, var(--page-a), var(--page-c));
         color: var(--color-ink-900);
         box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7), inset 0 0 0 2px var(--color-blood-400);
       }
@@ -84,7 +84,7 @@ import { isChunkFailure } from '../domain/errorReport';
       .crash__warn {
         padding: 0.45rem 0.6rem;
         border-radius: 6px;
-        background: rgba(180, 146, 42, 0.18);
+        background: rgb(var(--accent-deep-rgb) / 0.18);
         border: 1px solid var(--color-gold-600);
         font-size: 0.9rem;
       }
