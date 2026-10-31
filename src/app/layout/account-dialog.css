@@ -193,6 +193,7 @@
 }
 
 .acc__perks {
+  list-style: disc;
   margin: 0;
   padding-left: 1.1rem;
   font-size: 0.86rem;

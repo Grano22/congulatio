@@ -87,10 +87,10 @@
           <app-lucide-icon [icon]="wandererIcon" iconClass="ic-14" [strokeWidth]="2" />
           Enter as a wanderer
         </app-rpg-button>
-        <app-rpg-button variant="ghost" size="sm" [disabled]="session.busy()" (click)="back()">
+        <button type="button" class="login__back" [disabled]="session.busy()" (click)="back()">
           <app-lucide-icon [icon]="backIcon" iconClass="ic-14" [strokeWidth]="2" />
           Back to the forge without an account
-        </app-rpg-button>
+        </button>
       </div>
 
       <dl class="login__modes">
