@@ -22,7 +22,7 @@
     } @else {
       @if (!session.configured()) {
         <p class="login__note login__note--warn" role="status">
-          The cloud is not set up for this build. You can still work in this browser; your tome stays on this device.
+          The cloud is not set up for this build, so accounts are unavailable. Everything else works in this browser.
         </p>
       }
 
@@ -87,16 +87,16 @@
           <app-lucide-icon [icon]="wandererIcon" iconClass="ic-14" [strokeWidth]="2" />
           Enter as a wanderer
         </app-rpg-button>
-        <app-rpg-button variant="ghost" size="sm" [disabled]="session.busy()" (click)="offline()">
-          <app-lucide-icon [icon]="driveIcon" iconClass="ic-14" [strokeWidth]="2" />
-          Work offline on this device
+        <app-rpg-button variant="ghost" size="sm" [disabled]="session.busy()" (click)="back()">
+          <app-lucide-icon [icon]="backIcon" iconClass="ic-14" [strokeWidth]="2" />
+          Back to the forge without an account
         </app-rpg-button>
       </div>
 
       <dl class="login__modes">
         <div>
           <dt>Account</dt>
-          <dd>Your tome syncs to the cloud and follows you to every device. {{ accountQuota }} of cloud storage.</dd>
+          <dd>Your tome syncs to the cloud and follows you to every device, with a portrait and {{ accountQuota }} of storage.</dd>
         </div>
         <div>
           <dt>Wanderer</dt>
@@ -106,10 +106,11 @@
           </dd>
         </div>
         <div>
-          <dt>Offline</dt>
-          <dd>Nothing leaves this browser. The tome lives in its built-in database.</dd>
+          <dt>No account</dt>
+          <dd>Keep working offline. The tome stays in this browser's built-in database and survives closing it.</dd>
         </div>
       </dl>
+      <p class="login__note">A brand-new account or wanderer starts with the tome you have open in this browser.</p>
     }
   </section>
 </main>

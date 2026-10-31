@@ -9,8 +9,9 @@ import { Session } from '../cloud/session';
 import { CloudSync, SyncStatus } from '../cloud/cloudSync';
 import { AccountStore } from '../cloud/account';
 import { formatBytes } from '../domain/cloudSync';
+import { DEFAULT_QUOTA } from '../cloud/firebaseConfig';
 
-const KIND_LABEL = { offline: 'Offline scribe', anonymous: 'Wanderer', account: 'Account' } as const;
+const KIND_LABEL = { offline: 'No account', anonymous: 'Wanderer', account: 'Account' } as const;
 
 const SYNC_LABEL: Record<SyncStatus, string> = {
   off: 'Not synced',
@@ -41,6 +42,7 @@ export class AccountDialog {
   protected readonly syncLabel = computed(() => SYNC_LABEL[this.sync.status()]);
   protected readonly initial = computed(() => (this.user()?.name ?? '?').trim().charAt(0).toUpperCase() || '?');
   protected readonly bytes = formatBytes;
+  protected readonly accountQuota = DEFAULT_QUOTA.account;
 
   protected readonly name = signal('');
   protected readonly linkEmail = signal('');
@@ -99,6 +101,11 @@ export class AccountDialog {
     if (await this.session.refreshQuota()) this.shell.notify('info', 'Storage limits refreshed.');
   }
 
+  protected signIn(): void {
+    this.shell.closeDialog();
+    void this.router.navigate(['/login']);
+  }
+
   protected async signOut(): Promise<void> {
     if (this.signOutWarning() && !this.confirmSignOut()) {
       this.confirmSignOut.set(true);
@@ -108,7 +115,6 @@ export class AccountDialog {
     if (this.sync.active()) await this.sync.sync();
     this.shell.closeDialog();
     await this.session.signOut();
-    this.history.close();
-    await this.router.navigate(['/login']);
+    this.shell.notify('info', 'Signed out. You are back on the tome kept in this browser.');
   }
 }

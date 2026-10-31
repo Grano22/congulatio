@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Cloud, HardDrive, KeyRound, Shield, UserRound } from 'lucide';
+import { ArrowLeft, Cloud, KeyRound, Shield, UserRound } from 'lucide';
 import { RpgButton } from '../ui/rpg-button';
 import { LucideIcon } from '../ui/lucide-icon';
 import { Session } from '../cloud/session';
@@ -26,7 +26,7 @@ export class LoginPage {
 
   protected readonly shieldIcon = Shield;
   protected readonly cloudIcon = Cloud;
-  protected readonly driveIcon = HardDrive;
+  protected readonly backIcon = ArrowLeft;
   protected readonly keyIcon = KeyRound;
   protected readonly wandererIcon = UserRound;
 
@@ -34,7 +34,7 @@ export class LoginPage {
   protected readonly accountQuota = `${DEFAULT_QUOTA.account / MIB} MiB`;
 
   protected readonly title = computed(() =>
-    this.mode() === 'register' ? 'Open a new ledger' : this.mode() === 'reset' ? 'Recover your key' : 'Enter the scriptorium',
+    this.mode() === 'register' ? 'Open a new ledger' : this.mode() === 'reset' ? 'Recover your key' : 'Sign in to keep your tome everywhere',
   );
   protected readonly submitLabel = computed(() =>
     this.mode() === 'register' ? 'Create account' : this.mode() === 'reset' ? 'Send reset link' : 'Sign in',
@@ -43,7 +43,7 @@ export class LoginPage {
 
   constructor() {
     effect(() => {
-      if (this.session.user()) void this.router.navigateByUrl('/');
+      if (this.session.cloud()) void this.router.navigateByUrl('/');
     });
   }
 
@@ -72,7 +72,8 @@ export class LoginPage {
     void this.session.enterAnonymously();
   }
 
-  protected offline(): void {
-    void this.session.continueOffline();
+  protected back(): void {
+    this.session.error.set(null);
+    void this.router.navigateByUrl('/');
   }
 }

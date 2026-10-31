@@ -97,6 +97,23 @@
       }
     </section>
 
+    @if (u.kind === 'offline') {
+      <section class="acc__block acc__block--keep">
+        <h3>Sign in to keep your tome everywhere</h3>
+        <ul class="acc__perks">
+          <li>Your tome syncs to the cloud and opens on any device.</li>
+          <li>A cloud copy survives clearing this browser's data.</li>
+          <li>A portrait that follows you, and up to {{ bytes(accountQuota) }} of cloud storage.</li>
+          <li>No account yet? Start as an anonymous wanderer and link an e-mail or Google later.</li>
+        </ul>
+        @if (session.configured()) {
+          <app-rpg-button variant="gold" size="sm" (click)="signIn()">Sign in or create an account</app-rpg-button>
+        } @else {
+          <p class="acc__row acc__row--muted">Accounts are not set up for this build.</p>
+        }
+      </section>
+    }
+
     @if (u.kind === 'anonymous') {
       <section class="acc__block acc__block--keep">
         <h3>Keep this ledger</h3>
@@ -116,7 +133,9 @@
   }
 
   <app-rpg-button modalFooter variant="wood" size="sm" (click)="shell.closeDialog()">Close</app-rpg-button>
-  <app-rpg-button modalFooter variant="danger" size="sm" [disabled]="session.busy()" (click)="signOut()">
-    {{ confirmSignOut() ? 'Sign out anyway' : 'Sign out' }}
-  </app-rpg-button>
+  @if (session.cloud()) {
+    <app-rpg-button modalFooter variant="danger" size="sm" [disabled]="session.busy()" (click)="signOut()">
+      {{ confirmSignOut() ? 'Sign out anyway' : 'Sign out' }}
+    </app-rpg-button>
+  }
 </app-rpg-modal>

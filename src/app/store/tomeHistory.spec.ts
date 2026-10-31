@@ -128,6 +128,26 @@ describe('TomeHistory', () => {
     expect(history.entries().length).toBe(1);
   });
 
+  it('carries the open tome into a brand-new owner', async () => {
+    await history.open('local');
+    rename('Carried');
+    await history.open('fresh', true);
+    expect(characters.characters()[0].firstName).toBe('Carried');
+    expect(history.dirty()).toBe(false);
+    expect((vault.rows.get(`${TOMES}/fresh`) as VaultTome).tome.characters[0].firstName).toBe('Carried');
+  });
+
+  it('never carries the open tome over an owner that already has one', async () => {
+    await history.open('known');
+    rename('Known');
+    await history.persist();
+    history.close();
+    await history.open('local');
+    rename('Local');
+    await history.open('known', true);
+    expect(characters.characters()[0].firstName).toBe('Known');
+  });
+
   it('moves a tome saved by older versions into the browser database', async () => {
     const tome = { ...history.current(), characters: [{ ...history.current().characters[0], firstName: 'Legacy' }] };
     localStorage.setItem('congulatio.tome.v1', JSON.stringify({ format: TOME_FORMAT, version: 1, savedAt: '2026-01-01T00:00:00.000Z', tome, changeset: [] }));

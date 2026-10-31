@@ -121,10 +121,10 @@ export class TomeHistory {
     this.shell.notify('success', 'The tome was reset. Undo brings your work back.');
   }
 
-  open(owner: string): Promise<void> {
+  open(owner: string, carryCurrent = false): Promise<void> {
     if (this.owner() === owner) return Promise.resolve();
     if (this.opening?.owner === owner) return this.opening.done;
-    const done = this.read(owner).finally(() => {
+    const done = this.read(owner, carryCurrent).finally(() => {
       if (this.opening?.done === done) this.opening = undefined;
     });
     this.opening = { owner, done };
@@ -275,10 +275,10 @@ export class TomeHistory {
     this.attributes.replaceAll(snapshot.attributeDefs);
   }
 
-  private async read(owner: string): Promise<void> {
+  private async read(owner: string, carryCurrent: boolean): Promise<void> {
     let record: VaultTome | undefined;
     try {
-      record = (await this.vault.get<VaultTome>(TOMES, owner)) ?? (await this.migrateLegacy(owner));
+      record = (await this.vault.get<VaultTome>(TOMES, owner)) ?? (carryCurrent ? await this.carry(owner) : await this.migrateLegacy(owner));
     } catch {
       this.shell.notify('error', 'The browser database could not be opened, so the tome lives only until this tab closes.');
     }
@@ -306,6 +306,13 @@ export class TomeHistory {
     this.archived.set(changeset);
     this.entries.set([{ id: this.nextId++, label, details: [], at: now(), snapshot: this.current() }]);
     this.index.set(0);
+  }
+
+  private async carry(owner: string): Promise<VaultTome> {
+    this.flush();
+    const record: VaultTome = { owner, savedAt: now(), tome: this.current(), changeset: this.changeset() };
+    await this.vault.put(TOMES, record);
+    return record;
   }
 
   private async migrateLegacy(owner: string): Promise<VaultTome | undefined> {

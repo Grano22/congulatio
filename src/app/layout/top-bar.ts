@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Download, PanelLeftClose, PanelLeftOpen, Save, Shield } from 'lucide';
 import { RpgButton } from '../ui/rpg-button';
 import { LucideIcon } from '../ui/lucide-icon';
@@ -27,11 +28,11 @@ export class TopBar {
   protected readonly session = inject(Session);
   protected readonly sync = inject(CloudSync);
   protected readonly account = inject(AccountStore);
+  private readonly router = inject(Router);
   protected readonly initial = computed(() => (this.session.user()?.name ?? '?').trim().charAt(0).toUpperCase() || '?');
   protected readonly syncTitle = computed(() => {
     const user = this.session.user();
-    if (!user) return '';
-    if (user.kind === 'offline') return `${user.name} · this device only`;
+    if (user.kind === 'offline') return 'No account · the tome stays in this browser';
     return `${user.name} · cloud ${this.sync.status() === 'idle' ? 'in sync' : this.sync.status()}`;
   });
   protected readonly saveKeys = this.commands.shortcut(this.commands.get('tome.save')!);
@@ -43,4 +44,8 @@ export class TopBar {
   protected readonly shieldIcon = Shield;
   protected readonly downloadIcon = Download;
   protected readonly saveIcon = Save;
+
+  protected signIn(): void {
+    void this.router.navigate(['/login']);
+  }
 }

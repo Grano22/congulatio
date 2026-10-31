@@ -1,6 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { User } from 'firebase/auth';
-import { TomeVault } from '../store/tomeVault';
 import { LOCAL_OWNER } from '../store/tomeHistory';
 import { DEFAULT_QUOTA, loadCloudConfig } from './firebaseConfig';
 import { firebaseAuth } from './firebase';
@@ -19,9 +18,7 @@ export type SessionUser = {
   admin: boolean;
 };
 
-const OFFLINE_KEY = 'session.offline';
-
-const OFFLINE_USER: SessionUser = {
+export const OFFLINE_USER: SessionUser = {
   uid: LOCAL_OWNER,
   kind: 'offline',
   name: 'Local scribe',
@@ -34,26 +31,23 @@ const OFFLINE_USER: SessionUser = {
 
 @Injectable({ providedIn: 'root' })
 export class Session {
-  private readonly vault = inject(TomeVault);
-
   readonly configured = signal(false);
   readonly stage = signal<string | null>(null);
   readonly emulated = signal(false);
-  readonly user = signal<SessionUser | null>(null);
+  readonly user = signal<SessionUser>(OFFLINE_USER);
   readonly ready = signal(false);
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
-  readonly cloud = computed(() => {
-    const kind = this.user()?.kind;
-    return kind === 'anonymous' || kind === 'account';
-  });
+  readonly cloud = computed(() => this.user().kind !== 'offline');
   readonly quotaBytes = computed(() => {
     const user = this.user();
-    if (!user || user.kind === 'offline') return null;
+    if (user.kind === 'offline') return null;
     return user.quotaBytes ?? (user.kind === 'anonymous' ? DEFAULT_QUOTA.anonymous : DEFAULT_QUOTA.account);
   });
 
   private readonly started: Promise<void>;
+  private signingIn = false;
+  private carryLocalTome = false;
 
   constructor() {
     this.started = this.start();
@@ -63,29 +57,38 @@ export class Session {
     return this.started;
   }
 
+  takeLocalTome(): boolean {
+    const carry = this.carryLocalTome;
+    this.carryLocalTome = false;
+    return carry;
+  }
+
   enterAnonymously(): Promise<boolean> {
-    return this.run(async (sdk, auth) => {
+    return this.signIn(async (sdk, auth) => {
       await sdk.signInAnonymously(auth);
+      return true;
     });
   }
 
   signInWithGoogle(): Promise<boolean> {
-    return this.run(async (sdk, auth) => {
-      await sdk.signInWithPopup(auth, new sdk.GoogleAuthProvider());
+    return this.signIn(async (sdk, auth) => {
+      const credential = await sdk.signInWithPopup(auth, new sdk.GoogleAuthProvider());
+      return sdk.getAdditionalUserInfo(credential)?.isNewUser === true;
     });
   }
 
   signInWithEmail(email: string, password: string): Promise<boolean> {
-    return this.run(async (sdk, auth) => {
+    return this.signIn(async (sdk, auth) => {
       await sdk.signInWithEmailAndPassword(auth, email.trim(), password);
+      return false;
     });
   }
 
   register(email: string, password: string, name: string): Promise<boolean> {
-    return this.run(async (sdk, auth) => {
+    return this.signIn(async (sdk, auth) => {
       const { user } = await sdk.createUserWithEmailAndPassword(auth, email.trim(), password);
       if (name.trim()) await sdk.updateProfile(user, { displayName: name.trim() });
-      await this.adopt(user);
+      return true;
     });
   }
 
@@ -128,35 +131,34 @@ export class Session {
     });
   }
 
-  async continueOffline(): Promise<void> {
-    this.error.set(null);
-    await this.vault.remember(OFFLINE_KEY, true);
-    this.user.set(OFFLINE_USER);
-  }
-
   async signOut(): Promise<void> {
     this.error.set(null);
-    if (this.user()?.kind === 'offline') {
-      await this.vault.remember(OFFLINE_KEY, undefined);
-      this.user.set(null);
-      return;
-    }
+    if (!this.cloud()) return;
     await this.run(async (sdk, auth) => {
       await sdk.signOut(auth);
     });
-    this.user.set(null);
+    this.user.set(OFFLINE_USER);
+  }
+
+  private async signIn(action: (sdk: typeof import('firebase/auth'), auth: import('firebase/auth').Auth) => Promise<boolean>): Promise<boolean> {
+    const wasOffline = !this.cloud();
+    this.signingIn = true;
+    try {
+      return await this.run(async (sdk, auth) => {
+        const fresh = await action(sdk, auth);
+        this.carryLocalTome = wasOffline && fresh;
+        await this.adopt(auth.currentUser);
+      });
+    } finally {
+      this.signingIn = false;
+    }
   }
 
   private async start(): Promise<void> {
-    const [config, offline] = await Promise.all([loadCloudConfig(), this.vault.setting<boolean>(OFFLINE_KEY)]);
+    const config = await loadCloudConfig();
     this.configured.set(Boolean(config));
     this.stage.set(config?.stage ?? null);
     this.emulated.set(Boolean(config?.emulators));
-    if (offline) {
-      this.user.set(OFFLINE_USER);
-      this.ready.set(true);
-      return;
-    }
     if (!config) {
       this.ready.set(true);
       return;
@@ -166,8 +168,8 @@ export class Session {
       await auth.authStateReady();
       await this.adopt(auth.currentUser);
       sdk.onAuthStateChanged(auth, (user) => {
-        if (this.user()?.kind === 'offline') return;
-        if (user?.uid !== this.user()?.uid) void this.adopt(user);
+        if (this.signingIn) return;
+        if ((user?.uid ?? OFFLINE_USER.uid) !== this.user().uid) void this.adopt(user);
       });
     } catch (e) {
       this.error.set(cloudErrorMessage(e, 'The cloud could not be reached. You can still work on this device.'));
@@ -177,7 +179,7 @@ export class Session {
 
   private async adopt(user: User | null, forceRefresh = false): Promise<void> {
     if (!user) {
-      if (this.user()?.kind !== 'offline') this.user.set(null);
+      this.user.set(OFFLINE_USER);
       return;
     }
     let claims: Record<string, unknown> = {};

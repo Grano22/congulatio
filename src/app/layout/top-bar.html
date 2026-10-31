@@ -37,6 +37,9 @@
         <span class="topbar__dirty" aria-label="unsaved changes"></span>
       }
     </app-rpg-button>
+    @if (!session.cloud() && session.configured()) {
+      <app-rpg-button variant="ghost" size="sm" title="Sign in to sync your tome across devices" (click)="signIn()">Sign in</app-rpg-button>
+    }
     @if (session.user(); as user) {
       <button type="button" class="topbar__account" [attr.title]="syncTitle()" aria-label="Account and storage" (click)="shell.open('account')">
         @if (account.avatarUrl(); as url) {

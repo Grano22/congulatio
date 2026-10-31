@@ -28,9 +28,7 @@ export class StatusBar {
   private readonly sync = inject(CloudSync);
   protected readonly version = APP_VERSION;
   protected readonly cloudLabel = computed(() => {
-    const user = this.session.user();
-    if (!user) return null;
-    if (user.kind === 'offline') return 'This device only';
+    if (this.session.user().kind === 'offline') return 'This device only';
     const status = this.sync.status();
     if (status === 'idle') return 'Cloud in sync';
     if (status === 'syncing') return 'Syncing…';

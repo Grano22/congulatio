@@ -191,3 +191,10 @@
   gap: 0.4rem;
   width: 100%;
 }
+
+.acc__perks {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
