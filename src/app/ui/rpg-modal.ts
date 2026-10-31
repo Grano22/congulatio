@@ -78,7 +78,7 @@ let modalCounter = 0;
       class="rmodal"
       [style.--modal-width]="width()"
       [attr.aria-labelledby]="titleId"
-      (close)="closed.emit()"
+      (close)="onNativeClose()"
       (click)="onBackdrop($event)"
     >
       <div class="rmodal__frame">
@@ -109,6 +109,10 @@ export class RpgModal {
       if (this.open() && !el.open) el.showModal();
       if (!this.open() && el.open) el.close();
     });
+  }
+
+  protected onNativeClose(): void {
+    if (this.open()) this.closed.emit();
   }
 
   protected onBackdrop(event: MouseEvent): void {
