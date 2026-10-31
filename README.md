@@ -50,21 +50,28 @@ Pojęcia świata (Tom, dusza, rutyna, interakcja, scena…), zależności międz
 
 Interfejs aplikacji jest w języku angielskim; poniżej nazwy elementów podano tak, jak wyglądają w aplikacji.
 
-### Tryby widoku i motywy
+### Tryby widoku
 
-Tryb wybiera się w **View → View mode** albo przełącznikiem nad sceną. Każdy tryb ma własny zestaw zakładek,
-nawigatorów i domyślny motyw; wybór zapamiętuje przeglądarka.
+Tryb wybiera się w **View → View mode** albo przełącznikiem nad sceną. Każdy tryb ma własną ikonę (widoczną też w
+menu i na pasku stanu) oraz własny zestaw zakładek i nawigatorów; wybór zapamiętuje przeglądarka.
 
 | Tryb | Co pokazuje |
 | --- | --- |
-| **Game NPC Flow Design** (domyślny) | Wszystko do projektowania NPC: postacie, dialogi, rutyny, interakcje, mapa relacji i symulacje. Motyw Forge. |
-| **Dungeons & Dragons** (beta) | Tylko elementy sesji przy stole: postacie, karta postaci w stylu 5e, rzeźbiarz i mapa relacji, a w panelu Kodeks, Attribute Ledger, Quest Board i World Atlas. Dialogi zostają w trybie NPC Flow — otwarcie dialogu (np. z wyszukiwarki) przełącza tryb z komunikatem. Motyw Dragonfire. |
+| **Game NPC Flow Design** (domyślny) | Wszystko do projektowania NPC: postacie, dialogi, rutyny, interakcje, mapa relacji i symulacje. |
+| **Dungeons & Dragons** (beta) | Tylko elementy sesji przy stole: postacie, karta postaci w stylu 5e, rzeźbiarz i mapa relacji, a w panelu Kodeks, Attribute Ledger, Quest Board i World Atlas. Dialogi zostają w trybie NPC Flow — otwarcie dialogu (np. z wyszukiwarki) przełącza tryb z komunikatem. |
 
 Karta postaci (zakładka **Sheet**) wylicza wartości z atrybutów duszy: 1–100 → 3–20, klasa według najlepszej
 cechy, punkty życia, KP, rzuty obronne, umiejętności i bierna percepcja według SRD 5.2 (CC BY 4.0). **Print sheet /
 save as PDF** drukuje stronę A4 (w oknie druku wybierz „Zapisz jako PDF”), a **Print card** — dwustronną kartę
-63 × 88 mm. Motyw można też ustawić ręcznie w **View → Theme**. Nowy tryb dodaje się wpisem w
-`src/app/domain/viewModes.ts`, a nowy motyw — wpisem w `THEMES` i blokiem `:root[data-theme='…']` w `styles.css`.
+63 × 88 mm. Nowy tryb dodaje się wpisem w `src/app/domain/viewModes.ts`.
+
+### Motywy
+
+Motyw to osobna funkcja, niezależna od trybu widoku. Do wyboru są **Forge** (klasyczny dąb i mosiądz), **Ebony
+Tome** (ciemna drewniana księga ze starym welinem) i **Dragonfire** (żar na zwęglonym żelazie). Motyw wybiera się
+przyciskiem z paletą nad sceną (z podglądem), w **View → Theme**, w **Settings** albo skrótem Ctrl+Alt+T. Kolory
+pochodzą z tokenów CSS; nowy motyw to wpis w `src/app/domain/themes.ts` i blok
+`:root[data-theme='…'], [data-theme-preview='…']` w `styles.css`.
 
 ### Lewy panel (nawigatory)
 
@@ -489,6 +496,7 @@ tour → Shortcuts** (F1).
 | Maksymalizuj scenę / Pełny ekran | Ctrl+Alt+M / Ctrl+Alt+F |
 | Zakładki 1–7 (Character … Simulation) | Alt+1 … Alt+7 |
 | Karta postaci D&D (Sheet) | Alt+8 |
+| Następny motyw | Ctrl+Alt+T |
 | Przywołaj losową duszę | Ctrl+Alt+N |
 | Ustawienia | Ctrl+Alt+P |
 | Szybki przewodnik | F1 lub ? |
